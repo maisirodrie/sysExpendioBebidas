@@ -1,0 +1,18 @@
+.footer {
+    background-color: #4a5568; /* Cambia el color de fondo según tu diseño */
+    color: #cbd5e0; /* Cambia el color del texto según tu diseño */
+    padding: 1rem; /* Ajusta el relleno según sea necesario */
+    position: fixed;
+    bottom: 0;
+    width: 100%;
+    display: flex; /* Agrega display flex para alinear verticalmente */
+    align-items: center; /* Centra verticalmente el contenido del footer */
+  }
+  
+  @media (max-width: 768px) {
+    /* Estilos específicos para pantallas más pequeñas */
+    .footer {
+      font-size: 0.8rem; /* Ajusta el tamaño del texto para pantallas más pequeñas */
+    }
+  }
+  

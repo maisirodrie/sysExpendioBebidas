@@ -1,0 +1,14 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+body {
+  background:#fff ;
+  color: #202020;
+}
+
+/* App.css */
+.app-container {
+  min-height: calc(100vh - 60px); /* Resta el tamaño del navbar */
+  margin-bottom: 50px; /* Ajusta el margen inferior para evitar que el contenido se superponga con el footer */
+}

@@ -1,0 +1,114 @@
+import User from '../models/user.model.js'
+import bcrypt from 'bcryptjs'
+import {createAccessToke} from '../libs/jwt.js'
+import jwt from 'jsonwebtoken'
+import { TOKEN_SECRET } from '../config.js'
+
+
+export const register = async (req, res) => {
+    const { username, email, password, role } = req.body;
+
+    try {
+        const userFoundByUsername = await User.findOne({ username });
+        if (userFoundByUsername) return res.status(400).json(["The username already exists"]);
+
+        const userFoundByEmail = await User.findOne({ email });
+        if (userFoundByEmail) return res.status(400).json(["The email already exists"]);
+
+        const passwordHash = await bcrypt.hash(password, 10);
+
+        const newUser = new User({
+            username,
+            email,
+            password: passwordHash,
+            role
+        });
+
+        const userSaved = await newUser.save();
+        const token = await createAccessToke({ id: userSaved._id });
+        res.cookie('token', token);
+        res.json({
+            id: userSaved._id,
+            username: userSaved.username,
+            email: userSaved.email,
+            role: userSaved.role,
+            createAt: userSaved.createdAt,
+            updateAt: userSaved.updatedAt,
+        });
+
+    } catch (error) {
+        res.status(500).json({ message: error.message });
+    }
+};
+
+export const login = async (req, res) => {
+    const { email, password } = req.body;
+
+    try {
+        const userFound = await User.findOne({ email });
+
+        if (!userFound) return res.status(400).json({ message: "User not found" });
+
+        const isMatch =  await bcrypt.compare(password, userFound.password);
+        if (!isMatch) return res.status(400).json({ message: "Incorrect password" });
+
+        const token = await createAccessToke({ id: userFound._id });
+        res.cookie('token', token);
+        res.json({
+            id: userFound._id,
+            username: userFound.username,
+            email: userFound.email,
+            role: userFound.role,
+            createAt: userFound.createdAt,
+            updateAt: userFound.updatedAt,
+        });
+
+    } catch (error) {
+        res.status(500).json({ message: error.message });
+    }
+};
+
+
+
+export const logout = async (req,res) => {
+    res.cookie('token', "", {
+        expires: new Date(0)
+    })
+    return res.sendStatus(200)
+
+}
+
+
+export const profile = async (req,res) => {
+    const userFound = await User.findById(req.user.id)
+
+    if (!userFound) return res.status(400).json ({ message : "User not found"})
+    return res.json({
+        id: userFound._id,
+        username: userFound.username,
+        email:userFound.email,
+        role:userFound.role,
+        createAt: userFound.createdAt,
+        updateAt: userFound.updatedAt,
+
+    })
+
+}
+
+
+export const verifyToken = async (req, res) => {
+    const { token } = req.cookies;
+    if (!token) return res.send(false);
+  
+    jwt.verify(token, TOKEN_SECRET, async (error, user) => {
+      if (error) return res.sendStatus(401);
+  
+      const userFound = await User.findById(user.id);
+      if (!userFound) return res.sendStatus(401);
+  
+      return res.json({
+        id: userFound._id,
+        email: userFound.email,
+      });
+    });
+  };

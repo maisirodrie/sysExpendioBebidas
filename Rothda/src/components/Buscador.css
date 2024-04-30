@@ -1,0 +1,22 @@
+.input-group {
+    max-width: 400px;
+    margin: 0 auto; /* Centrar horizontalmente */
+  }
+  
+  .form-control {
+    border-color: #ced4da;
+    border-right-color: transparent; /* Oculta el borde derecho */
+    border-radius: 20px; /* Hace los bordes redondeados */
+  }
+  
+  .btn {
+    border-color: #ced4da;
+    border-left-color: transparent; /* Oculta el borde izquierdo */
+    border-radius: 20px; /* Hace los bordes redondeados */
+  }
+  
+  .btn:hover {
+    background-color: #f8f9fa; /* Cambia el color de fondo al pasar el ratón */
+  }
+
+  
