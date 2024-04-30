@@ -34,4 +34,5 @@ export const Disciplinaspublicas = [
     { id: 32, nombre: "Danza Acrobática" },
     { id: 33, nombre: "Danzas Árabes" },
     { id: 34, nombre: "Otras" },
+    { id: 35, nombre: "Ninguno" }
 ]

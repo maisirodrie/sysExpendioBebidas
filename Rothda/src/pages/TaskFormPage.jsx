@@ -14,6 +14,9 @@ import { Disciplinas } from '../api/disciplina.js';
 import Select from 'react-select';
 
 function TaskFormPage() {
+  const defaultOption = { value: 'Ninguno', label: 'Ninguno' };
+  const defaultOptions = { value: 'NINGUNO', label: 'NINGUNO' };
+  
   const { register, handleSubmit, setValue } = useForm();
   const { createTask, getTask, updateTask } = useTasks();
   const navigate = useNavigate();
@@ -23,14 +26,14 @@ function TaskFormPage() {
   const [dniError, setDniError] = useState("");
   const [selectedMunicipioValue, setSelectedMunicipioValue] = useState("");
   const [selectedDisciplinaValue, setSelectedDisciplinaValue] = useState("");
-  const [selectedDirectosValue, setSelectedDirectosValue] = useState("");
-  const [selectedDisciplinaDirectaValue, setSelectedDisciplinaDirectaValue] = useState("");
-  const [selectedIndirectosValue, setSelectedIndirectosValue] = useState("");
-  const [selectedDisciplinaIndirectaValue, setSelectedDisciplinaIndirectaValue] = useState("");
-  const [selectedFormacionPublicaValue, setSelectedFormacionPublicaValue] = useState("");
-  const [selectedDisciplinaPublicaValue, setSelectedDisciplinaPublicaValue] = useState("");
-  const [selectedFormacionPrivadaValue, setSelectedFormacionPrivadaValue] = useState("");
-  const [selectedDisciplinaPrivadaValue, setSelectedDisciplinaPrivadaValue] = useState("");
+  const [selectedDirectosValue, setSelectedDirectosValue] = useState([defaultOptions]);
+  const [selectedIndirectosValue, setSelectedIndirectosValue] = useState([defaultOptions]);
+  const [selectedDisciplinaDirectaValue, setSelectedDisciplinaDirectaValue] = useState([defaultOption]);
+  const [selectedDisciplinaIndirectaValue, setSelectedDisciplinaIndirectaValue] = useState([defaultOption]);
+  const [selectedFormacionPublicaValue, setSelectedFormacionPublicaValue] = useState([defaultOptions]);
+  const [selectedDisciplinaPublicaValue, setSelectedDisciplinaPublicaValue] = useState([defaultOption]);
+  const [selectedFormacionPrivadaValue, setSelectedFormacionPrivadaValue] = useState([defaultOptions]);
+  const [selectedDisciplinaPrivadaValue, setSelectedDisciplinaPrivadaValue] = useState([defaultOption]);
 
   useEffect(() => {
     async function loadTask() {
@@ -51,10 +54,12 @@ function TaskFormPage() {
         setValue('nacionalidad', task.nacionalidad);
         setValue('correo', task.correo);
         setValue('telefono', task.telefono);
-        setValue('publico', task.publico);
-        setValue('privada', task.privada);
+        setValue('publico', task.publico || '');
+setValue('privada', task.privada || '');
         setValue('direccion', task.direccion);
         setValue('observaciones', task.observaciones);
+
+   
 
         setSelectedMunicipioValue(task.municipio);
         // Transforma el array de cadenas en un array de objetos para las opciones de disciplina
@@ -104,7 +109,8 @@ function TaskFormPage() {
         disciplinapublica:selectedDisciplinaPublicaValue.map(option => option.value),
         formacionprivada:selectedFormacionPrivadaValue.map(option => option.value),
         disciplinaprivada:selectedDisciplinaPrivadaValue.map(option => option.value),
-        };
+
+      };
       
       console.log('Datos del formulario a enviar:', updatedData);
       
@@ -226,8 +232,14 @@ function TaskFormPage() {
             </label>
             <input type='text' {...register("postal", { required: true })} className='w-full bg-gray-100 text-black px-4 py-2 rounded-md my-2' placeholder='Direccion Postal' />
 
+            <label htmlFor="direccion" className="block text-sm font-medium text-black">
+            Direccion
+            </label>
+            <input type='text' {...register("direccion", { required: true })} className='w-full bg-gray-100 text-black px-4 py-2 rounded-md my-2' placeholder='Direccion' />
+           
+
             <label htmlFor="residencia" className="block text-sm font-medium text-black">
-            Años de Residencia
+            Años de Residencia en la Provincia de Misiones
             </label>
             <input type='text' {...register("residencia", { required: true })} className='w-full bg-gray-100 text-black px-4 py-2 rounded-md my-2' placeholder='Años de Residencia' />
 
@@ -321,7 +333,7 @@ function TaskFormPage() {
 <label htmlFor="publico" className="block text-sm font-medium text-black">
 Indique la/las institución/es en la que finalizo sus estudios:
             </label>
-            <input type='text' {...register("publico", { required: true })} className='w-full bg-gray-100 text-black px-4 py-2 rounded-md my-2' placeholder='Ingrese la/s institución/es' />
+            <input type='text' {...register("publico")} className='w-full bg-gray-100 text-black px-4 py-2 rounded-md my-2' placeholder='Ingrese la/s institución/es' />
 
 <label htmlFor="formacionprivada" className="block text-sm font-medium text-black">
     Formación académica en instituciones privadas de educación Superior / universitario/ posgrados
@@ -347,14 +359,9 @@ Indique la/las institución/es en la que finalizo sus estudios:
 <label htmlFor="privada" className="block text-sm font-medium text-black">
 Indique la/las institución/es en la que finalizo sus estudios:
             </label>
-            <input type='text' {...register("privada", { required: true })} className='w-full bg-gray-100 text-black px-4 py-2 rounded-md my-2' placeholder='Ingrese la/s institución/es' />
+            <input type='text' {...register("privada")} className='w-full bg-gray-100 text-black px-4 py-2 rounded-md my-2' placeholder='Ingrese la/s institución/es' />
 
-            <label htmlFor="direccion" className="block text-sm font-medium text-black">
-            Direccion
-            </label>
-            <input type='text' {...register("direccion", { required: true })} className='w-full bg-gray-100 text-black px-4 py-2 rounded-md my-2' placeholder='Direccion' />
            
-
 
 
             {/* <select {...register("disciplina", { required: true })} value={selectedDisciplinaValue} className='w-full bg-gray-100 text-black px-4 py-2 rounded-md my-2' onChange={handleDisciplinaChange}>

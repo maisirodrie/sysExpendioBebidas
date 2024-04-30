@@ -25,7 +25,7 @@ function Table() {
     const municipio = task.municipio ? task.municipio.toLowerCase() : '';
     const roldirecto = Array.isArray(task.roldirecto) ? task.roldirecto.map(roldirecto => roldirecto.toLowerCase()).join(', ') : task.roldirecto.toLowerCase();
     const disciplinadirecta = Array.isArray(task.disciplinadirecta) ? task.disciplinadirecta.map(disciplinadirecta => disciplinadirecta.toLowerCase()).join(', ') : task.disciplina.toLowerCase();
-    const rolindirecto= Array.isArray(task.rolindirecto) ? task.rolindirecto.map(rolindirecto => rolldirecto.toLowerCase()).join(', ') : task.rolindirecto.toLowerCase();
+    const rolindirecto = Array.isArray(task.rolindirecto) ? task.rolindirecto.map(rolindirecto => rolindirecto.toLowerCase()).join(', ') : task.rolindirecto.toLowerCase();
     const disciplinaindirecta = Array.isArray(task.disciplinaindirecta) ? task.disciplinaindirecta.map(disciplinaindirecta => disciplinaindirecta.toLowerCase()).join(', ') : task.disciplina.toLowerCase();
     const searchLowerCase = search.toLowerCase();
 
@@ -36,7 +36,7 @@ function Table() {
       roldirecto.includes(searchLowerCase) ||
       disciplinadirecta.includes(searchLowerCase) ||
       rolindirecto.includes(searchLowerCase) ||
-      disciplinaindirecta.includes(searchLowerCase) 
+      disciplinaindirecta.includes(searchLowerCase)
     );
   });
 
@@ -72,7 +72,7 @@ function Table() {
                 <thead>
                   <tr>
                     <th colSpan="10" className="table-title">Listado de Inscriptos</th>
-                  </tr> 
+                  </tr>
                   <tr>
                     <th>Apellido</th>
                     <th>Nombre</th>
@@ -115,7 +115,7 @@ function Table() {
                           if (typeof rolindirecto === 'string') {
                             return rolindirecto.toLowerCase();
                           } else {
-                            return 'No tiene'; // O maneja el caso donde disciplina no es una cadena de texto
+                            return 'No tiene';
                           }
                         }).join(', ') : 'No tiene'}
                       </td>
@@ -137,7 +137,7 @@ function Table() {
                       </td>
                       <td>
                         <div className='button-container'>
-                          <Link className='btn btn-primary' to={`/task/${task._id}`}>
+                          <Link className='btn btn-primary' to={`/edit-task/${task._id}`}>
                             <FontAwesomeIcon icon={faEdit} />
                           </Link>
                         </div>

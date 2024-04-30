@@ -12,6 +12,7 @@ import { TaskProvider } from "./context/TasksContext"
 import { Navbar } from "./components/Navbar"
 import TaskViewPage from "./pages/TaskViewPage"
 import Footer from "./components/Footer"
+import TaskFormPageEdit from "./pages/TaskFormPageEdit"
 
 function App() {
   return(
@@ -30,7 +31,7 @@ function App() {
           <Route path='/add-task' element={<TaskFormPage/>} />
           <Route path='/task' element={<TaskPage/>}/>
           <Route path='/view/task/:id/' element={<TaskViewPage/>} /> {/* Ruta para ver */}
-          <Route path='/task/:id' element={<TaskFormPage/>} />
+          <Route path="/edit-task/:id" element={<TaskFormPageEdit />} />
           <Route path='/profile' element={<Profilepage/>} />
           </Route>
       </Routes>

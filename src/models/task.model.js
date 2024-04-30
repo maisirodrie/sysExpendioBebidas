@@ -51,6 +51,12 @@ const tasksSchema = new mongoose.Schema({
         trim: true,
     },
 
+    direccion :{
+        type: String,
+        require: true,
+        trim: true,
+    },
+
     residencia :{
         type: String,
         require: true,
@@ -76,70 +82,46 @@ const tasksSchema = new mongoose.Schema({
 
     roldirecto: {
         type: [String], // Ahora es un arreglo de strings
-        required: true,
         trim: true,
     },
-    
     disciplinadirecta: {
         type: [String], // Ahora es un arreglo de strings
-        required: true,
         trim: true,
     }, 
-
     rolindirecto: {
         type: [String], // Ahora es un arreglo de strings
-        required: true,
         trim: true,
     },
-
     disciplinaindirecta: {
         type: [String], // Ahora es un arreglo de strings
-        required: true,
         trim: true,
     }, 
-
-    publico :{
+    publico: {
         type: String,
-        require: true,
         trim: true,
     }, 
-
     formacionpublica: {
         type: [String], // Ahora es un arreglo de strings
-        required: true,
         trim: true,
     }, 
-
     disciplinapublica: {
         type: [String], // Ahora es un arreglo de strings
-        required: true,
         trim: true,
     }, 
-
-    privada :{
+    privada: {
         type: String,
-        require: true,
         trim: true,
     }, 
-
-
     formacionprivada: {
         type: [String], // Ahora es un arreglo de strings
-        required: true,
         trim: true,
     }, 
-
     disciplinaprivada: {
         type: [String], // Ahora es un arreglo de strings
-        required: true,
-        trim: true,
-    }, 
-  
-    direccion :{
-        type: String,
-        require: true,
         trim: true,
     },
+  
+    
 
     observaciones :{
         type: String,

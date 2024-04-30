@@ -45,7 +45,7 @@ function TaskViewPage() {
               <p className="my-4"><strong>Lugar de nacimiento:</strong> {task.nacimiento}</p>
               <p className="my-4"><strong>Municipio:</strong> {task.municipio}</p>
               <p className="my-4"><strong>Dirección Postal:</strong> {task.postal}</p>
-              <p className="my-4"><strong>Años de residencia:</strong> {task.residencia}</p>
+              <p className="my-4"><strong>Años de residencia en la provincia de Misiones:</strong> {task.residencia}</p>
               <p className="my-4"><strong>Nacionalidad:</strong> {task.nacionalidad}</p>
               <p className="my-4"><strong>Correo:</strong> {task.correo}</p>
               <p className="my-4"><strong>Teléfono:</strong> {task.telefono}</p>
@@ -150,8 +150,9 @@ function TaskViewPage() {
               <p className="my-4"><strong>Dirección:</strong> {task.direccion}</p>
               
 
-
+              <p className="my-4"><strong>Observaciones:</strong> </p>
               <textarea
+              
   id="observaciones"
   readOnly
   className="w-full bg-gray-100 text-black px-4 py-2 rounded-md my-2 resize-none"

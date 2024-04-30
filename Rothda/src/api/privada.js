@@ -5,4 +5,5 @@ export const Privadas = [
     { id: 3, nombre: "BAILARÍN PROFESIONAL" },
     { id: 4, nombre: "INTÉRPRETE" },
     { id: 5, nombre: "OTRO" },
+    { id: 6, nombre: "NINGUNO" }
 ]

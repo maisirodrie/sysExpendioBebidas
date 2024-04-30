@@ -1,95 +1,77 @@
-import {z} from 'zod'
+import { z } from 'zod'
 
 export const creatTaskSchema = z.object({
 
-    apellido:z.string({
+    apellido: z.string({
         required_error: 'Apellido is required'
     }),
-    nombre:z.string({
+    nombre: z.string({
         required_error: 'Nombre is required'
     }),
-    dni:z.string({
+    dni: z.string({
         required_error: 'DNI is required'
-    }),    
+    }),
     fechanacimiento: z.string({
         required_error: 'Fecha de nacimiento es requerida'
     }),
-    genero:z.string({
+    genero: z.string({
         required_error: 'Género is required'
     }),
-    nacimiento:z.string({
+    nacimiento: z.string({
         required_error: 'Lugar de Nacimiento is required'
     }),
 
-    municipio:z.string({
+    municipio: z.string({
         required_error: 'Municipio is required'
     }),
 
-    postal:z.string({
+    postal: z.string({
         required_error: 'Dirección Postal is required'
+    }),
+
+    direccion: z.string({
+        required_error: 'Dirección is required'
     }),
 
     residencia: z.string({
         required_error: 'Residencia es requerida'
     }),
- 
-    nacionalidad:z.string({
+
+    nacionalidad: z.string({
         required_error: 'Nacionalidad is required'
     }),
-    correo:z.string({
+    correo: z.string({
         required_error: 'Correo is required'
     }),
 
-    telefono:z.string({
+    telefono: z.string({
         required_error: 'Teléfono is required'
     }),
 
-    roldirecto: z.array(z.string()).nonempty({
-        message: 'Rol directo is required and must be a non-empty array of strings',
-    }),
+    roldirecto: z.array(z.string()),
 
-    disciplinadirecta: z.array(z.string()).nonempty({
-        message: 'Disciplina del rol directo is required and must be a non-empty array of strings',
-    }),
+    disciplinadirecta: z.array(z.string()),
 
-    rolindirecto: z.array(z.string()).nonempty({
-        message: 'Rol directo is required and must be a non-empty array of strings',
-    }),
+    rolindirecto: z.array(z.string()),
 
-    disciplinaindirecta: z.array(z.string()).nonempty({
-        message: 'Disciplina del rol indirecto is required and must be a non-empty array of strings',
-    }),
+    disciplinaindirecta: z.array(z.string()),
 
-    publico:z.string({
-        required_error: 'Público is required'
-    }),
+    publico: z.string(),
 
-    formacionpublica: z.array(z.string()).nonempty({
-        message: 'Disciplina del rol indirecto is required and must be a non-empty array of strings',
-    }),
+    formacionpublica: z.array(z.string()),
 
-    disciplinapublica: z.array(z.string()).nonempty({
-        message: 'Disciplina del rol indirecto is required and must be a non-empty array of strings',
-    }),
+    disciplinapublica: z.array(z.string()),
 
-    privada:z.string({
-        required_error: 'Privada is required'
-    }),
+    privada: z.string(),
 
-    formacionprivada: z.array(z.string()).nonempty({
-        message: 'Disciplina del rol indirecto is required and must be a non-empty array of strings',
-    }),
+    formacionprivada: z.array(z.string()),
 
-    disciplinaprivada: z.array(z.string()).nonempty({
-        message: 'Disciplina del rol indirecto is required and must be a non-empty array of strings',
-    }),
+    disciplinaprivada: z.array(z.string()),
+
+
     
 
-    direccion:z.string({
-        required_error: 'Dirección is required'
-    }),
-    
-    observaciones:z.string({
+    observaciones: z.string({
         required_error: 'Observaciones is required'
     }),
 

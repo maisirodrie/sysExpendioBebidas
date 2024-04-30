@@ -6,4 +6,5 @@ export const Formacionprivadas = [
     { id: 3, nombre: "Bailarín Profesional" },
     { id: 4, nombre: "Intérprete" },
     { id: 5, nombre: "Otro " },
+    { id: 6, nombre: "Ninguno" }
 ]

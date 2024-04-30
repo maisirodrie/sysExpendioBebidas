@@ -8,4 +8,5 @@ export const Publicas = [
     { id: 5, nombre: "LICENCIATURA EN DANZAS" },
     { id: 6, nombre: "ESPECIALIZACIÓN EN DANZA Y EDUCACIÓN" },
     { id: 7, nombre: "OTROS" },
+    { id: 8, nombre: "NINGUNO" }
 ]

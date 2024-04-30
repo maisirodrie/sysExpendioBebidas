@@ -8,4 +8,5 @@ export const Indirectos = [
 { id: 6, nombre: "PRODUCTOR EN DANZAS" },
 { id: 7, nombre: "GESTOR DE DANZAS" },
 { id: 8, nombre: "OTROS" },
+{ id: 9, nombre: "NINGUNO" }
 ]

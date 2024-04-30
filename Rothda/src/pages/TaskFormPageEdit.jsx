@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { useForm } from 'react-hook-form';
-import { useTasks } from '../context/TasksContext';
+import { useTasks } from '../context/TasksContext.jsx';
 import { Link, useNavigate, useParams } from 'react-router-dom';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faArrowLeft } from '@fortawesome/free-solid-svg-icons';
@@ -14,7 +14,7 @@ import { useAuth } from '../context/AuthContext.jsx';
 
 import Select from 'react-select';
 
-function TaskFormPageUser() {
+function TaskFormPageEdit() {
   const { register, handleSubmit, setValue } = useForm();
   const { createTask, getTask, updateTask } = useTasks();
   const { isAuthenticated, user } = useAuth();
@@ -92,7 +92,7 @@ function TaskFormPageUser() {
       }
     }
     loadTask();
-  }, []);
+  }, [params.id, getTask, setValue]);
 
 
   
@@ -119,7 +119,7 @@ function TaskFormPageUser() {
       } else {
         await createTask(updatedData);
       }
-      navigate('/profile')
+      navigate('/task')
     } catch (error) {
       if (error.response && error.response.status === 400) {
         setDniError(error.response.data.message);
@@ -180,8 +180,10 @@ function TaskFormPageUser() {
 
     <div className="bg-gray-300 max-w-md w-full p-10 rounded-md">
       <div className="flex justify-between items-center mb-4">
-        <h1 className="text-2xl font-bold text-black">Registro de Persona</h1>
-        
+        <h1 className="text-2xl font-bold text-black">Editar registro</h1>
+        <Link to="/task" className="btn btn-success">
+            <FontAwesomeIcon icon={faArrowLeft} />
+          </Link>
       </div>
           <form onSubmit={onSubmit}>
           {/* <label htmlFor="apellido" className="block text-sm font-medium text-black">
@@ -230,8 +232,13 @@ function TaskFormPageUser() {
             </label>
             <input type='text' {...register("postal", { required: true })} className='w-full bg-gray-100 text-black px-4 py-2 rounded-md my-2' placeholder='Direccion Postal' />
 
+            <label htmlFor="direccion" className="block text-sm font-medium text-black">
+            Direccion
+            </label>
+            <input type='text' {...register("direccion", { required: true })} className='w-full bg-gray-100 text-black px-4 py-2 rounded-md my-2' placeholder='Direccion' />
+
             <label htmlFor="residencia" className="block text-sm font-medium text-black">
-            Años de Residencia
+            Años de Residencia en la Provincia de Misiones
             </label>
             <input type='text' {...register("residencia", { required: true })} className='w-full bg-gray-100 text-black px-4 py-2 rounded-md my-2' placeholder='Años de Residencia' />
 
@@ -325,7 +332,7 @@ function TaskFormPageUser() {
 <label htmlFor="publico" className="block text-sm font-medium text-black">
 Indique la/las institución/es en la que finalizo sus estudios:
             </label>
-            <input type='text' {...register("publico", { required: true })} className='w-full bg-gray-100 text-black px-4 py-2 rounded-md my-2' placeholder='Ingrese la/s institución/es' />
+            <input type='text' {...register("publico")} className='w-full bg-gray-100 text-black px-4 py-2 rounded-md my-2' placeholder='Ingrese la/s institución/es' />
 
 <label htmlFor="formacionprivada" className="block text-sm font-medium text-black">
     Formación académica en instituciones privadas de educación Superior / universitario/ posgrados
@@ -351,12 +358,9 @@ Indique la/las institución/es en la que finalizo sus estudios:
 <label htmlFor="privada" className="block text-sm font-medium text-black">
 Indique la/las institución/es en la que finalizo sus estudios:
             </label>
-            <input type='text' {...register("privada", { required: true })} className='w-full bg-gray-100 text-black px-4 py-2 rounded-md my-2' placeholder='Ingrese la/s institución/es' />
+            <input type='text' {...register("privada")} className='w-full bg-gray-100 text-black px-4 py-2 rounded-md my-2' placeholder='Ingrese la/s institución/es' />
 
-            <label htmlFor="direccion" className="block text-sm font-medium text-black">
-            Direccion
-            </label>
-            <input type='text' {...register("direccion", { required: true })} className='w-full bg-gray-100 text-black px-4 py-2 rounded-md my-2' placeholder='Direccion' />
+
            
 
 
@@ -383,9 +387,7 @@ Indique la/las institución/es en la que finalizo sus estudios:
 
 
             <button className="bg-blue-500 px-4 py-1 rounded-md my-2 disabled:bg-blue-300 text-white">Guardar</button>
-            <button className="bg-red-500 px-4 py-1 rounded-md my-2 text-white">
-        Cancelar
-      </button>
+            
           </form>
         </div>
       </div>
@@ -393,4 +395,4 @@ Indique la/las institución/es en la que finalizo sus estudios:
   );
 }
 
-export default TaskFormPageUser;
+export default TaskFormPageEdit;
