@@ -4,6 +4,7 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faPlus } from '@fortawesome/free-solid-svg-icons';
 import { Link, useNavigate } from 'react-router-dom'; // Importa useNavigate
 import axios from 'axios';
+import './profile.css'
 
 const Profilepage = () => {
   const { user } = useAuth();
@@ -47,14 +48,14 @@ const Profilepage = () => {
   }
 
   return (
-    <div>
-      <h1>Bienvenido</h1>
-      <p>{user.username}</p>
-      <p>Su formulario ha sido cargado con exito</p>
+    <div className="welcome-container">
+      <h1 className="welcome-title">Bienvenido</h1>
+      <p className="username">{user.username}</p>
+      <p className="success-message">Su formulario ha sido cargado con éxito</p>
       {!userTask && (
-        <ul className='button-container'>
+        <ul className="button-container">
           <li>
-            <button onClick={handleCreateTask} className='btn btn-success'>
+            <button onClick={handleCreateTask} className="btn btn-success">
               <FontAwesomeIcon icon={faPlus} />
             </button>
           </li>

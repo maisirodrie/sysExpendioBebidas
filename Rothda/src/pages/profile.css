@@ -1,0 +1,25 @@
+/* Estilos para el contenedor principal */
+.welcome-container {
+  text-align: center;
+  margin-top: 50px;
+}
+
+/* Estilos para el título de bienvenida */
+.welcome-title {
+  color: #333;
+  font-size: 36px;
+  font-weight: bold;
+}
+
+/* Estilos para el nombre de usuario */
+.username {
+  color: #666;
+  font-size: 24px;
+}
+
+/* Estilos para el mensaje de éxito */
+.success-message {
+  color: #28a745;
+  font-size: 20px;
+}
+

@@ -181,9 +181,9 @@ setValue('privada', task.privada || '');
     <div className="bg-gray-300 max-w-md w-full p-10 rounded-md">
       <div className="flex justify-between items-center mb-4">
         <h1 className="text-2xl font-bold text-black">Registro de Persona</h1>
-        <button className="btn btn-success" onClick={() => navigate("/task")}>
+        {/* <button className="btn btn-success" onClick={() => navigate("/")}>
           <FontAwesomeIcon icon={faArrowLeft} /> {/* Ícono de flecha hacia la izquierda */}
-        </button>
+        {/* </button> */} 
       </div>
           <form onSubmit={onSubmit}>
           {/* <label htmlFor="apellido" className="block text-sm font-medium text-black">

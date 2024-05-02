@@ -12,3 +12,4 @@ body {
   min-height: calc(100vh - 60px); /* Resta el tamaño del navbar */
   margin-bottom: 50px; /* Ajusta el margen inferior para evitar que el contenido se superponga con el footer */
 }
+

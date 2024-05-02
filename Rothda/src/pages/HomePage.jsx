@@ -5,10 +5,7 @@ import "./login.css";
 function HomePage() {
   return (
     <section>
-      <div className="bg-yellow-200 rounded-lg p-4 text-center">
-            <h2 className="text-lg font-bold mb-2">¡Próximamente!</h2>
-            <p className="text-sm text-gray-700">Esta página se habilitará el 30 de Abril</p>
-          </div>
+      
       <header
         className="bg-cover bg-no-repeat py-10 text-white relative flex flex-col justify-center items-center"
         style={{
@@ -24,12 +21,12 @@ function HomePage() {
             “La Danza abarca todas las formas de expresión artística corporal
             en sus diversos géneros, estilos y formatos interpretativos”
           </p>
-          {/* <Link
+          <Link
   className="bg-blue-500 text-white border-blue-500 border-2 px-4 py-2 rounded-md inline-block"
   to="/login"
 >
   Bienvenido
-</Link> */}
+</Link>
 
 
         </div>
