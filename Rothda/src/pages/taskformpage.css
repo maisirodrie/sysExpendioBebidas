@@ -1,3 +1,11 @@
 .custom-select {
     transform: translateY(100%);
   }
+
+ 
+  .react-datepicker-wrapper {
+      display: block !important;
+      padding: 0;
+      border: 0;
+  }
+  
