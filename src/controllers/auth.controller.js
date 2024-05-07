@@ -10,10 +10,10 @@ export const register = async (req, res) => {
 
     try {
         const userFoundByUsername = await User.findOne({ username });
-        if (userFoundByUsername) return res.status(400).json(["The username already exists"]);
+        if (userFoundByUsername) return res.status(400).json(["El usuario ya existe"]);
 
         const userFoundByEmail = await User.findOne({ email });
-        if (userFoundByEmail) return res.status(400).json(["The email already exists"]);
+        if (userFoundByEmail) return res.status(400).json(["El correo ya existe"]);
 
         const passwordHash = await bcrypt.hash(password, 10);
 
@@ -47,10 +47,10 @@ export const login = async (req, res) => {
     try {
         const userFound = await User.findOne({ email });
 
-        if (!userFound) return res.status(400).json({ message: "User not found" });
+        if (!userFound) return res.status(400).json({ message: "Usuario incorrecto" });
 
         const isMatch =  await bcrypt.compare(password, userFound.password);
-        if (!isMatch) return res.status(400).json({ message: "Incorrect password" });
+        if (!isMatch) return res.status(400).json({ message: "Contraseña Incorrecta" });
 
         const token = await createAccessToke({ id: userFound._id });
         res.cookie('token', token);
