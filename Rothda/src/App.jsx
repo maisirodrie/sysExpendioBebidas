@@ -22,7 +22,7 @@ function App() {
       <main className="container mx-auto">
       <Navbar/>
       <Routes>
-      <Route path='/' element={<HomePage/>} />
+      <Route path='/login' element={<HomePage/>} />
           <Route path='/login' element={<LoginPage/>} />
           <Route path='/register' element={<RegisterPage/>} />
           
