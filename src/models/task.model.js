@@ -22,7 +22,6 @@ const tasksSchema = new mongoose.Schema({
     fechanacimiento: {
         type: Date,
         required: true,
-        unique: true,
         trim: true,
 
     },

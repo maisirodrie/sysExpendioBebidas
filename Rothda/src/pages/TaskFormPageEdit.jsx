@@ -38,10 +38,11 @@ function TaskFormPageEdit() {
     async function loadTask() {
    
       if (params.id) {
-
-        const currentDate = new Date().toISOString().split('T')[0];// Obtenemos la fecha actual en formato ISO (YYYY-MM-DD)
         const task = await getTask(params.id);
-
+        const taskDate = new Date(task.fechanacimiento);
+        const currentDate = taskDate.toISOString().split('T')[0];// Obtenemos la fecha actual en formato ISO (YYYY-MM-DD)
+        
+        
         setValue('apellido', task.apellido);
         setValue('nombre', task.nombre);
         setValue('dni', task.dni);

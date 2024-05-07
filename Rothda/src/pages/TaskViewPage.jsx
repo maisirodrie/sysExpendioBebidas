@@ -1,8 +1,10 @@
 import React, { useEffect, useState } from 'react';
 import { Link, useParams } from 'react-router-dom';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faArrowLeft, faStar } from '@fortawesome/free-solid-svg-icons'; // Importa el icono de estrella
+import { format } from 'date-fns';
+import esLocale from 'date-fns/locale/es';
 import { useTasks } from '../context/TasksContext';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faArrowLeft, faStar } from '@fortawesome/free-solid-svg-icons';
 
 function TaskViewPage() {
   const { getTask } = useTasks();
@@ -13,10 +15,7 @@ function TaskViewPage() {
     async function fetchTask() {
       try {
         const fetchedTask = await getTask(params.id);
-        // Formatear la fecha de nacimiento antes de establecerla en el estado
-        if (fetchedTask && fetchedTask.fechanacimiento) {
-          fetchedTask.fechanacimiento = new Date(fetchedTask.fechanacimiento).toISOString().split('T')[0];
-        }
+        console.log('Fecha de nacimiento de la tarea:', fetchedTask.fechanacimiento);
         setTask(fetchedTask);
       } catch (error) {
         console.error('Error fetching task:', error);
@@ -24,6 +23,16 @@ function TaskViewPage() {
     }
     fetchTask();
   }, [getTask, params.id]);
+
+  const formatDate = (dateString) => {
+    const date = new Date(dateString);
+    // Obtener la fecha local
+    const localDate = new Date(date.getTime() + date.getTimezoneOffset() * 60000);
+    // Formatear la fecha local
+    return format(localDate, 'dd/MM/yyyy', { locale: esLocale });
+  };
+  
+  
 
   return (
     <div className="flex items-center justify-center overflow-y-auto my-10">
@@ -40,7 +49,11 @@ function TaskViewPage() {
               <p className="my-4"><strong>Apellido:</strong> {task.apellido}</p>
               <p className="my-4"><strong>Nombre:</strong> {task.nombre}</p>
               <p className="my-4"><strong>DNI:</strong> {task.dni}</p>
-              <p className="my-4"><strong>Fecha de nacimiento:</strong> {task.fechanacimiento ? new Date(task.fechanacimiento).toLocaleDateString('es-AR') : 'No especificada'}</p>
+              <p className="my-4"><strong>Fecha de nacimiento:</strong> {formatDate(task.fechanacimiento)}</p>
+             
+
+
+
               <p className="my-4"><strong>Género:</strong> {task.genero}</p>
               <p className="my-4"><strong>Lugar de nacimiento:</strong> {task.nacimiento}</p>
               <p className="my-4"><strong>Municipio:</strong> {task.municipio}</p>

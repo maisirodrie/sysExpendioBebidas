@@ -10,13 +10,17 @@ import { Indirectos } from '../api/indirectos.js';
 import { Publicas } from '../api/publica.js';
 import { Privadas } from '../api/privada.js';
 import { Disciplinas } from '../api/disciplina.js';
+import DatePicker from 'react-datepicker';
+import 'react-datepicker/dist/react-datepicker.css';
 
 import Select from 'react-select';
 
 function TaskFormPage() {
   const defaultOption = { value: 'Ninguno', label: 'Ninguno' };
   const defaultOptions = { value: 'NINGUNO', label: 'NINGUNO' };
-  
+  const [startDate, setStartDate] = useState(new Date());
+  const [selectedDate, setSelectedDate] = useState(new Date());
+
   const { register, handleSubmit, setValue } = useForm();
   const { createTask, getTask, updateTask } = useTasks();
   const navigate = useNavigate();
@@ -39,13 +43,13 @@ function TaskFormPage() {
     async function loadTask() {
       if (params.id) {
 
-        const currentDate = new Date().toISOString().split('T')[0];// Obtenemos la fecha actual en formato ISO (YYYY-MM-DD)
+        const currentDate = task.fechanacimiento ? new Date(task.fechanacimiento) : new Date();
         const task = await getTask(params.id);
 
         setValue('apellido', task.apellido);
         setValue('nombre', task.nombre);
         setValue('dni', task.dni);
-        setValue('fechanacimiento', currentDate);
+        setValue('fechanacimiento', task.fechanacimiento);
         setValue('genero', task.genero);
         setValue('nacimiento', task.nacimiento);
         setValue("municipio", task.municipio);
@@ -99,7 +103,9 @@ setValue('privada', task.privada || '');
   const onSubmit = handleSubmit(async (data) => {
     try {
       // Agregar los nombres de disciplina al objeto de datos
+      const formattedDate = selectedDate.toLocaleDateString('es-AR');
       const updatedData = { ...data,
+        fechanacimiento: formattedDate,
         
         roldirecto: selectedDirectosValue.map(option => option.value),
         disciplinadirecta: selectedDisciplinaDirectaValue.map(option => option.value),
@@ -181,14 +187,13 @@ setValue('privada', task.privada || '');
     <div className="bg-gray-300 max-w-md w-full p-10 rounded-md">
       <div className="flex justify-between items-center mb-4">
         <h1 className="text-2xl font-bold text-black">Registro de Persona</h1>
-        {/* <button className="btn btn-success" onClick={() => navigate("/")}>
-          <FontAwesomeIcon icon={faArrowLeft} /> {/* Ícono de flecha hacia la izquierda */}
-        {/* </button> */} 
+        <Link to="/task" className="btn btn-success" onClick={() => navigate("/")}>
+  <FontAwesomeIcon icon={faArrowLeft} /> {/* Ícono de flecha hacia la izquierda */}
+</Link>
+
       </div>
           <form onSubmit={onSubmit}>
-          {/* <label htmlFor="apellido" className="block text-sm font-medium text-black">
-              Prueba
-            </label> */}
+
             
             
 
@@ -208,7 +213,16 @@ setValue('privada', task.privada || '');
             <label htmlFor="dni" className="block text-sm font-medium text-black">
             Fecha de nacimiento
             </label>
-            <input type='date' {...register("fechanacimiento", { required: true })} className='w-full bg-gray-100 text-black px-4 py-2 rounded-md my-2' placeholder='Fecha de nacimiento' />
+            <DatePicker
+  dateFormat="yyyy-MM-dd"
+  selected={selectedDate}
+  onChange={(date) => setSelectedDate(date)}
+  className="w-full bg-gray-100 text-black px-4 py-2 rounded-md my-2"
+/>
+
+
+
+
 
             <label htmlFor="genero" className="block text-sm font-medium text-black">
             Género
