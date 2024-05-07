@@ -5,7 +5,8 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
-    "build": "vite build",
+    "build:restart": "vite build && cp -r /logos /dist && cp -r /fondos /dist && pm2 restart frontend",
+    "build:start": "vite build && cp -r /logos /dist && cp -r /fondos /dist && pm2 serve dist 3000 --spa --name frontend",
     "lint": "eslint . --ext js,jsx --report-unused-disable-directives --max-warnings 0",
     "preview": "vite preview"
   },
