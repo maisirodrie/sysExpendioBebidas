@@ -7,7 +7,7 @@
   "scripts": {
     "dev": "nodemon src/index.js",
     "produ:start": "pm2 start src/index.js --name backend",
-    "produ:restart": "pm2 restart src/index.js --name backend"
+    "produ:restart": "pm2 restart backend"
   },
   "keywords": [],
   "author": "",
