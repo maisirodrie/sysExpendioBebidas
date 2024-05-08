@@ -72,7 +72,6 @@ export const creatTaskSchema = z.object({
     
 
     observaciones: z.string({
-        required_error: 'Observaciones is required'
     }),
 
 

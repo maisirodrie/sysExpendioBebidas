@@ -392,7 +392,7 @@ Indique la/las institución/es en la que finalizo sus estudios:
 </label>
 <textarea
   id="observaciones"
-  {...register("observaciones", { required: true })}
+  {...register("observaciones")}
   className="w-full bg-gray-100 text-black px-4 py-2 rounded-md my-2"
   placeholder="Observaciones"
   rows={4} // Define la cantidad de filas que mostrará el textarea

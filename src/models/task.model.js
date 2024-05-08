@@ -124,7 +124,6 @@ const tasksSchema = new mongoose.Schema({
 
     observaciones :{
         type: String,
-        require: true,
         trim: true,
     },
 
