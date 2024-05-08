@@ -4,6 +4,7 @@ import { useTasks } from '../context/TasksContext';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faTrashAlt, faEdit, faEye, faPlus, faSearch, faChevronLeft, faChevronRight } from '@fortawesome/free-solid-svg-icons';
 import './Table.css';
+import Paginator from './Paginator';
 
 function Table() {
   const { tasks, deleteTask } = useTasks();
