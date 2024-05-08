@@ -154,6 +154,7 @@ function Table() {
                 </tbody>
               </table>
             </div>
+            <Paginator currentPage={currentPage} totalPages={totalPages} onPageChange={handlePageChange} />
           </div>
         </div>
       </div>
