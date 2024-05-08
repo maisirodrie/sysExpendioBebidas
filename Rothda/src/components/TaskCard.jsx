@@ -4,7 +4,6 @@ import { useTasks } from '../context/TasksContext';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faTrashAlt, faEdit, faEye, faPlus, faSearch, faChevronLeft, faChevronRight } from '@fortawesome/free-solid-svg-icons';
 import './Table.css';
-import Paginator from './Paginator';
 
 function Table() {
   const { tasks, deleteTask } = useTasks();
@@ -19,13 +18,6 @@ function Table() {
   const searcher = (e) => {
     setSearch(e.target.value)
   }
-
-  const handlePageChange = (pageNumber) => {
-    setCurrentPage(pageNumber);
-  };
-
-
-  const totalPages = Math.ceil(results.length / tasksPerPage);
 
   const results = !search ? tasks : tasks.filter((task) => {
     const apellido = task.apellido ? task.apellido.toLowerCase() : '';
@@ -162,7 +154,6 @@ function Table() {
                 </tbody>
               </table>
             </div>
-            <Paginator currentPage={currentPage} totalPages={totalPages} onPageChange={handlePageChange} />
           </div>
         </div>
       </div>
