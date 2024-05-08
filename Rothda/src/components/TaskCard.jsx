@@ -2,8 +2,7 @@ import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { useTasks } from '../context/TasksContext';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faTrashAlt, faEdit, faEye, faPlus, faSearch } from '@fortawesome/free-solid-svg-icons';
-import Paginator from './Paginator'; // Importa el componente del paginador
+import { faTrashAlt, faEdit, faEye, faPlus, faSearch, faChevronLeft, faChevronRight } from '@fortawesome/free-solid-svg-icons';
 import './Table.css';
 
 function Table() {
@@ -40,16 +39,6 @@ function Table() {
       disciplinaindirecta.includes(searchLowerCase)
     );
   });
-
-  // Calcula el índice inicial y final de las tareas a mostrar
-  const indexOfLastTask = currentPage * tasksPerPage;
-  const indexOfFirstTask = indexOfLastTask - tasksPerPage;
-  const currentTasks = results.slice(indexOfFirstTask, indexOfLastTask);
-
-  // Cambia de página
-  const onPageChange = (pageNumber) => {
-    setCurrentPage(pageNumber);
-  };
 
   return (
     <div className='container-fluid bg-primary vh-100 vw-100 d-flex align-items-center justify-content-center'>
@@ -98,7 +87,7 @@ function Table() {
                   </tr>
                 </thead>
                 <tbody>
-                  {currentTasks.map((task) => (
+                  {results.map((task) => (
                     <tr key={task._id}>
                       <td>{task.apellido ? task.apellido.toUpperCase() : ''}</td>
                       <td>{task.nombre ? task.nombre.toUpperCase() : ''}</td>
@@ -166,7 +155,6 @@ function Table() {
               </table>
             </div>
           </div>
-          <Paginator currentPage={currentPage} totalPages={Math.ceil(results.length / tasksPerPage)} onPageChange={onPageChange} /> // Agrega el paginador aquí
         </div>
       </div>
     </div>
