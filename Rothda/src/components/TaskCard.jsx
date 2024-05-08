@@ -20,6 +20,13 @@ function Table() {
     setSearch(e.target.value)
   }
 
+  const handlePageChange = (pageNumber) => {
+    setCurrentPage(pageNumber);
+  };
+
+
+  const totalPages = Math.ceil(results.length / tasksPerPage);
+
   const results = !search ? tasks : tasks.filter((task) => {
     const apellido = task.apellido ? task.apellido.toLowerCase() : '';
     const nombre = task.nombre ? task.nombre.toLowerCase() : '';
