@@ -1,9 +1,9 @@
 import React from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faChevronLeft, faChevronRight } from '@fortawesome/free-solid-svg-icons';
+import { faChevronLeft, faChevronRight, faAngleDoubleLeft, faAngleDoubleRight } from '@fortawesome/free-solid-svg-icons';
 
 const Paginator = ({ currentPage, totalPages, onPageChange }) => {
-  const maxPagesToShow = 5; // Cambia este valor según la cantidad de páginas que deseas mostrar
+  const maxPagesToShow = 10; // Cambia este valor según la cantidad de páginas que deseas mostrar
   const pageNumbers = Array.from({ length: totalPages }, (_, i) => i + 1);
 
   let startPage = Math.max(1, currentPage - Math.floor(maxPagesToShow / 2));
@@ -28,6 +28,11 @@ const Paginator = ({ currentPage, totalPages, onPageChange }) => {
     <nav>
       <ul className='pagination justify-content-center'>
         <li className='page-item'>
+          <button onClick={() => onPageChange(1)} className='page-link' disabled={currentPage === 1}>
+            <FontAwesomeIcon icon={faAngleDoubleLeft} />
+          </button>
+        </li>
+        <li className='page-item'>
           <button onClick={() => onPageChange(currentPage - 1)} className='page-link' disabled={currentPage === 1}>
             <FontAwesomeIcon icon={faChevronLeft} />
           </button>
@@ -42,6 +47,11 @@ const Paginator = ({ currentPage, totalPages, onPageChange }) => {
         <li className='page-item'>
           <button onClick={() => onPageChange(currentPage + 1)} className='page-link' disabled={currentPage === totalPages}>
             <FontAwesomeIcon icon={faChevronRight} />
+          </button>
+        </li>
+        <li className='page-item'>
+          <button onClick={() => onPageChange(totalPages)} className='page-link' disabled={currentPage === totalPages}>
+            <FontAwesomeIcon icon={faAngleDoubleRight} />
           </button>
         </li>
       </ul>

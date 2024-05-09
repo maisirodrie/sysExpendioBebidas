@@ -4,12 +4,13 @@ import { useTasks } from '../context/TasksContext';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faTrashAlt, faEdit, faEye, faPlus, faSearch, faChevronLeft, faChevronRight } from '@fortawesome/free-solid-svg-icons';
 import './Table.css';
+import Paginator from './Paginator'; // Importa el componente del paginador
 
 function Table() {
   const { tasks, deleteTask } = useTasks();
   const [search, setSearch] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
-  const tasksPerPage = 20; // Cambia a 1 para mostrar solo un elemento por página
+  const tasksPerPage = 10;
 
   const handleDelete = (id) => {
     deleteTask(id);
@@ -19,7 +20,7 @@ function Table() {
     setSearch(e.target.value)
   }
 
-  const results = !search ? tasks : tasks.filter((task) => {
+  const filteredTasks = !search ? tasks : tasks.filter((task) => {
     const apellido = task.apellido ? task.apellido.toLowerCase() : '';
     const nombre = task.nombre ? task.nombre.toLowerCase() : '';
     const municipio = task.municipio ? task.municipio.toLowerCase() : '';
@@ -39,6 +40,15 @@ function Table() {
       disciplinaindirecta.includes(searchLowerCase)
     );
   });
+
+  // Paginación
+  const indexOfLastTask = currentPage * tasksPerPage;
+  const indexOfFirstTask = indexOfLastTask - tasksPerPage;
+  const currentTasks = filteredTasks.slice(indexOfFirstTask, indexOfLastTask);
+
+  const onPageChange = (pageNumber) => {
+    setCurrentPage(pageNumber);
+  };
 
   return (
     <div className='container-fluid bg-primary vh-100 vw-100 d-flex align-items-center justify-content-center'>
@@ -87,7 +97,7 @@ function Table() {
                   </tr>
                 </thead>
                 <tbody>
-                  {results.map((task) => (
+                  {currentTasks.map((task) => (
                     <tr key={task._id}>
                       <td>{task.apellido ? task.apellido.toUpperCase() : ''}</td>
                       <td>{task.nombre ? task.nombre.toUpperCase() : ''}</td>
@@ -97,7 +107,7 @@ function Table() {
                           if (typeof roldirecto === 'string') {
                             return roldirecto.toLowerCase();
                           } else {
-                            return 'No tiene'; // O maneja el caso donde disciplina no es una cadena de texto
+                            return 'No tiene';
                           }
                         }).join(', ') : 'No tiene'}
                       </td>
@@ -106,7 +116,7 @@ function Table() {
                           if (typeof disciplinadirecta === 'string') {
                             return disciplinadirecta.toLowerCase();
                           } else {
-                            return 'No tiene'; // O maneja el caso donde disciplina no es una cadena de texto
+                            return 'No tiene';
                           }
                         }).join(', ') : 'No tiene'}
                       </td>
@@ -124,7 +134,7 @@ function Table() {
                           if (typeof disciplinaindirecta === 'string') {
                             return disciplinaindirecta.toLowerCase();
                           } else {
-                            return 'No tiene'; // O maneja el caso donde disciplina no es una cadena de texto
+                            return 'No tiene';
                           }
                         }).join(', ') : 'No tiene'}
                       </td>
@@ -155,6 +165,7 @@ function Table() {
               </table>
             </div>
           </div>
+          <Paginator currentPage={currentPage} totalPages={Math.ceil(filteredTasks.length / tasksPerPage)} onPageChange={onPageChange} />
         </div>
       </div>
     </div>
