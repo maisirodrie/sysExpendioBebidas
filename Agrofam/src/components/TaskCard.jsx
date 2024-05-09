@@ -23,7 +23,9 @@ function Table() {
   const filteredTasks = !search ? tasks : tasks.filter((task) => {
     const apellido = task.apellido ? task.apellido.toLowerCase() : '';
     const nombre = task.nombre ? task.nombre.toLowerCase() : '';
+    const dni = task.dni ? task.dni.toLowerCase() : '';
     const municipio = task.municipio ? task.municipio.toLowerCase() : '';
+    const direccion = task.direccion ? task.direccion.toLowerCase() : '';
     const roldirecto = Array.isArray(task.roldirecto) ? task.roldirecto.map(roldirecto => roldirecto.toLowerCase()).join(', ') : task.roldirecto.toLowerCase();
     const disciplinadirecta = Array.isArray(task.disciplinadirecta) ? task.disciplinadirecta.map(disciplinadirecta => disciplinadirecta.toLowerCase()).join(', ') : task.disciplina.toLowerCase();
     const rolindirecto = Array.isArray(task.rolindirecto) ? task.rolindirecto.map(rolindirecto => rolindirecto.toLowerCase()).join(', ') : task.rolindirecto.toLowerCase();
@@ -33,9 +35,9 @@ function Table() {
     return (
       apellido.includes(searchLowerCase) ||
       nombre.includes(searchLowerCase) ||
+      dni.includes(searchLowerCase) ||
       municipio.includes(searchLowerCase) ||
-      roldirecto.includes(searchLowerCase) ||
-      disciplinadirecta.includes(searchLowerCase) ||
+      direccion.includes(searchLowerCase) ||
       rolindirecto.includes(searchLowerCase) ||
       disciplinaindirecta.includes(searchLowerCase)
     );
@@ -81,19 +83,17 @@ function Table() {
               <table className='table' style={{ textTransform: 'uppercase' }}>
                 <thead>
                   <tr>
-                    <th colSpan="10" className="table-title">Listado de Inscriptos</th>
+                    <th colSpan="6" className="table-title">Listado de Inscriptos</th>
                   </tr>
                   <tr>
                     <th>Apellido</th>
                     <th>Nombre</th>
+                    <th>DNI</th>
                     <th>Municipio</th>
-                    <th>Rol Directo</th>
-                    <th>Disciplina Directa</th>
-                    <th>Rol Indirecto</th>
-                    <th>Disciplina Indirecta</th>
+                    <th>Dirección</th>
                     <th>Ver</th>
-                    <th>Editar</th>
-                    <th>Borrar</th>
+                    {/* <th>Editar</th>
+                    <th>Borrar</th> */}
                   </tr>
                 </thead>
                 <tbody>
@@ -101,8 +101,10 @@ function Table() {
                     <tr key={task._id}>
                       <td>{task.apellido ? task.apellido.toUpperCase() : ''}</td>
                       <td>{task.nombre ? task.nombre.toUpperCase() : ''}</td>
+                      <td>{task.dni ? task.dni.toUpperCase() : ''}</td>
                       <td>{task.municipio ? task.municipio.toUpperCase() : ''}</td>
-                      <td>
+                      <td>{task.direccion ? task.direccion.toUpperCase() : ''}</td>
+                      {/* <td>
                         {Array.isArray(task.roldirecto) ? task.roldirecto.map(roldirecto => {
                           if (typeof roldirecto === 'string') {
                             return roldirecto.toLowerCase();
@@ -137,7 +139,7 @@ function Table() {
                             return 'No tiene';
                           }
                         }).join(', ') : 'No tiene'}
-                      </td>
+                      </td> */}
                       <td>
                         <div className='button-container'>
                           <Link className='btn btn-success' to={`/view/task/${task._id}`}>
@@ -145,7 +147,7 @@ function Table() {
                           </Link>
                         </div>
                       </td>
-                      <td>
+                      {/* <td>
                         <div className='button-container'>
                           <Link className='btn btn-primary' to={`/edit-task/${task._id}`}>
                             <FontAwesomeIcon icon={faEdit} />
@@ -158,7 +160,7 @@ function Table() {
                             <FontAwesomeIcon icon={faTrashAlt} />
                           </button>
                         </div>
-                      </td>
+                      </td> */}
                     </tr>
                   ))}
                 </tbody>

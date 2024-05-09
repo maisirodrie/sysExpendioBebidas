@@ -42,10 +42,10 @@ export const register = async (req, res) => {
 };
 
 export const login = async (req, res) => {
-    const { email, password } = req.body;
+    const { username, password } = req.body;
 
     try {
-        const userFound = await User.findOne({ email });
+        const userFound = await User.findOne({ username });
 
         if (!userFound) return res.status(400).json({ message: "Usuario incorrecto" });
 
@@ -108,7 +108,7 @@ export const verifyToken = async (req, res) => {
   
       return res.json({
         id: userFound._id,
-        email: userFound.email,
+        username: userFound.username,
       });
     });
   };

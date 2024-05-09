@@ -54,12 +54,12 @@ function TaskFormPage() {
         setValue('nacimiento', task.nacimiento);
         setValue("municipio", task.municipio);
         setValue('postal', task.postal);
-        setValue('residencia', task.residencia);
+        // setValue('residencia', task.residencia);
         setValue('nacionalidad', task.nacionalidad);
         setValue('correo', task.correo);
         setValue('telefono', task.telefono);
-        setValue('publico', task.publico || '');
-setValue('privada', task.privada || '');
+        // setValue('publico', task.publico || '');
+        // setValue('privada', task.privada || '');
         setValue('direccion', task.direccion);
         setValue('observaciones', task.observaciones);
 
@@ -125,7 +125,8 @@ setValue('privada', task.privada || '');
       } else {
         await createTask(updatedData);
       }
-      navigate('/profile');
+      // navigate('/profile');
+      navigate('/task');
     } catch (error) {
       if (error.response && error.response.status === 400) {
         setDniError(error.response.data.message);
@@ -252,10 +253,10 @@ setValue('privada', task.privada || '');
             <input type='text' {...register("direccion", { required: true })} className='w-full bg-gray-100 text-black px-4 py-2 rounded-md my-2' placeholder='Direccion' />
            
 
-            <label htmlFor="residencia" className="block text-sm font-medium text-black">
+            {/* <label htmlFor="residencia" className="block text-sm font-medium text-black">
             Años de Residencia en la Provincia de Misiones
             </label>
-            <input type='text' {...register("residencia", { required: true })} className='w-full bg-gray-100 text-black px-4 py-2 rounded-md my-2' placeholder='Años de Residencia' />
+            <input type='text' {...register("residencia", { required: true })} className='w-full bg-gray-100 text-black px-4 py-2 rounded-md my-2' placeholder='Años de Residencia' /> */}
 
             <label htmlFor="nacionalidad" className="block text-sm font-medium text-black">
             Nacionalidad
@@ -280,7 +281,7 @@ setValue('privada', task.privada || '');
             </label>
             <input type='text' {...register("telefono", { required: true })} className='w-full bg-gray-100 text-black px-4 py-2 rounded-md my-2' placeholder='Teléfono' />
 
-            <label htmlFor="roldirecto" className="block text-sm font-medium text-black">
+            {/* <label htmlFor="roldirecto" className="block text-sm font-medium text-black">
             Rol Directo que desempeña en la danza
           </label>
            <Select
@@ -373,7 +374,7 @@ Indique la/las institución/es en la que finalizo sus estudios:
 <label htmlFor="privada" className="block text-sm font-medium text-black">
 Indique la/las institución/es en la que finalizo sus estudios:
             </label>
-            <input type='text' {...register("privada")} className='w-full bg-gray-100 text-black px-4 py-2 rounded-md my-2' placeholder='Ingrese la/s institución/es' />
+            <input type='text' {...register("privada")} className='w-full bg-gray-100 text-black px-4 py-2 rounded-md my-2' placeholder='Ingrese la/s institución/es' /> */}
 
            
 

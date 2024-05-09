@@ -56,11 +56,11 @@ const tasksSchema = new mongoose.Schema({
         trim: true,
     },
 
-    residencia :{
-        type: String,
-        require: true,
-        trim: true,
-    },
+    // residencia :{
+    //     type: String,
+    //     require: true,
+    //     trim: true,
+    // },
     
     nacionalidad :{
         type: String,
@@ -79,46 +79,46 @@ const tasksSchema = new mongoose.Schema({
         trim: true,
     }, 
 
-    roldirecto: {
-        type: [String], // Ahora es un arreglo de strings
-        trim: true,
-    },
-    disciplinadirecta: {
-        type: [String], // Ahora es un arreglo de strings
-        trim: true,
-    }, 
-    rolindirecto: {
-        type: [String], // Ahora es un arreglo de strings
-        trim: true,
-    },
-    disciplinaindirecta: {
-        type: [String], // Ahora es un arreglo de strings
-        trim: true,
-    }, 
-    publico: {
-        type: String,
-        trim: true,
-    }, 
-    formacionpublica: {
-        type: [String], // Ahora es un arreglo de strings
-        trim: true,
-    }, 
-    disciplinapublica: {
-        type: [String], // Ahora es un arreglo de strings
-        trim: true,
-    }, 
-    privada: {
-        type: String,
-        trim: true,
-    }, 
-    formacionprivada: {
-        type: [String], // Ahora es un arreglo de strings
-        trim: true,
-    }, 
-    disciplinaprivada: {
-        type: [String], // Ahora es un arreglo de strings
-        trim: true,
-    },
+    // roldirecto: {
+    //     type: [String], // Ahora es un arreglo de strings
+    //     trim: true,
+    // },
+    // disciplinadirecta: {
+    //     type: [String], // Ahora es un arreglo de strings
+    //     trim: true,
+    // }, 
+    // rolindirecto: {
+    //     type: [String], // Ahora es un arreglo de strings
+    //     trim: true,
+    // },
+    // disciplinaindirecta: {
+    //     type: [String], // Ahora es un arreglo de strings
+    //     trim: true,
+    // }, 
+    // publico: {
+    //     type: String,
+    //     trim: true,
+    // }, 
+    // formacionpublica: {
+    //     type: [String], // Ahora es un arreglo de strings
+    //     trim: true,
+    // }, 
+    // disciplinapublica: {
+    //     type: [String], // Ahora es un arreglo de strings
+    //     trim: true,
+    // }, 
+    // privada: {
+    //     type: String,
+    //     trim: true,
+    // }, 
+    // formacionprivada: {
+    //     type: [String], // Ahora es un arreglo de strings
+    //     trim: true,
+    // }, 
+    // disciplinaprivada: {
+    //     type: [String], // Ahora es un arreglo de strings
+    //     trim: true,
+    // },
   
     
 

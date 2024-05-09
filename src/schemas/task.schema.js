@@ -33,9 +33,9 @@ export const creatTaskSchema = z.object({
         required_error: 'Dirección is required'
     }),
 
-    residencia: z.string({
-        required_error: 'Residencia es requerida'
-    }),
+    // residencia: z.string({
+    //     required_error: 'Residencia es requerida'
+    // }),
 
     nacionalidad: z.string({
         required_error: 'Nacionalidad is required'
@@ -48,25 +48,25 @@ export const creatTaskSchema = z.object({
         required_error: 'Teléfono is required'
     }),
 
-    roldirecto: z.array(z.string()),
+    // roldirecto: z.array(z.string()),
 
-    disciplinadirecta: z.array(z.string()),
+    // disciplinadirecta: z.array(z.string()),
 
-    rolindirecto: z.array(z.string()),
+    // rolindirecto: z.array(z.string()),
 
-    disciplinaindirecta: z.array(z.string()),
+    // disciplinaindirecta: z.array(z.string()),
 
-    publico: z.string(),
+    // publico: z.string(),
 
-    formacionpublica: z.array(z.string()),
+    // formacionpublica: z.array(z.string()),
 
-    disciplinapublica: z.array(z.string()),
+    // disciplinapublica: z.array(z.string()),
 
-    privada: z.string(),
+    // privada: z.string(),
 
-    formacionprivada: z.array(z.string()),
+    // formacionprivada: z.array(z.string()),
 
-    disciplinaprivada: z.array(z.string()),
+    // disciplinaprivada: z.array(z.string()),
 
 
     

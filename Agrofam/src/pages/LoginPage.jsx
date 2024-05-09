@@ -47,16 +47,17 @@ function LoginPage() {
 
               <h1 className='text-2xl font-bold text-black'>Acceso</h1>
               <form onSubmit={onSubmit}>
-              <label htmlFor="email" className="block text-sm font-medium text-black text-left">
-                                Correo
+              <label htmlFor="username" className="block text-sm font-medium text-black text-left">
+                                Usuario
                             </label>
                 <input
                   type="text"
-                  {...register("email", { required: true })}
+                  {...register("username", { required: true })}
                   className='w-full bg-white text-gray-600 px-4 py-2 rounded-md my-2 border border-gray-300'
-                  placeholder='Correo'
+                  placeholder='Usuario'
                 />
-                {errors.email && (<p className='text-red-500'>Correo es requerido</p>)}
+                {errors.username && (<p className='text-red-500'>Usuario es requerido</p>)}
+                
                 <label htmlFor="password" className="block text-sm font-medium text-black text-left">
                                 Contraseña
                             </label>
@@ -69,10 +70,10 @@ function LoginPage() {
                 {errors.password && (<p className='text-red-500'>Contraseña es requerida</p>)}
                 <button className="custom-button">Iniciar Sesión</button>
               </form>
-              <p className="flex gap-x-2 justify-between text-black">
+              {/* <p className="flex gap-x-2 justify-between text-black">
                 ¿No tienes una cuenta?
                 <Link to="/register" className="text-sky-500">Registrate</Link>
-              </p>
+              </p> */}
             </div>
           </div>
         </div>
