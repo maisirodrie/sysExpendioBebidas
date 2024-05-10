@@ -13,17 +13,17 @@ function LoginPage() {
     signin(data);
   });
 
-  // useEffect(() => {
-  //   if (isAuthenticated && user) {
-  //     if (user.role === 'admin') {
-  //       // Si es un administrador, redirige a la página de administrador
-  //       navigate("/task");
-  //     } else if (user.role === 'user') {
-  //       // Si es un usuario normal y ya está registrado, redirige a su perfil
-  //       navigate("/profile");
-  //     }
-  //   }
-  // }, [isAuthenticated, navigate, user]);;
+  useEffect(() => {
+    if (isAuthenticated && user) {
+      if (user.role === 'admin') {
+        // Si es un administrador, redirige a la página de administrador
+        navigate("/task");
+      } else if (user.role === 'user') {
+        // Si es un usuario normal y ya está registrado, redirige a su perfil
+        navigate("/");
+      }
+    }
+  }, [isAuthenticated, navigate, user]);
 
   return (
     <section>
@@ -57,7 +57,7 @@ function LoginPage() {
                   placeholder='Usuario'
                 />
                 {errors.username && (<p className='text-red-500'>Usuario es requerido</p>)}
-
+                
                 <label htmlFor="password" className="block text-sm font-medium text-black text-left">
                                 Contraseña
                             </label>
