@@ -23,7 +23,7 @@ function LoginPage() {
   //       navigate("/profile");
   //     }
   //   }
-  // }, [isAuthenticated, navigate, user]);
+  // }, [isAuthenticated, navigate, user]);;
 
   return (
     <section>
