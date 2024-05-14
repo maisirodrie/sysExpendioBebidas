@@ -9,3 +9,9 @@
       border: 0;
   }
   
+  .subtitle {
+    font-size: 1rem; /* Tamaño de fuente más grande */
+    font-weight: bold; /* Texto en negrita */
+    color: #111; /* Color del texto */
+    /* Otros estilos según tus preferencias */
+  }

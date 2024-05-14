@@ -12,6 +12,7 @@ import { Privadas } from '../api/privada.js';
 import { Disciplinas } from '../api/disciplina.js';
 import DatePicker from 'react-datepicker';
 import 'react-datepicker/dist/react-datepicker.css';
+import './taskformpage.css'
 
 import Select from 'react-select';
 
@@ -193,11 +194,39 @@ function TaskFormPage() {
 </Link>
 
       </div>
-          <form onSubmit={onSubmit}>
+          <form onSubmit={onSubmit} >
 
             
             
+          <div>
+          <label htmlFor="apellido" className="block text-sm font-medium text-black">
+  <span className="subtitle">Datos del encuestador</span>
+</label>
+</div>
+<label htmlFor="apellido" className="block text-sm font-medium text-black">
+              Apellido
+            </label>
 
+            <label htmlFor="nombre" className="block text-sm font-medium text-black">
+              Nombre
+            </label>
+
+            <label htmlFor="nombre" className="block text-sm font-medium text-black">
+              Organismo/Área Institucional
+            </label>
+
+            <label htmlFor="nombre" className="block text-sm font-medium text-black">
+              Celular
+            </label>
+
+            <label htmlFor="nombre" className="block text-sm font-medium text-black">
+              Correo
+            </label>
+            
+<div>
+<label htmlFor="apellido" className="block text-sm font-medium text-black">
+  <span className="subtitle">Datos personales de las y los responsables de la unidad productiva</span>
+</label>
             <label htmlFor="apellido" className="block text-sm font-medium text-black">
               Apellido
             </label>
@@ -215,7 +244,7 @@ function TaskFormPage() {
             Fecha de nacimiento
             </label>
             <DatePicker
-  dateFormat="yyyy-MM-dd"
+  dateFormat="dd/MM/yyyy"
   selected={selectedDate}
   onChange={(date) => setSelectedDate(date)}
   className="w-full bg-gray-100 text-black px-4 py-2 rounded-md my-2"
@@ -398,7 +427,7 @@ Indique la/las institución/es en la que finalizo sus estudios:
   placeholder="Observaciones"
   rows={4} // Define la cantidad de filas que mostrará el textarea
 />
-
+            </div>
 
             <button className="bg-blue-500 px-4 py-1 rounded-md my-2 disabled:bg-blue-300 text-white">Guardar</button>
           </form>

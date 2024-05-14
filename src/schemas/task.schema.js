@@ -2,51 +2,308 @@ import { z } from 'zod'
 
 export const creatTaskSchema = z.object({
 
-    apellido: z.string({
-        required_error: 'Apellido is required'
+    //Encuestador
+
+    apellidoenc: z.string({
+        required_error: 'Apellido del encuestador es requerido'
     }),
-    nombre: z.string({
-        required_error: 'Nombre is required'
+    nombreenc: z.string({
+        required_error: 'Nombre del encuestador es requerido'
     }),
-    dni: z.string({
-        required_error: 'DNI is required'
+    celularen: z.string({
+        required_error: 'Celular del encuestador es requerido'
     }),
-    fechanacimiento: z.string({
-        required_error: 'Fecha de nacimiento es requerida'
-    }),
-    genero: z.string({
-        required_error: 'Género is required'
-    }),
-    nacimiento: z.string({
-        required_error: 'Lugar de Nacimiento is required'
+    correoen: z.string({
+        required_error: 'Correo del encuestador es requerido'
     }),
 
-    municipio: z.string({
-        required_error: 'Municipio is required'
+    //Datos personales de las y los responsables de la unidad productiva
+
+    //Primer responsable 
+    nombreresp1:z.string({
+        required_error: 'Apellido es requerido'
+    }),
+    apellidoresp1:z.string({
+        required_error: 'Nombre es requerido'
+    }),
+    dniresp1: z.string({
+        required_error: 'DNI es requerido'
+    }),
+    cuitresp1:z.string({
+        required_error: 'CUIT-CUIL es requerido'
+    }),
+    fechanacimientoresp1:z.string({
+        required_error: 'Fecha de nacimiento es requerido'
+    }),
+    celularresp1:z.string({
+        required_error: 'Celular es requerido'
+    }),
+    correoresp1:z.string({
+        required_error: 'Correo es requerido'
+    }),
+    estudiosresp1:z.string({
+        required_error: 'Estudios es requerido'
     }),
 
-    postal: z.string({
-        required_error: 'Dirección Postal is required'
+    //Segundo responsable 
+
+    nombreresp2:z.string({
+        required_error: 'Apellido es requerido'
+    }),
+    apellidoresp2:z.string({
+        required_error: 'Nombre es requerido'
+    }),
+    dniresp2: z.string({
+        required_error: 'DNI es requerido'
+    }),
+    cuitresp2:z.string({
+        required_error: 'CUIT-CUIL es requerido'
+    }),
+    fechanacimientoresp2:z.string({
+        required_error: 'Fecha de nacimiento es requerido'
+    }),
+    celularresp2:z.string({
+        required_error: 'Celular es requerido'
+    }),
+    correoresp2:z.string({
+        required_error: 'Correo es requerido'
+    }),
+    estudiosresp2:z.string({
+        required_error: 'Estudios es requerido'
     }),
 
-    direccion: z.string({
-        required_error: 'Dirección is required'
+    //Datos del grupo familiar
+    integrantestrabajandofamiliar: z.string({
     }),
+
+    hijosfamiliar:z.string({
+    }),
+    convivefamiliar: z.string({
+    }),
+    escuelafamiliar:z.string({
+    }),
+    
+    nivelinicialfamiliar: z.array(z.string()),
+    
+    primariafamiliar: z.array(z.string()),
+    
+    secundariafamiliar: z.array(z.string()),
+    
+    terciariaosuperiorfamiliar: z.array(z.string()),
+
+    domiciliofamiliar: z.string({
+    }),
+
+    lotefamiliar:z.string({
+    }),
+
+    parcelafamiliar:z.string({
+    }),
+
+    seccionfamiliar:z.string({
+    }),
+
+    partidafamiliar:z.string({
+    }),
+
+    coloniaparajefamiliar:z.string({
+    }),
+
+    localidadfamiliar:z.string({
+    }),
+
+    departamentofamiliar:z.string({
+    }),
+
+    pueblosoriginariosfamiliar:z.string({
+    }),
+
+    //Datos prediales de la unidad productiva
+
+    loteprediales:z.string({
+    }),
+
+    parcelaprediales:z.string({
+    }),
+
+    seccionprediales:z.string({
+    }),
+
+    partidaprediales:z.string({
+    }),
+
+    coloniaprediales:z.string({
+    }),
+
+    localidadprediales:z.string({
+    }),
+
+    departamentoprediales:z.string({
+    }),
+
+    propietarioprediales:z.string({
+    }),
+
+    arrendatarioprediales:z.string({
+    }),
+
+    condominioprediales:z.string({
+    }),
+
+    ocupanteprediales:z.string({
+    }),
+
+    superficietotalprediales:z.string({
+    }),
+
+    supagricprediales:z.string({
+    }),
+
+    supgandprediales:z.string({
+    }),
+
+    monteprediales:z.string({
+    }),
+
+    suppiscicolaprediales:z.string({
+    }),
+
+    supapicolaprediales:z.string({
+    }),
+
+    supactindustrialprediales:z.string({
+    }),
+
+    sinusoprediales:z.string({
+    }),
+
+    otrosprediales:z.string({
+    }),
+
+    puntosgpsprediales:z.string({
+    }),
+
+    //Pefil Productivo
+
+    produccionagroecologica:z.string({
+    }),
+
+    produccionconvencional:z.string({
+    }),
+
+    produccionanimal:z.string({
+    }),
+
+    produccionvegetal:z.string({
+    }),
+
+    accesoagua:z.string({
+    }),
+
+    infraestructuraproductiva:z.string({
+    }),
+
+    maquinariaproductiva:z.string({
+    }),
+
+    //Datos de Comercializacion
+
+    vendecomercializacion:z.string({
+    }),
+
+    feriaperteneciente:z.string({
+    }),
+
+    puesto:z.string({
+    }),
+
+    carnetmanipulacion:z.string({
+    }),
+
+    monotributista:z.string({
+    }),
+
+    excedenteproduccion:z.string({
+    }),
+
+    pedido:z.string({
+    }),
+
+    compraproduccion:z.string({
+    }),
+
+    agregadovalor:z.string({
+    }),
+
+    equipamento:z.string({
+    }),
+
+    difusion:z.string({
+    }),
+
+    //Registro asignados
+
+    registroprovincial:z.string({
+    }),
+
+    registroproductor:z.string({
+    }),
+
+    rensapa:z.string({
+    }),
+
+    carnetsanitario:z.string({
+    }),
+
+    municipio:z.string({
+    }),
+
+    renapa:z.string({
+    }),
+
+
+
+
+
+    
+    // fechanacimiento: z.string({
+    //     required_error: 'Fecha de nacimiento es requerida'
+    // }),
+    // genero: z.string({
+    //     required_error: 'Género is required'
+    // }),
+    // nacimiento: z.string({
+    //     required_error: 'Lugar de Nacimiento is required'
+    // }),
+
+    // municipio: z.string({
+    //     required_error: 'Municipio is required'
+    // }),
+
+    // postal: z.string({
+    //     required_error: 'Dirección Postal is required'
+    // }),
+
+    // direccion: z.string({
+    //     required_error: 'Dirección is required'
+    // }),
 
     // residencia: z.string({
     //     required_error: 'Residencia es requerida'
     // }),
 
-    nacionalidad: z.string({
-        required_error: 'Nacionalidad is required'
-    }),
-    correo: z.string({
-        required_error: 'Correo is required'
-    }),
+    // nacionalidad: z.string({
+    //     required_error: 'Nacionalidad is required'
+    // }),
+    // correo: z.string({
+    //     required_error: 'Correo is required'
+    // }),
 
-    telefono: z.string({
-        required_error: 'Teléfono is required'
-    }),
+    // telefono: z.string({
+    //     required_error: 'Teléfono is required'
+    // }),
+
+
 
     // roldirecto: z.array(z.string()),
 
@@ -71,8 +328,8 @@ export const creatTaskSchema = z.object({
 
     
 
-    observaciones: z.string({
-    }),
+    // observaciones: z.string({
+    // }),
 
 
 
