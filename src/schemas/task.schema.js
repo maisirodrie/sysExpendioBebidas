@@ -72,194 +72,194 @@ export const creatTaskSchema = z.object({
         required_error: 'Estudios es requerido'
     }),
 
-    //Datos del grupo familiar
-    integrantestrabajandofamiliar: z.string({
-    }),
+    // //Datos del grupo familiar
+    // integrantestrabajandofamiliar: z.string({
+    // }),
 
-    hijosfamiliar:z.string({
-    }),
-    convivefamiliar: z.string({
-    }),
-    escuelafamiliar:z.string({
-    }),
+    // hijosfamiliar:z.string({
+    // }),
+    // convivefamiliar: z.string({
+    // }),
+    // escuelafamiliar:z.string({
+    // }),
     
-    nivelinicialfamiliar: z.array(z.string()),
+    // nivelinicialfamiliar: z.array(z.string()),
     
-    primariafamiliar: z.array(z.string()),
+    // primariafamiliar: z.array(z.string()),
     
-    secundariafamiliar: z.array(z.string()),
+    // secundariafamiliar: z.array(z.string()),
     
-    terciariaosuperiorfamiliar: z.array(z.string()),
+    // terciariaosuperiorfamiliar: z.array(z.string()),
 
-    domiciliofamiliar: z.string({
-    }),
+    // domiciliofamiliar: z.string({
+    // }),
 
-    lotefamiliar:z.string({
-    }),
+    // lotefamiliar:z.string({
+    // }),
 
-    parcelafamiliar:z.string({
-    }),
+    // parcelafamiliar:z.string({
+    // }),
 
-    seccionfamiliar:z.string({
-    }),
+    // seccionfamiliar:z.string({
+    // }),
 
-    partidafamiliar:z.string({
-    }),
+    // partidafamiliar:z.string({
+    // }),
 
-    coloniaparajefamiliar:z.string({
-    }),
+    // coloniaparajefamiliar:z.string({
+    // }),
 
-    localidadfamiliar:z.string({
-    }),
+    // localidadfamiliar:z.string({
+    // }),
 
-    departamentofamiliar:z.string({
-    }),
+    // departamentofamiliar:z.string({
+    // }),
 
-    pueblosoriginariosfamiliar:z.string({
-    }),
+    // pueblosoriginariosfamiliar:z.string({
+    // }),
 
-    //Datos prediales de la unidad productiva
+    // //Datos prediales de la unidad productiva
 
-    loteprediales:z.string({
-    }),
+    // loteprediales:z.string({
+    // }),
 
-    parcelaprediales:z.string({
-    }),
+    // parcelaprediales:z.string({
+    // }),
 
-    seccionprediales:z.string({
-    }),
+    // seccionprediales:z.string({
+    // }),
 
-    partidaprediales:z.string({
-    }),
+    // partidaprediales:z.string({
+    // }),
 
-    coloniaprediales:z.string({
-    }),
+    // coloniaprediales:z.string({
+    // }),
 
-    localidadprediales:z.string({
-    }),
+    // localidadprediales:z.string({
+    // }),
 
-    departamentoprediales:z.string({
-    }),
+    // departamentoprediales:z.string({
+    // }),
 
-    propietarioprediales:z.string({
-    }),
+    // propietarioprediales:z.string({
+    // }),
 
-    arrendatarioprediales:z.string({
-    }),
+    // arrendatarioprediales:z.string({
+    // }),
 
-    condominioprediales:z.string({
-    }),
+    // condominioprediales:z.string({
+    // }),
 
-    ocupanteprediales:z.string({
-    }),
+    // ocupanteprediales:z.string({
+    // }),
 
-    superficietotalprediales:z.string({
-    }),
+    // superficietotalprediales:z.string({
+    // }),
 
-    supagricprediales:z.string({
-    }),
+    // supagricprediales:z.string({
+    // }),
 
-    supgandprediales:z.string({
-    }),
+    // supgandprediales:z.string({
+    // }),
 
-    monteprediales:z.string({
-    }),
+    // monteprediales:z.string({
+    // }),
 
-    suppiscicolaprediales:z.string({
-    }),
+    // suppiscicolaprediales:z.string({
+    // }),
 
-    supapicolaprediales:z.string({
-    }),
+    // supapicolaprediales:z.string({
+    // }),
 
-    supactindustrialprediales:z.string({
-    }),
+    // supactindustrialprediales:z.string({
+    // }),
 
-    sinusoprediales:z.string({
-    }),
+    // sinusoprediales:z.string({
+    // }),
 
-    otrosprediales:z.string({
-    }),
+    // otrosprediales:z.string({
+    // }),
 
-    puntosgpsprediales:z.string({
-    }),
+    // puntosgpsprediales:z.string({
+    // }),
 
-    //Pefil Productivo
+    // //Pefil Productivo
 
-    produccionagroecologica:z.string({
-    }),
+    // produccionagroecologica:z.string({
+    // }),
 
-    produccionconvencional:z.string({
-    }),
+    // produccionconvencional:z.string({
+    // }),
 
-    produccionanimal:z.string({
-    }),
+    // produccionanimal:z.string({
+    // }),
 
-    produccionvegetal:z.string({
-    }),
+    // produccionvegetal:z.string({
+    // }),
 
-    accesoagua:z.string({
-    }),
+    // accesoagua:z.string({
+    // }),
 
-    infraestructuraproductiva:z.string({
-    }),
+    // infraestructuraproductiva:z.string({
+    // }),
 
-    maquinariaproductiva:z.string({
-    }),
+    // maquinariaproductiva:z.string({
+    // }),
 
-    //Datos de Comercializacion
+    // //Datos de Comercializacion
 
-    vendecomercializacion:z.string({
-    }),
+    // vendecomercializacion:z.string({
+    // }),
 
-    feriaperteneciente:z.string({
-    }),
+    // feriaperteneciente:z.string({
+    // }),
 
-    puesto:z.string({
-    }),
+    // puesto:z.string({
+    // }),
 
-    carnetmanipulacion:z.string({
-    }),
+    // carnetmanipulacion:z.string({
+    // }),
 
-    monotributista:z.string({
-    }),
+    // monotributista:z.string({
+    // }),
 
-    excedenteproduccion:z.string({
-    }),
+    // excedenteproduccion:z.string({
+    // }),
 
-    pedido:z.string({
-    }),
+    // pedido:z.string({
+    // }),
 
-    compraproduccion:z.string({
-    }),
+    // compraproduccion:z.string({
+    // }),
 
-    agregadovalor:z.string({
-    }),
+    // agregadovalor:z.string({
+    // }),
 
-    equipamento:z.string({
-    }),
+    // equipamento:z.string({
+    // }),
 
-    difusion:z.string({
-    }),
+    // difusion:z.string({
+    // }),
 
-    //Registro asignados
+    // //Registro asignados
 
-    registroprovincial:z.string({
-    }),
+    // registroprovincial:z.string({
+    // }),
 
-    registroproductor:z.string({
-    }),
+    // registroproductor:z.string({
+    // }),
 
-    rensapa:z.string({
-    }),
+    // rensapa:z.string({
+    // }),
 
-    carnetsanitario:z.string({
-    }),
+    // carnetsanitario:z.string({
+    // }),
 
-    municipio:z.string({
-    }),
+    // municipio:z.string({
+    // }),
 
-    renapa:z.string({
-    }),
+    // renapa:z.string({
+    // }),
 
 
 

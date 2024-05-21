@@ -2,82 +2,118 @@ import mongoose from "mongoose";
 
 const tasksSchema = new mongoose.Schema({
 
-    apellido: {
+    //Encuestador
+
+    apellidoenc: {
         type: String,
         require: true,
         trim: true,
     },
-    nombre :{
+    nombreenc :{
         type: String,
         require: true,
         trim: true,
     },
-    dni: {
+    celularen: {
         type: String,
         required: true,
-        unique: true,
         trim: true,
     },
     
-    fechanacimiento: {
+    correoen: {
         type: Date,
         required: true,
         trim: true,
 
     },
-     
-    genero :{
-        type: String,
-        require: true,
-        trim: true,
-    },
 
-    nacimiento :{
-        type: String,
-        require: true,
-        trim: true,
-    },
+    //Datos personales de las y los responsables de la unidad productiva
 
-    municipio: {
+    //Primer responsable 
+
+    nombreresp1: {
         type: String,
         required: true,
         trim: true
     },
 
-    postal :{
+    apellidoresp1 :{
         type: String,
         require: true,
         trim: true,
     },
 
-    direccion :{
+    dniresp1 :{
         type: String,
         require: true,
         trim: true,
     },
-
-    // residencia :{
-    //     type: String,
-    //     require: true,
-    //     trim: true,
-    // },
     
-    nacionalidad :{
+    cuitresp1 :{
         type: String,
         require: true,
         trim: true,
     },  
 
-    correo :{
+    fechanacimientoresp1 :{
         type: String,
         require: true,
         trim: true,
     },    
-    telefono :{
+    celularresp1 :{
         type: String,
         require: true,
         trim: true,
     }, 
+
+    estudiosresp1 :{
+        type: String,
+        require: true,
+        trim: true,
+    },
+
+    //Segundo responsable 
+
+    nombreresp2: {
+        type: String,
+        required: true,
+        trim: true
+    },
+
+    apellidoresp2 :{
+        type: String,
+        require: true,
+        trim: true,
+    },
+
+    dniresp2 :{
+        type: String,
+        require: true,
+        trim: true,
+    },
+    
+    cuitresp2 :{
+        type: String,
+        require: true,
+        trim: true,
+    },  
+
+    fechanacimientoresp2 :{
+        type: String,
+        require: true,
+        trim: true,
+    },    
+    celularresp2 :{
+        type: String,
+        require: true,
+        trim: true,
+    }, 
+
+    estudiosresp2 :{
+        type: String,
+        require: true,
+        trim: true,
+    },
 
     // roldirecto: {
     //     type: [String], // Ahora es un arreglo de strings
