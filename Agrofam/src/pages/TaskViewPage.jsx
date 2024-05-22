@@ -1,10 +1,10 @@
-import React, { useEffect, useState } from 'react';
-import { Link, useParams } from 'react-router-dom';
-import { format } from 'date-fns';
-import esLocale from 'date-fns/locale/es';
-import { useTasks } from '../context/TasksContext';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faArrowLeft, faStar } from '@fortawesome/free-solid-svg-icons';
+import React, { useEffect, useState } from "react";
+import { Link, useParams } from "react-router-dom";
+import { format } from "date-fns";
+import esLocale from "date-fns/locale/es";
+import { useTasks } from "../context/TasksContext";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faArrowLeft } from "@fortawesome/free-solid-svg-icons";
 
 function TaskViewPage() {
   const { getTask } = useTasks();
@@ -15,28 +15,33 @@ function TaskViewPage() {
     async function fetchTask() {
       try {
         const fetchedTask = await getTask(params.id);
-        console.log('Fecha de nacimiento de la tarea:', fetchedTask.fechanacimiento);
         setTask(fetchedTask);
       } catch (error) {
-        console.error('Error fetching task:', error);
+        console.error("Error fetching task:", error);
       }
     }
     fetchTask();
   }, [getTask, params.id]);
 
   const formatDate = (dateString) => {
-    const date = new Date(dateString);
-    // Obtener la fecha local
-    const localDate = new Date(date.getTime() + date.getTimezoneOffset() * 60000);
-    // Formatear la fecha local
-    return format(localDate, 'dd/MM/yyyy', { locale: esLocale });
+    try {
+      const date = new Date(dateString);
+      if (isNaN(date)) {
+        return "Fecha no válida"; // Return a fallback message for invalid dates
+      }
+      // Obtener la fecha local
+      const localDate = new Date(date.getTime() + date.getTimezoneOffset() * 60000);
+      // Formatear la fecha local
+      return format(localDate, "dd/MM/yyyy", { locale: esLocale });
+    } catch (error) {
+      console.error("Error formatting date:", error);
+      return "Fecha no válida"; // Return a fallback message in case of an error
+    }
   };
-  
-  
 
   return (
     <div className="flex items-center justify-center overflow-y-auto my-10">
-      <div className="bg-gray-200 max-w-md w-full p-10 ">
+      <div className="bg-gray-200 max-w-md w-full p-10">
         <div className="flex justify-between items-center mb-4">
           <h1 className="text-2xl font-bold text-black">Detalles del Registro</h1>
           <Link to="/task" className="btn btn-success">
@@ -45,41 +50,30 @@ function TaskViewPage() {
         </div>
         <div className="text-black">
           {task && (
-            <>
-              <p className="my-4"><strong>Apellido:</strong> {task.apellido}</p>
-              <p className="my-4"><strong>Nombre:</strong> {task.nombre}</p>
-              <p className="my-4"><strong>DNI:</strong> {task.dni}</p>
-              <p className="my-4"><strong>Fecha de nacimiento:</strong> {formatDate(task.fechanacimiento)}</p>
-             
-
-
-
-              <p className="my-4"><strong>Género:</strong> {task.genero}</p>
-              <p className="my-4"><strong>Lugar de nacimiento:</strong> {task.nacimiento}</p>
-              <p className="my-4"><strong>Municipio:</strong> {task.municipio}</p>
-              <p className="my-4"><strong>Dirección Postal:</strong> {task.postal}</p>
-              {/* <p className="my-4"><strong>Años de residencia en la provincia de Misiones:</strong> {task.residencia}</p> */}
-              <p className="my-4"><strong>Nacionalidad:</strong> {task.nacionalidad}</p>
-              <p className="my-4"><strong>Correo:</strong> {task.correo}</p>
-              <p className="my-4"><strong>Teléfono:</strong> {task.telefono}</p>
-              
-              {/* <p className="my-4"><strong>Localidad:</strong> {task.localidad}</p> */}
-              
-              
-              
-            
-              <p className="my-4"><strong>Dirección:</strong> {task.direccion}</p>
-              
-
-              <p className="my-4"><strong>Observaciones:</strong> </p>
-              <textarea
-              
-  id="observaciones"
-  readOnly
-  className="w-full bg-gray-100 text-black px-4 py-2 rounded-md my-2 resize-none"
-  style={{ minHeight: '100px' }} // Altura mínima del textarea
-  value={task.observaciones}
-/>
+            <> 
+              <p className="my-4"><strong>Datos del Encuestador</strong></p>
+              <p className="my-4"><strong>Apellido:</strong> {task.apellidoenc}</p>
+              <p className="my-4"><strong>Nombre:</strong> {task.nombreenc}</p>
+              <p className="my-4"><strong>Organismo/Área Institucional :</strong> {task.organismoenc}</p>
+              <p className="my-4"><strong>Celular:</strong> {task.celularen}</p>
+              <p className="my-4"><strong>Correo :</strong> {task.correoen}</p>
+              <p className="my-4"><strong>Datos personales de las y los responsables de la unidad productiva</strong></p>
+              <p className="my-4"><strong>Apellido:</strong> {task.nombreresp1}</p>
+              <p className="my-4"><strong>DNI:</strong> {task.apellidoresp1}</p>
+              <p className="my-4"><strong>CUIT-CUIL:</strong> {task.dniresp1}</p>
+              <p className="my-4"><strong>Celular:</strong> {task.cuitresp1}</p>
+              <p className="my-4"><strong>Correo:</strong> {task.correoresp1}</p>
+              <p className="my-4"><strong>Estudios alcanzados :</strong> {task.estudiosresp1}</p>
+              <p className="my-4"><strong>Apellido:</strong> {task.nombreresp2}</p>
+              <p className="my-4"><strong>Nombre:</strong> {task.apellidoresp2}</p>
+              <p className="my-4"><strong>DNI:</strong> {task.dniresp2}</p>
+              <p className="my-4"><strong>CUIT-CUIL:</strong> {task.cuitresp2}</p>
+              <p className="my-4"><strong>Estudios alcanzados:</strong> {task.celularresp2}</p>
+              <p className="my-4"><strong>Datos del grupo familiar:</strong> {task.tieneintegrantes}</p>
+              <p className="my-4"><strong>¿Tiene integrantes trabajando?</strong> {task.cuantosintegrantes}</p>
+              <p className="my-4"><strong>Cantidad de Hijos:</strong> {task.cantidadhijosgrupo}</p>
+              <p className="my-4"><strong>¿Convive la Familia en el mismo hogar?</strong> {task.convive}</p>
+              <p className="my-4"><strong>¿Cuantos hijos asisten a la escuela?</strong> {task.hijosasisten}</p>
             </>
           )}
         </div>
