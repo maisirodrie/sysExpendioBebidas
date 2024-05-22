@@ -1,178 +1,138 @@
 import mongoose from "mongoose";
 
-const tasksSchema = new mongoose.Schema({
-
+const tasksSchema = new mongoose.Schema(
+  {
     //Encuestador
-
     apellidoenc: {
-        type: String,
-        require: true,
-        trim: true,
+      type: String,
+      trim: true,
     },
-    nombreenc :{
-        type: String,
-        require: true,
-        trim: true,
+    nombreenc: {
+      type: String,
+      trim: true,
+    },
+    organismoenc: {
+      type: String,
+      trim: true,
     },
     celularen: {
-        type: String,
-        required: true,
-        trim: true,
+      type: String,
+      trim: true,
     },
-    
     correoen: {
-        type: Date,
-        required: true,
-        trim: true,
-
+      type: String,
+      trim: true,
     },
 
     //Datos personales de las y los responsables de la unidad productiva
-
-    //Primer responsable 
-
+    //Primer responsable
     nombreresp1: {
-        type: String,
-        required: true,
-        trim: true
+      type: String,
+      trim: true,
+    },
+    apellidoresp1: {
+      type: String,
+      trim: true,
+    },
+    dniresp1: {
+      type: String,
+      trim: true,
+    },
+    cuitresp1: {
+      type: String,
+      trim: true,
+    },
+    celularresp1: {
+      type: String,
+      trim: true,
+    },
+    correoresp1: {
+      type: String,
+      trim: true,
+    },
+    estudiosresp1: {
+      type: String,
+      trim: true,
     },
 
-    apellidoresp1 :{
-        type: String,
-        require: true,
-        trim: true,
-    },
-
-    dniresp1 :{
-        type: String,
-        require: true,
-        trim: true,
-    },
-    
-    cuitresp1 :{
-        type: String,
-        require: true,
-        trim: true,
-    },  
-
-    fechanacimientoresp1 :{
-        type: String,
-        require: true,
-        trim: true,
-    },    
-    celularresp1 :{
-        type: String,
-        require: true,
-        trim: true,
-    }, 
-
-    estudiosresp1 :{
-        type: String,
-        require: true,
-        trim: true,
-    },
-
-    //Segundo responsable 
-
+    //Segundo responsable
     nombreresp2: {
-        type: String,
-        required: true,
-        trim: true
+      type: String,
+      trim: true,
+    },
+    apellidoresp2: {
+      type: String,
+      trim: true,
+    },
+    dniresp2: {
+      type: String,
+      trim: true,
+    },
+    cuitresp2: {
+      type: String,
+      trim: true,
+    },
+    celularresp2: {
+      type: String,
+      trim: true,
+    },
+    correoresp2: {
+      type: String,
+      trim: true,
+    },
+    estudiosresp2: {
+      type: String,
+      trim: true,
     },
 
-    apellidoresp2 :{
+    //Datos del grupo familiar
+    tieneintegrantes:{
         type: String,
-        require: true,
         trim: true,
     },
-
-    dniresp2 :{
+    cuantosintegrantes:{
         type: String,
-        require: true,
         trim: true,
     },
     
-    cuitresp2 :{
+    cantidadhijosgrupo: {
         type: String,
-        require: true,
-        trim: true,
-    },  
-
-    fechanacimientoresp2 :{
-        type: String,
-        require: true,
-        trim: true,
-    },    
-    celularresp2 :{
-        type: String,
-        require: true,
-        trim: true,
-    }, 
-
-    estudiosresp2 :{
-        type: String,
-        require: true,
         trim: true,
     },
 
-    // roldirecto: {
-    //     type: [String], // Ahora es un arreglo de strings
-    //     trim: true,
-    // },
-    // disciplinadirecta: {
-    //     type: [String], // Ahora es un arreglo de strings
-    //     trim: true,
-    // }, 
-    // rolindirecto: {
-    //     type: [String], // Ahora es un arreglo de strings
-    //     trim: true,
-    // },
-    // disciplinaindirecta: {
-    //     type: [String], // Ahora es un arreglo de strings
-    //     trim: true,
-    // }, 
-    // publico: {
+    convive:{
+        type: String,
+        trim: true,
+    },
+
+    hijosasisten: {
+        type: String,
+        trim: true,
+    },
+
+
+
+
+    // integrantesTrabajando: {
+    //   tieneIntegrantes: {
     //     type: String,
-    //     trim: true,
-    // }, 
-    // formacionpublica: {
-    //     type: [String], // Ahora es un arreglo de strings
-    //     trim: true,
-    // }, 
-    // disciplinapublica: {
-    //     type: [String], // Ahora es un arreglo de strings
-    //     trim: true,
-    // }, 
-    // privada: {
-    //     type: String,
-    //     trim: true,
-    // }, 
-    // formacionprivada: {
-    //     type: [String], // Ahora es un arreglo de strings
-    //     trim: true,
-    // }, 
-    // disciplinaprivada: {
-    //     type: [String], // Ahora es un arreglo de strings
-    //     trim: true,
+    //     enum: ["Si", "No"],
+    //     required: true,
+    //   },
+    //   cantidad: {
+    //     type: Number,
+    //   },
     // },
-  
-    
 
-    observaciones :{
-        type: String,
-        trim: true,
+    user: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "User",
+      required: true,
     },
+  },
+  {
+    timestamps: true,
+  }
+);
 
-    user:{
-        type: mongoose.Schema.Types.ObjectId,
-        ref: 'User',
-        require: true
-    }
-
-},
-    {
-        timestamps: true,
-    
-})
-
-export default mongoose.model ('Task' , tasksSchema)
+export default mongoose.model("Task", tasksSchema);

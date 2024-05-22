@@ -21,25 +21,19 @@ function Table() {
   }
 
   const filteredTasks = !search ? tasks : tasks.filter((task) => {
-    const apellido = task.apellido ? task.apellido.toLowerCase() : '';
-    const nombre = task.nombre ? task.nombre.toLowerCase() : '';
-    const dni = task.dni ? task.dni.toLowerCase() : '';
+    const apellidoresp1 = task.apellidoresp1 ? task.apellidoresp1.toLowerCase() : '';
+    const nombreresp1 = task.nombreresp1 ? task.nombreresp1.toLowerCase() : '';
+    const dniresp1 = task.dni ? task.dniresp1.toLowerCase() : '';
     const municipio = task.municipio ? task.municipio.toLowerCase() : '';
     const direccion = task.direccion ? task.direccion.toLowerCase() : '';
-    const roldirecto = Array.isArray(task.roldirecto) ? task.roldirecto.map(roldirecto => roldirecto.toLowerCase()).join(', ') : task.roldirecto.toLowerCase();
-    const disciplinadirecta = Array.isArray(task.disciplinadirecta) ? task.disciplinadirecta.map(disciplinadirecta => disciplinadirecta.toLowerCase()).join(', ') : task.disciplina.toLowerCase();
-    const rolindirecto = Array.isArray(task.rolindirecto) ? task.rolindirecto.map(rolindirecto => rolindirecto.toLowerCase()).join(', ') : task.rolindirecto.toLowerCase();
-    const disciplinaindirecta = Array.isArray(task.disciplinaindirecta) ? task.disciplinaindirecta.map(disciplinaindirecta => disciplinaindirecta.toLowerCase()).join(', ') : task.disciplina.toLowerCase();
     const searchLowerCase = search.toLowerCase();
 
     return (
-      apellido.includes(searchLowerCase) ||
-      nombre.includes(searchLowerCase) ||
-      dni.includes(searchLowerCase) ||
+      apellidoresp1.includes(searchLowerCase) ||
+      nombreresp1.includes(searchLowerCase) ||
+      dniresp1.includes(searchLowerCase) ||
       municipio.includes(searchLowerCase) ||
-      direccion.includes(searchLowerCase) ||
-      rolindirecto.includes(searchLowerCase) ||
-      disciplinaindirecta.includes(searchLowerCase)
+      direccion.includes(searchLowerCase)
     );
   });
 
@@ -99,9 +93,9 @@ function Table() {
                 <tbody>
                   {currentTasks.map((task) => (
                     <tr key={task._id}>
-                      <td>{task.apellido ? task.apellido.toUpperCase() : ''}</td>
-                      <td>{task.nombre ? task.nombre.toUpperCase() : ''}</td>
-                      <td>{task.dni ? task.dni.toUpperCase() : ''}</td>
+                      <td>{task.apellidoresp1 ? task.apellidoresp1.toUpperCase() : ''}</td>
+                      <td>{task.nombreresp1 ? task.nombreresp1.toUpperCase() : ''}</td>
+                      <td>{task.dniresp1 ? task.dniresp1.toUpperCase() : ''}</td>
                       <td>{task.municipio ? task.municipio.toUpperCase() : ''}</td>
                       <td>{task.direccion ? task.direccion.toUpperCase() : ''}</td>
                       {/* <td>

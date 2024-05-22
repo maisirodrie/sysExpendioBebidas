@@ -16,7 +16,7 @@ export function Navbar() {
     <nav className="bg-gray-200 px-10 flex flex-col md:flex-row md:items-center justify-between w-full">
       <div className="flex items-center">
         <h1 className="text-2xl font-bold mr-4">
-          <Link to={isAuthenticated ? (user.role === 'admin' ? "/task" : "/profile") : "/"}>
+          <Link to={isAuthenticated ? (user.role === 'admin' ? "/task" : "/") : "/"}>
             <img src="/logos/LOGO IPD Misiones.png" alt="Logo" className="h-20" />
           </Link>
         </h1>
