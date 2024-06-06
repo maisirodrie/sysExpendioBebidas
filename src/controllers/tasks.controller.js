@@ -17,13 +17,13 @@ export const getTasks = async (req,res) => {
   } catch (error) {
       return res.status(500).json({ message: error.message });
   }
-};
+}
 
 export const createTasks = async (req, res) => {
   try {
     const {
       apellidoenc, nombreenc, organismoenc, celularen, correoen, nombreresp1, apellidoresp1, dniresp1, cuitresp1, fechanacimientoresp1, celularresp1, correoresp1, estudiosresp1,
-      apellidoresp2,nombreresp2, dniresp2, cuitresp2, fechanacimientoresp2, celularresp2, correoresp2, estudiosresp2, tieneintegrantes,cuantosintegrantes,cantidadhijosgrupo,convive,hijosasisten, userRole // Ensure nombreresp2 is included in the request body
+      apellidoresp2,nombreresp2, dniresp2, cuitresp2, fechanacimientoresp2, celularresp2, correoresp2, estudiosresp2, tieneintegrantes,cuantosintegrantes,cantidadhijosgrupo,convive,hijosasisten,nivelinicialfamiliar,primariafamiliar,secundariafamiliar,terciariaosuperiorfamiliar, userRole // Ensure nombreresp2 is included in the request body
     } = req.body;
 
     // Check if a task with the same dniresp1 already exists
@@ -37,7 +37,7 @@ export const createTasks = async (req, res) => {
     // Create a new task
     const newTask = new Task({
       apellidoenc, nombreenc, organismoenc, celularen, correoen, nombreresp1, apellidoresp1, dniresp1, cuitresp1, fechanacimientoresp1, celularresp1, correoresp1, estudiosresp1,
-      apellidoresp2,nombreresp2, dniresp2, cuitresp2, fechanacimientoresp2, celularresp2, correoresp2, estudiosresp2, tieneintegrantes,cuantosintegrantes,cantidadhijosgrupo,convive,hijosasisten, userRole,
+      apellidoresp2,nombreresp2, dniresp2, cuitresp2, fechanacimientoresp2, celularresp2, correoresp2, estudiosresp2, tieneintegrantes,cuantosintegrantes,cantidadhijosgrupo,convive,hijosasisten,nivelinicialfamiliar,primariafamiliar,secundariafamiliar,terciariaosuperiorfamiliar, userRole,
       user: req.user.id, // Assuming req.user.id contains the ID of the authenticated user
     });
 
@@ -54,12 +54,6 @@ export const createTasks = async (req, res) => {
 
 
 
-
-
-
-
-
-
 export const getTask = async (req, res) => {
   try {
     const task = await Task.findById(req.params.id).populate("user");
@@ -71,10 +65,11 @@ export const getTask = async (req, res) => {
 };
 
 
+
 export const updateTasks = async (req, res) => {
   try {
       const { apellidoenc,nombreenc,organismoenc,celularen,correoen,nombreresp1,apellidoresp1,dniresp1,cuitresp1,fechanacimientoresp1,celularresp1,correoresp1,estudiosresp1,
-        apellidoresp2,dniresp2,cuitresp2,fechanacimientoresp2,celularresp2,correoresp2,estudiosresp2, integrantesTrabajando,cantidadhijosgrupo,convive,hijosasisten } = req.body;
+        apellidoresp2,dniresp2,cuitresp2,fechanacimientoresp2,celularresp2,correoresp2,estudiosresp2, integrantesTrabajando,cantidadhijosgrupo,convive,hijosasisten,nivelinicialfamiliar,primariafamiliar,secundariafamiliar,terciariaosuperiorfamiliar } = req.body;
 
       // Buscar si ya existe una tarea con el mismo DNI, excluyendo el documento actual
       const existingTask = await Task.findOne({ dni: dni, _id: { $ne: req.params.id } });
@@ -88,7 +83,7 @@ export const updateTasks = async (req, res) => {
       const updatedTask = await Task.findByIdAndUpdate(
           req.params.id,
           { apellidoenc,nombreenc,organismoenc,celularen,correoen,nombreresp1,apellidoresp1,dniresp1,cuitresp1,fechanacimientoresp1,celularresp1,correoresp1,estudiosresp1,
-            apellidoresp2,dniresp2,cuitresp2,fechanacimientoresp2,celularresp2,correoresp2,estudiosresp2 , integrantesTrabajando,cantidadhijosgrupo,convive,hijosasisten},
+            apellidoresp2,dniresp2,cuitresp2,fechanacimientoresp2,celularresp2,correoresp2,estudiosresp2 , integrantesTrabajando,cantidadhijosgrupo,convive,hijosasisten,nivelinicialfamiliar,primariafamiliar,secundariafamiliar,terciariaosuperiorfamiliar},
           { new: true }
       );
 

@@ -85,44 +85,46 @@ const tasksSchema = new mongoose.Schema(
       trim: true,
     },
 
-    //Datos del grupo familiar
-    tieneintegrantes:{
-        type: String,
-        trim: true,
+    // Datos del grupo familiar
+    tieneintegrantes: {
+      type: String, // Cambiar a String
+      enum: ["SI", "NO"], // Validación para aceptar solo "SI" o "NO"
+      trim: true,
     },
-    cuantosintegrantes:{
-        type: String,
-        trim: true,
+    cuantosintegrantes: {
+      type: String,
+      trim: true,
+    },
+    cantidadhijosgrupo: {
+      type: String,
+      trim: true,
+    },
+    convive: {
+      type: String, // Cambiar a String
+      enum: ["SI", "NO"], // Validación para aceptar solo "SI" o "NO"
+      trim: true,
+    },
+    hijosasisten: {
+      type: String,
+      trim: true,
     },
     
-    cantidadhijosgrupo: {
-        type: String,
-        trim: true,
+    nivelinicialfamiliar:{
+      type: String,
+      trim: true,
     },
-
-    convive:{
-        type: String,
-        trim: true,
+    primariafamiliar:{
+      type: String,
+      trim: true,
     },
-
-    hijosasisten: {
-        type: String,
-        trim: true,
+    secundariafamiliar:{
+      type: String,
+      trim: true,
     },
-
-
-
-
-    // integrantesTrabajando: {
-    //   tieneIntegrantes: {
-    //     type: String,
-    //     enum: ["Si", "No"],
-    //     required: true,
-    //   },
-    //   cantidad: {
-    //     type: Number,
-    //   },
-    // },
+    terciariaosuperiorfamiliar:{
+      type: String,
+      trim: true,
+    },
 
     user: {
       type: mongoose.Schema.Types.ObjectId,

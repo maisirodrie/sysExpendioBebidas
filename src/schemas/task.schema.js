@@ -3,103 +3,93 @@ import { z } from "zod";
 export const creatTaskSchema = z.object({
   //Encuestador
 
-  // apellidoenc: z.string({
-  //     // required_error: 'Apellido del encuestador es requerido'
-  // }),
-  // nombreenc: z.string({
-  //     // required_error: 'Nombre del encuestador es requerido'
-  // }),
-  // organismoenc: z.string({
-  //     // required_error: 'Organismo del encuestador es requerido'
-  // }),
-  // celularen: z.string({
-  //     // required_error: 'Celular del encuestador es requerido'
-  // }),
-  // correoen: z.string({
-  //     // required_error: 'Correo del encuestador es requerido'
-  // }),
+  apellidoenc: z.string({
+    required_error: "Apellido del encuestador es requerido",
+  }),
+  nombreenc: z.string({
+    required_error: "Nombre del encuestador es requerido",
+  }),
+  organismoenc: z.string({
+    required_error: "Organismo del encuestador es requerido",
+  }),
+  celularen: z.string({
+    required_error: "Celular del encuestador es requerido",
+  }),
+  correoen: z.string({
+    required_error: "Correo del encuestador es requerido",
+  }),
 
-  // //Datos personales de las y los responsables de la unidad productiva
+  //Datos personales de las y los responsables de la unidad productiva
 
-  // //Primer responsable
-  // nombreresp1:z.string({
-  //     // required_error: 'Nombre responsable 1 es requerido'
+  //Primer responsable
+  nombreresp1: z.string({
+    required_error: "Nombre responsable 1 es requerido",
+  }),
+  apellidoresp1: z.string({
+    required_error: "Apellido responsable 1 es requerido",
+  }),
+  dniresp1: z.string({
+    required_error: "DNI responsable 1 es requerido",
+  }),
+  cuitresp1: z.string({
+    required_error: "CUIT-CUIL responsable 1 es requerido",
+  }),
+  // fechanacimientoresp1:z.string({
+  //     required_error: 'Fecha de nacimiento es requerido'
   // }),
-  // apellidoresp1:z.string({
-  //     // required_error: 'Apellido responsable 1 es requerido'
-  // }),
-  // dniresp1: z.string({
-  //     // required_error: 'DNI responsable 1 es requerido'
-  // }),
-  // cuitresp1:z.string({
-  //     // required_error: 'CUIT-CUIL responsable 1 es requerido'
-  // }),
-  // // fechanacimientoresp1:z.string({
-  // //     required_error: 'Fecha de nacimiento es requerido'
-  // // }),
-  // celularresp1:z.string({
-  //     // required_error: 'Celular responsable 1 es requerido'
-  // }),
-  // correoresp1:z.string({
-  //     // required_error: 'Correo responsable 1 es requerido'
-  // }),
-  // estudiosresp1:z.string({
-  //     // required_error: 'Estudios responsable 1 es requerido'
-  // }),
+  celularresp1: z.string({
+    required_error: "Celular responsable 1 es requerido",
+  }),
+  correoresp1: z.string({
+    required_error: "Correo responsable 1 es requerido",
+  }),
+  estudiosresp1: z.string({
+    required_error: "Estudios responsable 1 es requerido",
+  }),
 
-  // //Segundo responsable
+  //Segundo responsable
 
-  // nombreresp2:z.string({
-  //     // required_error: 'Nombre responsable 2 es requerido'
+  nombreresp2: z.string({
+    required_error: "Nombre responsable 2 es requerido",
+  }),
+  apellidoresp2: z.string({
+    required_error: "Apellido responsable 2 es requerido",
+  }),
+  dniresp2: z.string({
+    required_error: "DNI responsable 2 es requerido",
+  }),
+  cuitresp2: z.string({
+    required_error: "CUIT-CUIL responsable 2 es requerido",
+  }),
+  // fechanacimientoresp2:z.string({
+  //     required_error: 'Fecha de nacimiento es requerido'
   // }),
-  // apellidoresp2:z.string({
-  //     // required_error: 'Apellido responsable 2 es requerido'
-  // }),
-  // dniresp2: z.string({
-  //     // required_error: 'DNI responsable 2 es requerido'
-  // }),
-  // cuitresp2:z.string({
-  //     // required_error: 'CUIT-CUIL responsable 2 es requerido'
-  // }),
-  // // fechanacimientoresp2:z.string({
-  // //     required_error: 'Fecha de nacimiento es requerido'
-  // // }),
-  // celularresp2:z.string({
-  //     // required_error: 'Celular responsable 2 es requerido'
-  // }),
-  // correoresp2:z.string({
-  //     // required_error: 'Correo responsable 2 es requerido'
-  // }),
-  // estudiosresp2:z.string({
-  //     // required_error: 'Estudios responsable 2 es requerido'
-  // }),
+  celularresp2: z.string({
+    required_error: "Celular responsable 2 es requerido",
+  }),
+  correoresp2: z.string({
+    required_error: "Correo responsable 2 es requerido",
+  }),
+  estudiosresp2: z.string({
+    required_error: "Estudios responsable 2 es requerido",
+  }),
 
-  // //Datos del grupo familiar
-  tieneintegrantes: z.string({}),
-  cuantosintegrantes: z.string({}),
-  cantidadhijosgrupo:z.string({}),
-  convive:z.string({}),
-  hijosasisten:z.string({}),
+  // Datos del grupo familiar
+  tieneintegrantes: z.string({
+    required_error: "Hay integrantes es requerido",
+  }),
+  cuantosintegrantes: z.string({}).optional(),
+  cantidadhijosgrupo: z.string({}).optional(),
+  convive: z.string({}).optional(),
+  hijosasisten: z.string({}).optional(),
 
-  // integrantesTrabajando: z.object({
-  //     tieneIntegrantes: z.enum(["Si", "No"]),
-  //     cantidad: z.number().optional()
-  // }),
+  nivelinicialfamiliar: z.string({}).optional(),
 
-  // hijosfamiliar:z.string({
-  // }),
-  // convivefamiliar: z.string({
-  // }),
-  // escuelafamiliar:z.string({
-  // }),
+  primariafamiliar: z.string({}).optional(),
 
-  // nivelinicialfamiliar: z.array(z.string()),
+  secundariafamiliar: z.string({}).optional(),
 
-  // primariafamiliar: z.array(z.string()),
-
-  // secundariafamiliar: z.array(z.string()),
-
-  // terciariaosuperiorfamiliar: z.array(z.string()),
+  terciariaosuperiorfamiliar: z.string({}).optional(),
 
   // domiciliofamiliar: z.string({
   // }),

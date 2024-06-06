@@ -69,11 +69,13 @@ function TaskViewPage() {
               <p className="my-4"><strong>DNI:</strong> {task.dniresp2}</p>
               <p className="my-4"><strong>CUIT-CUIL:</strong> {task.cuitresp2}</p>
               <p className="my-4"><strong>Estudios alcanzados:</strong> {task.celularresp2}</p>
-              <p className="my-4"><strong>Datos del grupo familiar:</strong> {task.tieneintegrantes}</p>
-              <p className="my-4"><strong>¿Tiene integrantes trabajando?</strong> {task.cuantosintegrantes}</p>
-              <p className="my-4"><strong>Cantidad de Hijos:</strong> {task.cantidadhijosgrupo}</p>
-              <p className="my-4"><strong>¿Convive la Familia en el mismo hogar?</strong> {task.convive}</p>
-              <p className="my-4"><strong>¿Cuantos hijos asisten a la escuela?</strong> {task.hijosasisten}</p>
+              <p className="my-4"><strong>Datos del grupo familiar</strong></p>
+              <p className="my-4"><strong>¿Tiene integrantes trabajando? :</strong> {task.tieneintegrantes}</p>
+              <p className="my-4"><strong>¿Cuantos integrantes? :</strong>{task.cuantosintegrantes} </p>
+              <p className="my-4"><strong>Cantidad de Hijos:</strong> {task.hijosasisten}</p>
+              <p className="my-4"><strong>¿Convive la Familia en el mismo hogar? : </strong>{task.cantidadhijosgrupo} </p>
+              <p className="my-4"><strong>¿Cuantos hijos asisten a la escuela? </strong>{task.convive}</p>
+             
             </>
           )}
         </div>

@@ -77,14 +77,17 @@ function Table() {
               <table className='table' style={{ textTransform: 'uppercase' }}>
                 <thead>
                   <tr>
-                    <th colSpan="6" className="table-title">Listado de Inscriptos</th>
+                    <th colSpan="10" className="table-title">Listado de Inscriptos</th>
                   </tr>
                   <tr>
                     <th>Apellido</th>
                     <th>Nombre</th>
                     <th>DNI</th>
                     <th>Municipio</th>
-                    <th>Dirección</th>
+                    <th>Género</th>
+                    <th>Superficie Total</th>
+                    <th>Vende lo que produce</th>
+                    <th>Pueblo Originarios</th>
                     <th>Ver</th>
                     {/* <th>Editar</th>
                     <th>Borrar</th> */}
@@ -98,6 +101,10 @@ function Table() {
                       <td>{task.dniresp1 ? task.dniresp1.toUpperCase() : ''}</td>
                       <td>{task.municipio ? task.municipio.toUpperCase() : ''}</td>
                       <td>{task.direccion ? task.direccion.toUpperCase() : ''}</td>
+                      <td>{task.direccion ? task.direccion.toUpperCase() : ''}</td>
+                      <td>{task.direccion ? task.direccion.toUpperCase() : ''}</td>
+                      <td>{task.direccion ? task.direccion.toUpperCase() : ''}</td>
+                      
                       {/* <td>
                         {Array.isArray(task.roldirecto) ? task.roldirecto.map(roldirecto => {
                           if (typeof roldirecto === 'string') {
