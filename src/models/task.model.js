@@ -16,7 +16,7 @@ const tasksSchema = new mongoose.Schema(
       trim: true,
     },
     celularen: {
-      type: String,
+      type: number,
       trim: true,
     },
     correoen: {
@@ -35,15 +35,15 @@ const tasksSchema = new mongoose.Schema(
       trim: true,
     },
     dniresp1: {
-      type: String,
+      type: number,
       trim: true,
     },
     cuitresp1: {
-      type: String,
+      type: number,
       trim: true,
     },
     celularresp1: {
-      type: String,
+      type: number,
       trim: true,
     },
     correoresp1: {
@@ -65,15 +65,15 @@ const tasksSchema = new mongoose.Schema(
       trim: true,
     },
     dniresp2: {
-      type: String,
+      type: number,
       trim: true,
     },
     cuitresp2: {
-      type: String,
+      type: number,
       trim: true,
     },
     celularresp2: {
-      type: String,
+      type: number,
       trim: true,
     },
     correoresp2: {
@@ -92,11 +92,11 @@ const tasksSchema = new mongoose.Schema(
       trim: true,
     },
     cuantosintegrantes: {
-      type: String,
+      type: number,
       trim: true,
     },
     cantidadhijosgrupo: {
-      type: String,
+      type: number,
       trim: true,
     },
     convive: {
@@ -110,19 +110,19 @@ const tasksSchema = new mongoose.Schema(
     },
     
     nivelinicialfamiliar:{
-      type: String,
+      type: number,
       trim: true,
     },
     primariafamiliar:{
-      type: String,
+      type: number,
       trim: true,
     },
     secundariafamiliar:{
-      type: String,
+      type: number,
       trim: true,
     },
     terciariaosuperiorfamiliar:{
-      type: String,
+      type: number,
       trim: true,
     },
 

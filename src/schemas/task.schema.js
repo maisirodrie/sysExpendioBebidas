@@ -91,32 +91,27 @@ export const creatTaskSchema = z.object({
 
   terciariaosuperiorfamiliar: z.string({}).optional(),
 
-  // domiciliofamiliar: z.string({
-  // }),
+  pueblosoriginariosfamiliar: z.string({}).optional(),
 
-  // lotefamiliar:z.string({
-  // }),
+  cualpueblosoriginariosfamiliar: z.string({}).optional(),
 
-  // parcelafamiliar:z.string({
-  // }),
+  domiciliofamiliar: z.string({
+    required_error: "Vive donde produce es requerido",
+  }),
 
-  // seccionfamiliar:z.string({
-  // }),
+  lotefamiliar: z.string({}).optional(),
 
-  // partidafamiliar:z.string({
-  // }),
+  parcelafamiliar: z.string({}).optional(),
 
-  // coloniaparajefamiliar:z.string({
-  // }),
+  seccionfamiliar: z.string({}).optional(),
 
-  // localidadfamiliar:z.string({
-  // }),
+  partidafamiliar: z.string({}).optional(),
 
-  // departamentofamiliar:z.string({
-  // }),
+  coloniaparajefamiliar: z.string({}).optional(),
 
-  // pueblosoriginariosfamiliar:z.string({
-  // }),
+  localidadfamiliar: z.string({}).optional(),
+
+  departamentofamiliar: z.string({}).optional(),
 
   // //Datos prediales de la unidad productiva
 
@@ -140,6 +135,8 @@ export const creatTaskSchema = z.object({
 
   // departamentoprediales:z.string({
   // }),
+
+  propiedadproductiva: z.string({}).optional(),
 
   // propietarioprediales:z.string({
   // }),
@@ -185,11 +182,11 @@ export const creatTaskSchema = z.object({
 
   // //Pefil Productivo
 
-  // produccionagroecologica:z.string({
-  // }),
+  //required_error: "Producción Agroecológica es requerido",
+  
+  produccionagroecologica: z.string({}).optional(),
 
-  // produccionconvencional:z.string({
-  // }),
+  produccionconvencional:z.string({}).optional(),
 
   // produccionanimal:z.string({
   // }),
@@ -197,19 +194,15 @@ export const creatTaskSchema = z.object({
   // produccionvegetal:z.string({
   // }),
 
-  // accesoagua:z.string({
-  // }),
+  accesoagua:z.string({}).optional(),
 
-  // infraestructuraproductiva:z.string({
-  // }),
+  infraestructuraproductiva:z.string({}).optional(),
 
-  // maquinariaproductiva:z.string({
-  // }),
+  maquinariaproductiva:z.string({}).optional(),
 
   // //Datos de Comercializacion
 
-  // vendecomercializacion:z.string({
-  // }),
+  vendecomercializacion:z.string({}).optional(),
 
   // feriaperteneciente:z.string({
   // }),

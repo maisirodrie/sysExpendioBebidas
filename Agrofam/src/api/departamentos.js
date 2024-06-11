@@ -1,0 +1,20 @@
+export const Departamentos = [
+    { id: 1, nombre: "APÓSTOLES" },
+    { id: 2, nombre: "CAINGUÁS" },
+    { id: 3, nombre: "CANDELARIA" },
+    { id: 4, nombre: "CAPITAL" },
+    { id: 5, nombre: "CONCEPCIÓN" },
+    { id: 6, nombre: "ELDORADO" },
+    { id: 7, nombre: "GENERAL MANUEL BELGRANO" },
+    { id: 8, nombre: "GUARANÍ" },
+    { id: 9, nombre: "IGUAZÚ" },
+    { id: 10, nombre: "LEANDRO N. ALEM" },
+    { id: 11, nombre: "LIBERTADOR GENERAL SAN MARTÍN" },
+    { id: 12, nombre: "MONTECARLO" },
+    { id: 13, nombre: "OBERÁ" },
+    { id: 14, nombre: "SAN IGNACIO" },
+    { id: 15, nombre: "SAN JAVIER" },
+    { id: 16, nombre: "SAN PEDRO" },
+    { id: 17, nombre: "25 DE MAYO" },
+  ];
+  

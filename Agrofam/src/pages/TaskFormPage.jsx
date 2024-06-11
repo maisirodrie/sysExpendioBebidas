@@ -15,6 +15,17 @@ function TaskFormPage() {
   const [selectedCondicionIntegrantes, setSelectedCondicionIntegrantes] =
     useState("");
   const [selectedCondicionConvive, setSelectedCondicionConvive] = useState("");
+  const [selectedPueblosOriginarios, setSelectedPueblosOriginario] =
+  useState("");
+  const [selectedDomicilioFamiliar, setSelectedDomicilioFamiliar] =
+    useState("");
+
+  const [selectedPropiedadProductiva, setSelectedPropiedadProductiva] =
+    useState("");
+  const [selectedProduccionAgroecologica, setSelectedProduccionAgroecologica] =
+    useState("");
+  const [selectedProduccionConvencional, setSelectedProduccionConvencional] =
+    useState("");
   const [dniError, setDniError] = useState("");
 
   useEffect(() => {
@@ -59,6 +70,18 @@ function TaskFormPage() {
         setValue("primariafamiliar", task.primariafamiliar);
         setValue("secundariafamiliar", task.secundariafamiliar);
         setValue("terciariaosuperiorfamiliar", task.terciariaosuperiorfamiliar);
+        setValue("pueblosoriginariosfamiliar", task.pueblosoriginariosfamiliar);
+        setValue("cualpueblosoriginariosfamiliar", task.cualpueblosoriginariosfamiliar)
+        setValue("domiciliofamiliar", task.domiciliofamiliar);
+        setValue("lotefamiliar", task.lotefamiliar);
+        setValue("parcelafamiliar", task.parcelafamiliar);
+        setValue("seccionfamiliar", task.seccionfamiliar);
+        setValue("partidafamiliar", task.partidafamiliar);
+        setValue("coloniaparajefamiliar", task.coloniaparajefamiliar);
+        setValue("localidadfamiliar", task.localidadfamiliar);
+        setValue("departamentofamiliar", task.departamentofamiliar);
+
+        //Datos Prediales de la unidad Productiva
       }
     }
     loadTask();
@@ -70,6 +93,9 @@ function TaskFormPage() {
         ...data,
         tieneintegrantes: data.tieneintegrantes === "SI" ? "SI" : "NO",
         convive: data.convive === "SI" ? "SI" : "NO",
+        pueblosoriginariosfamiliar:
+          data.pueblosoriginariosfamiliar === "SI" ? "SI" : "NO",
+        domiciliofamiliar: data.domiciliofamiliar === "SI" ? "SI" : "NO",
       };
 
       console.log("Datos del formulario a enviar:", updatedData);
@@ -158,7 +184,7 @@ function TaskFormPage() {
             Celular
           </label>
           <input
-            type="text"
+            type="number"
             {...register("celularen", { required: true })}
             className="w-full bg-gray-100 text-black px-4 py-2 rounded-md my-2"
             placeholder="Celular"
@@ -170,7 +196,7 @@ function TaskFormPage() {
             Correo
           </label>
           <input
-            type="text"
+            type="email"
             {...register("correoen", { required: true })}
             className="w-full bg-gray-100 text-black px-4 py-2 rounded-md my-2"
             placeholder="Correo"
@@ -217,7 +243,7 @@ function TaskFormPage() {
               DNI
             </label>
             <input
-              type="text"
+              type="number"
               {...register("dniresp1", { required: true })}
               className="w-full bg-gray-100 text-black px-4 py-2 rounded-md my-2"
               placeholder="DNI"
@@ -241,7 +267,7 @@ function TaskFormPage() {
               Celular
             </label>
             <input
-              type="text"
+              type="number"
               {...register("celularresp1", { required: true })}
               className="w-full bg-gray-100 text-black px-4 py-2 rounded-md my-2"
               placeholder="Celular"
@@ -253,7 +279,7 @@ function TaskFormPage() {
               Correo
             </label>
             <input
-              type="text"
+              type="email"
               {...register("correoresp1", { required: true })}
               className="w-full bg-gray-100 text-black px-4 py-2 rounded-md my-2"
               placeholder="Correo"
@@ -309,7 +335,7 @@ function TaskFormPage() {
                 DNI
               </label>
               <input
-                type="text"
+                type="number"
                 {...register("dniresp2")}
                 className="w-full bg-gray-100 text-black px-4 py-2 rounded-md my-2"
                 placeholder="DNI"
@@ -333,7 +359,7 @@ function TaskFormPage() {
                 Celular
               </label>
               <input
-                type="text"
+                type="number"
                 {...register("celularresp2")}
                 className="w-full bg-gray-100 text-black px-4 py-2 rounded-md my-2"
                 placeholder="Celular"
@@ -345,7 +371,7 @@ function TaskFormPage() {
                 Correo
               </label>
               <input
-                type="text"
+                type="email"
                 {...register("correoresp2")}
                 className="w-full bg-gray-100 text-black px-4 py-2 rounded-md my-2"
                 placeholder="Correo"
@@ -419,7 +445,7 @@ function TaskFormPage() {
                       ¿Cuántos?
                     </label>
                     <input
-                      type="text"
+                      type="number"
                       {...register("cuantosintegrantes", {
                         required: selectedCondicionIntegrantes === "SI",
                       })}
@@ -433,7 +459,7 @@ function TaskFormPage() {
                       Cantidad de Hijos
                     </label>
                     <input
-                      type="text"
+                      type="number"
                       {...register("cantidadhijosgrupo", {
                         required: selectedCondicionIntegrantes === "SI",
                       })}
@@ -487,7 +513,7 @@ function TaskFormPage() {
                         ¿Cuantos hijos asisten a la escuela?
                       </label>
                       <input
-                        type="text"
+                        type="number"
                         {...register("hijosasisten")}
                         className="w-full bg-gray-100 text-black px-4 py-2 rounded-md my-2"
                         placeholder="¿Cuantos hijos asisten a la escuela?"
@@ -500,7 +526,7 @@ function TaskFormPage() {
                         Nivel Inicial
                       </label>
                       <input
-                        type="text"
+                        type="number"
                         {...register("nivelinicialfamiliar")}
                         className="w-full bg-gray-100 text-black px-4 py-2 rounded-md my-2"
                         placeholder="Nivel Inicial"
@@ -513,7 +539,7 @@ function TaskFormPage() {
                         Primaria
                       </label>
                       <input
-                        type="text"
+                        type="number"
                         {...register("primariafamiliar")}
                         className="w-full bg-gray-100 text-black px-4 py-2 rounded-md my-2"
                         placeholder="Primaria"
@@ -526,7 +552,7 @@ function TaskFormPage() {
                         Secundaria
                       </label>
                       <input
-                        type="text"
+                        type="number"
                         {...register("secundariafamiliar")}
                         className="w-full bg-gray-100 text-black px-4 py-2 rounded-md my-2"
                         placeholder="Secundaria"
@@ -539,15 +565,80 @@ function TaskFormPage() {
                         Terciaria o Superior
                       </label>
                       <input
-                        type="text"
+                        type="number"
                         {...register("terciariaosuperiorfamiliar")}
                         className="w-full bg-gray-100 text-black px-4 py-2 rounded-md my-2"
                         placeholder="Terciaria o Superior"
                       />
-                    </>
-                  </>
+                      </>
+                      </>
                 )}
               </div>
+              </div>
+              <div>                      
+                <label
+                        htmlFor="pueblosoriginariosfamiliar"
+                        className="block text-sm font-medium text-black"
+                      >
+                        ¿Pertenece a alguna comunidad de Pueblos Originarios?
+                      </label>
+                      <div>
+                        <label
+                          htmlFor="convive_si"
+                          className="inline-flex items-center mt-3"
+                        >
+                          <input
+                            type="radio"
+                            name="convive"
+                            value="SI"
+                            checked={selectedPueblosOriginarios === "SI"}
+                            {...register("pueblosoriginariosfamiliar")}
+                            onChange={() => setSelectedPueblosOriginario("SI")}
+                            className="form-radio h-5 w-5 text-indigo-600"
+                          />
+                          <span className="ml-2 text-black">SI</span>
+                        </label>
+                        <label
+                          htmlFor="convive_no"
+                          className="inline-flex items-center mt-3 ml-6"
+                        >
+                          <input
+                            type="radio"
+                            name="convive"
+                            value="NO"
+                            checked={selectedPueblosOriginarios === "NO"}
+                            {...register("pueblosoriginariosfamiliar")}
+                            onChange={() => setSelectedPueblosOriginario("NO")}
+                            className="form-radio h-5 w-5 text-indigo-600"
+                          />
+                          <span className="ml-2 text-black">NO</span>
+                        </label>
+                      </div> 
+                      {selectedPueblosOriginarios === "SI" && (
+                        <>
+                        <label
+                        htmlFor="cualpueblosoriginariosfamiliar"
+                        className="block text-sm font-medium text-black"
+                      >
+                        ¿Cuál?
+                      </label>
+                      <input
+                        type="text"
+                        {...register("cualpueblosoriginariosfamiliar")}
+                        className="w-full bg-gray-100 text-black px-4 py-2 rounded-md my-2"
+                        placeholder="¿Cuál?"
+                      />
+                  </>    
+                  
+                )}
+              
+                    
+                
+                  
+
+                     
+                  
+                  
             </div>
 
             <button
