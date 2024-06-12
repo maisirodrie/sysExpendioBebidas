@@ -109,208 +109,171 @@ export const creatTaskSchema = z.object({
 
   coloniaparajefamiliar: z.string({}).optional(),
 
-  localidadfamiliar: z.string({}).optional(),
+  municipiofamiliar: z.string({}).optional(),
 
   departamentofamiliar: z.string({}).optional(),
 
   // //Datos prediales de la unidad productiva
 
-  // loteprediales:z.string({
-  // }),
+  loteprediales:z.string({
+  }).optional(),
 
-  // parcelaprediales:z.string({
-  // }),
+  parcelaprediales:z.string({
+  }).optional(),
 
-  // seccionprediales:z.string({
-  // }),
+  seccionprediales:z.string({
+  }).optional(),
 
-  // partidaprediales:z.string({
-  // }),
+  partidaprediales:z.string({
+  }).optional(),
 
-  // coloniaprediales:z.string({
-  // }),
+  coloniaprediales:z.string({
+  }).optional(),
 
-  // localidadprediales:z.string({
-  // }),
+  municipioprediales:z.string({
+  }).optional(),
 
-  // departamentoprediales:z.string({
-  // }),
+  departamentoprediales:z.string({
+  }).optional(),
 
   propiedadproductiva: z.string({}).optional(),
 
-  // propietarioprediales:z.string({
-  // }),
+  propietarioprediales:z.string({
+  }).optional(),
 
-  // arrendatarioprediales:z.string({
-  // }),
+  arrendatarioprediales:z.string({
+  }).optional(),
 
-  // condominioprediales:z.string({
-  // }),
+  condominioprediales:z.string({
+  }).optional(),
 
-  // ocupanteprediales:z.string({
-  // }),
+  ocupanteprediales:z.string({
+  }).optional(),
 
-  // superficietotalprediales:z.string({
-  // }),
+  superficietotalprediales:z.string({
+  }).optional(),
 
-  // supagricprediales:z.string({
-  // }),
+  supagricprediales:z.string({
+  }).optional(),
 
-  // supgandprediales:z.string({
-  // }),
+  supgandprediales:z.string({
+  }).optional(),
 
-  // monteprediales:z.string({
-  // }),
+  monteprediales:z.string({
+  }).optional(),
 
-  // suppiscicolaprediales:z.string({
-  // }),
+  suppiscicolaprediales:z.string({
+  }).optional(),
 
-  // supapicolaprediales:z.string({
-  // }),
+  supapicolaprediales:z.string({
+  }).optional(),
 
-  // supactindustrialprediales:z.string({
-  // }),
+  supactindustrialprediales:z.string({
+  }).optional(),
 
-  // sinusoprediales:z.string({
-  // }),
+  sinusoprediales:z.string({
+  }).optional(),
 
-  // otrosprediales:z.string({
-  // }),
+  otrosprediales:z.string({
+  }).optional(),
 
-  // puntosgpsprediales:z.string({
-  // }),
+  puntosgpsprediales:z.string({
+  }).optional(),
 
   // //Pefil Productivo
 
   //required_error: "Producción Agroecológica es requerido",
   
   produccionagroecologica: z.string({}).optional(),
+  
+  situacionproduccionagroecologica: z.string({}).optional(),
 
   produccionconvencional:z.string({}).optional(),
 
-  // produccionanimal:z.string({
-  // }),
+  produccionanimal:z.string({
+  }).optional(),
 
-  // produccionvegetal:z.string({
-  // }),
+  produccionvegetal:z.string({
+  }).optional(),
 
   accesoagua:z.string({}).optional(),
 
+  modalidadaccesoagua:z.string({}).optional(),
+
   infraestructuraproductiva:z.string({}).optional(),
 
+  cualesinfraestructuraproductiva:z.string({}).optional(),
+
   maquinariaproductiva:z.string({}).optional(),
+
+  cualesmaquinariaproductiva:z.string({}).optional(),
 
   // //Datos de Comercializacion
 
   vendecomercializacion:z.string({}).optional(),
 
-  // feriaperteneciente:z.string({
-  // }),
+  cualesvendecomercializacion:z.string({}).optional(),
 
-  // puesto:z.string({
-  // }),
+  feriaperteneciente:z.string({
+  }).optional(),
 
-  // carnetmanipulacion:z.string({
-  // }),
+  puesto:z.string({
+  }).optional(),
 
-  // monotributista:z.string({
-  // }),
+  carnetmanipulacion:z.string({
+  }).optional(),
 
-  // excedenteproduccion:z.string({
-  // }),
+  vigencia:z.string({
+  }).optional(),
 
-  // pedido:z.string({
-  // }),
+  monotributista:z.string({
+  }).optional(),
 
-  // compraproduccion:z.string({
-  // }),
+  excedenteproduccion:z.string({
+  }).optional(),
 
-  // agregadovalor:z.string({
-  // }),
+  pedido:z.string({
+  }).optional(),
 
-  // equipamento:z.string({
-  // }),
+  compraproduccion:z.string({
+  }).optional(),
 
-  // difusion:z.string({
-  // }),
+  agregadovalor:z.string({
+  }).optional(),
+
+  cualesagregadovalor:z.string({
+  }).optional(),
+
+  equipamento:z.string({
+  }).optional(),
+
+  cualesequipamento:z.string({
+  }).optional(),
+
+  difusion:z.string({
+  }).optional(),
+
+  cualesdifusion:z.string({
+  }).optional(),
 
   // //Registro asignados
 
-  // registroprovincial:z.string({
-  // }),
+  registroprovincial:z.string({
+  }).optional(),
 
-  // registroproductor:z.string({
-  // }),
+  registroproductor:z.string({
+  }).optional(),
 
-  // rensapa:z.string({
-  // }),
+  rensapa:z.string({
+  }).optional(),
 
-  // carnetsanitario:z.string({
-  // }),
+  carnetsanitario:z.string({
+  }).optional(),
 
-  // municipio:z.string({
-  // }),
+  municipioasignados:z.string({
+  }).optional(),
 
-  // renapa:z.string({
-  // }),
+  renapa:z.string({
+  }).optional(),
 
-  // fechanacimiento: z.string({
-  //     required_error: 'Fecha de nacimiento es requerida'
-  // }),
-  // genero: z.string({
-  //     required_error: 'Género is required'
-  // }),
-  // nacimiento: z.string({
-  //     required_error: 'Lugar de Nacimiento is required'
-  // }),
-
-  // municipio: z.string({
-  //     required_error: 'Municipio is required'
-  // }),
-
-  // postal: z.string({
-  //     required_error: 'Dirección Postal is required'
-  // }),
-
-  // direccion: z.string({
-  //     required_error: 'Dirección is required'
-  // }),
-
-  // residencia: z.string({
-  //     required_error: 'Residencia es requerida'
-  // }),
-
-  // nacionalidad: z.string({
-  //     required_error: 'Nacionalidad is required'
-  // }),
-  // correo: z.string({
-  //     required_error: 'Correo is required'
-  // }),
-
-  // telefono: z.string({
-  //     required_error: 'Teléfono is required'
-  // }),
-
-  // roldirecto: z.array(z.string()),
-
-  // disciplinadirecta: z.array(z.string()),
-
-  // rolindirecto: z.array(z.string()),
-
-  // disciplinaindirecta: z.array(z.string()),
-
-  // publico: z.string(),
-
-  // formacionpublica: z.array(z.string()),
-
-  // disciplinapublica: z.array(z.string()),
-
-  // privada: z.string(),
-
-  // formacionprivada: z.array(z.string()),
-
-  // disciplinaprivada: z.array(z.string()),
-
-  // observaciones: z.string({
-  // }),
 });

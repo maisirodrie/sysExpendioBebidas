@@ -1,10 +1,18 @@
-import React, { useState } from 'react';
-import { Link } from 'react-router-dom';
-import { useTasks } from '../context/TasksContext';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faTrashAlt, faEdit, faEye, faPlus, faSearch, faChevronLeft, faChevronRight } from '@fortawesome/free-solid-svg-icons';
-import './Table.css';
-import Paginator from './Paginator'; // Importa el componente del paginador
+import React, { useState } from "react";
+import { Link } from "react-router-dom";
+import { useTasks } from "../context/TasksContext";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import {
+  faTrashAlt,
+  faEdit,
+  faEye,
+  faPlus,
+  faSearch,
+  faChevronLeft,
+  faChevronRight,
+} from "@fortawesome/free-solid-svg-icons";
+import "./Table.css";
+import Paginator from "./Paginator"; // Importa el componente del paginador
 
 function Table() {
   const { tasks, deleteTask } = useTasks();
@@ -17,25 +25,35 @@ function Table() {
   };
 
   const searcher = (e) => {
-    setSearch(e.target.value)
-  }
+    setSearch(e.target.value);
+  };
 
-  const filteredTasks = !search ? tasks : tasks.filter((task) => {
-    const apellidoresp1 = task.apellidoresp1 ? task.apellidoresp1.toLowerCase() : '';
-    const nombreresp1 = task.nombreresp1 ? task.nombreresp1.toLowerCase() : '';
-    const dniresp1 = task.dni ? task.dniresp1.toLowerCase() : '';
-    const municipio = task.municipio ? task.municipio.toLowerCase() : '';
-    const direccion = task.direccion ? task.direccion.toLowerCase() : '';
-    const searchLowerCase = search.toLowerCase();
+  const filteredTasks = !search
+    ? tasks
+    : tasks.filter((task) => {
+        const apellidoresp1 = task.apellidoresp1
+          ? task.apellidoresp1.toLowerCase()
+          : "";
+        const nombreresp1 = task.nombreresp1
+          ? task.nombreresp1.toLowerCase()
+          : "";
+        const dniresp1 = task.dni ? task.dniresp1.toLowerCase() : "";
+        const municipiofamiliar = task.municipiofamiliar
+          ? task.municipiofamiliar.toLowerCase()
+          : "";
+        const superficietotalprediales = task.superficietotalprediales
+          ? task.superficietotalprediales.toLowerCase()
+          : "";
+        const searchLowerCase = search.toLowerCase();
 
-    return (
-      apellidoresp1.includes(searchLowerCase) ||
-      nombreresp1.includes(searchLowerCase) ||
-      dniresp1.includes(searchLowerCase) ||
-      municipio.includes(searchLowerCase) ||
-      direccion.includes(searchLowerCase)
-    );
-  });
+        return (
+          apellidoresp1.includes(searchLowerCase) ||
+          nombreresp1.includes(searchLowerCase) ||
+          dniresp1.includes(searchLowerCase) ||
+          municipiofamiliar.includes(searchLowerCase) ||
+          superficietotalprediales.includes(searchLowerCase)
+        );
+      });
 
   // Paginación
   const indexOfLastTask = currentPage * tasksPerPage;
@@ -47,7 +65,7 @@ function Table() {
   };
 
   return (
-    <div className='container-fluid bg-primary vh-100 vw-100 d-flex align-items-center justify-content-center'>
+    <div className="container-fluid bg-primary vh-100 vw-100 d-flex align-items-center justify-content-center">
       <div className="row">
         <div className="col-md-12">
           <div className="table-container">
@@ -61,23 +79,28 @@ function Table() {
                 className="form-control border border-gray-300 focus:outline-none"
                 aria-describedby="search-icon"
               />
-              <span className="input-group-text bg-white border-none" id="search-icon">
+              <span
+                className="input-group-text bg-white border-none"
+                id="search-icon"
+              >
                 <FontAwesomeIcon icon={faSearch} className="ml-2" />
               </span>
             </div>
-            <ul className='button-container'>
+            <ul className="button-container">
               <li>
-                <Link to="/add-task" className='btn btn-success'>
+                <Link to="/add-task" className="btn btn-success">
                   <FontAwesomeIcon icon={faPlus} />
                 </Link>
               </li>
             </ul>
             <br />
             <div className="table-scroll">
-              <table className='table' style={{ textTransform: 'uppercase' }}>
+              <table className="table" style={{ textTransform: "uppercase" }}>
                 <thead>
                   <tr>
-                    <th colSpan="10" className="table-title">Listado de Inscriptos</th>
+                    <th colSpan="10" className="table-title">
+                      Listado de Inscriptos
+                    </th>
                   </tr>
                   <tr>
                     <th>Apellido</th>
@@ -96,14 +119,42 @@ function Table() {
                 <tbody>
                   {currentTasks.map((task) => (
                     <tr key={task._id}>
-                      <td>{task.apellidoresp1 ? task.apellidoresp1.toUpperCase() : ''}</td>
-                      <td>{task.nombreresp1 ? task.nombreresp1.toUpperCase() : ''}</td>
-                      <td>{task.dniresp1 ? task.dniresp1.toUpperCase() : ''}</td>
-                      <td>{task.municipio ? task.municipio.toUpperCase() : ''}</td>
-                      <td>{task.direccion ? task.direccion.toUpperCase() : ''}</td>
-                      <td>{task.direccion ? task.direccion.toUpperCase() : ''}</td>
-                      <td>{task.direccion ? task.direccion.toUpperCase() : ''}</td>
-                      <td>{task.direccion ? task.direccion.toUpperCase() : ''}</td>
+                      <td>
+                        {task.apellidoresp1
+                          ? task.apellidoresp1.toUpperCase()
+                          : ""}
+                      </td>
+                      <td>
+                        {task.nombreresp1 ? task.nombreresp1.toUpperCase() : ""}
+                      </td>
+                      <td>
+                        {task.dniresp1 ? task.dniresp1.toUpperCase() : ""}
+                      </td>
+                      <td>
+                        {task.municipiofamiliar
+                          ? task.municipiofamiliar.toUpperCase()
+                          : ""}
+                        {task.municipioprediales
+                          ? task.municipioprediales.toUpperCase()
+                          : ""}
+                      </td>
+                      <td>{task.genero1 ? task.genero1.toUpperCase() : ""}</td>
+                      <td>
+                        {task.superficietotalprediales
+                          ? task.superficietotalprediales.toUpperCase()
+                          : ""}
+                      </td>
+
+                      <td>
+                        {task.vendecomercializacion
+                          ? task.vendecomercializacion.toUpperCase()
+                          : ""}
+                      </td>
+                      <td>
+                        {task.pueblosoriginariosfamiliar
+                          ? task.pueblosoriginariosfamiliar.toUpperCase()
+                          : ""}
+                      </td>
                       
                       {/* <td>
                         {Array.isArray(task.roldirecto) ? task.roldirecto.map(roldirecto => {
@@ -142,22 +193,31 @@ function Table() {
                         }).join(', ') : 'No tiene'}
                       </td> */}
                       <td>
-                        <div className='button-container'>
-                          <Link className='btn btn-success' to={`/view/task/${task._id}`}>
+                        <div className="button-container">
+                          <Link
+                            className="btn btn-success"
+                            to={`/view/task/${task._id}`}
+                          >
                             <FontAwesomeIcon icon={faEye} />
                           </Link>
                         </div>
                       </td>
                       {/* <td>
-                        <div className='button-container'>
-                          <Link className='btn btn-primary' to={`/edit-task/${task._id}`}>
+                        <div className="button-container">
+                          <Link
+                            className="btn btn-primary"
+                            to={`/edit-task/${task._id}`}
+                          >
                             <FontAwesomeIcon icon={faEdit} />
                           </Link>
                         </div>
                       </td>
                       <td>
-                        <div className='button-container'>
-                          <button className='btn btn-danger' onClick={() => handleDelete(task._id)}>
+                        <div className="button-container">
+                          <button
+                            className="btn btn-danger"
+                            onClick={() => handleDelete(task._id)}
+                          >
                             <FontAwesomeIcon icon={faTrashAlt} />
                           </button>
                         </div>
@@ -168,7 +228,11 @@ function Table() {
               </table>
             </div>
           </div>
-          <Paginator currentPage={currentPage} totalPages={Math.ceil(filteredTasks.length / tasksPerPage)} onPageChange={onPageChange} />
+          <Paginator
+            currentPage={currentPage}
+            totalPages={Math.ceil(filteredTasks.length / tasksPerPage)}
+            onPageChange={onPageChange}
+          />
         </div>
       </div>
     </div>

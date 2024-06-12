@@ -5,11 +5,6 @@ import { Link, useNavigate, useParams } from 'react-router-dom';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faArrowLeft } from '@fortawesome/free-solid-svg-icons';
 import { Municipios } from '../api/municipios.js';
-import { Directos } from '../api/directos.js';
-import { Indirectos } from '../api/indirectos.js';
-import { Publicas } from '../api/publica.js';
-import { Privadas } from '../api/privada.js';
-import { Disciplinas } from '../api/disciplina.js';
 import { useAuth } from '../context/AuthContext.jsx';
 
 import Select from 'react-select';
