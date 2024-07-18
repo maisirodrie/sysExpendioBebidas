@@ -340,7 +340,12 @@ function TaskViewPage() {
               <p className="my-4">
                 <>Producción Vegetal: </>
               </p>
-              <ul></ul>
+              <ul>
+                {task &&
+                  task.produccionvegetal.map((vegetal, index) => (
+                    <li key={index}>{vegetal}</li>
+                  ))}
+              </ul>
               <p className="my-4">
                 <>¿Cuenta con accesso agua? : </>
                 {task.accesoagua}
@@ -348,7 +353,12 @@ function TaskViewPage() {
               <p className="my-4">
                 <>Modalidad : </>
               </p>
-              <ul></ul>
+              <ul>
+                {task &&
+                  task.modalidadaccesoagua.map((agua, index) => (
+                    <li key={index}>{agua}</li>
+                  ))}
+              </ul>
               <p className="my-4">
                 <>¿Cuenta con infraestructura Productiva? : </>
                 {task.infraestructuraproductiva}
@@ -356,7 +366,12 @@ function TaskViewPage() {
               <p className="my-4">
                 <>Cuales : </>
               </p>
-              <ul></ul>
+              <ul>
+                {task &&
+                  task.cualesinfraestructuraproductiva.map((infraestructura, index) => (
+                    <li key={index}>{infraestructura}</li>
+                  ))}
+              </ul>
 
               <p className="my-4">
                 <>¿Cuenta con Maquinaria Productiva? : </>
@@ -365,7 +380,12 @@ function TaskViewPage() {
               <p className="my-4">
                 <>Cuales : </>
               </p>
-              <ul></ul>
+              <ul>
+                {task &&
+                  task.cualesmaquinariaproductiva.map((maquinaria, index) => (
+                    <li key={index}>{maquinaria}</li>
+                  ))}
+              </ul>
 
               <p className="my-4">
                 <>¿Vende lo que produce? : </>

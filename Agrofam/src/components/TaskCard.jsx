@@ -98,7 +98,7 @@ function Table() {
               <table className="table" style={{ textTransform: "uppercase" }}>
                 <thead>
                   <tr>
-                    <th colSpan="10" className="table-title">
+                    <th colSpan="12" className="table-title">
                       Listado de Inscriptos
                     </th>
                   </tr>
@@ -111,6 +111,9 @@ function Table() {
                     <th>Superficie Total</th>
                     <th>Vende lo que produce</th>
                     <th>Pueblo Originarios</th>
+                    <th>Producción orgánica</th>
+                    <th>Producción agroecológica</th>
+                    <th>Producción convencional</th>
                     <th>Ver</th>
                     {/* <th>Editar</th>
                     <th>Borrar</th> */}
@@ -155,6 +158,23 @@ function Table() {
                           ? task.pueblosoriginariosfamiliar.toUpperCase()
                           : ""}
                       </td>
+                      <td>
+                        {task.produccionorganica
+                          ? task.produccionorganica.toUpperCase()
+                          : ""}
+                      </td>
+                      <td>
+                        {task.produccionagroecologica
+                          ? task.produccionagroecologica.toUpperCase()
+                          : ""}
+                      </td>
+                      
+                      <td>
+                        {task.produccionconvencional
+                          ? task.produccionconvencional.toUpperCase()
+                          : ""}
+                      </td>
+                      
                       
                       {/* <td>
                         {Array.isArray(task.roldirecto) ? task.roldirecto.map(roldirecto => {
@@ -202,7 +222,7 @@ function Table() {
                           </Link>
                         </div>
                       </td>
-                      {/* <td>
+                       <td>
                         <div className="button-container">
                           <Link
                             className="btn btn-primary"
@@ -221,7 +241,7 @@ function Table() {
                             <FontAwesomeIcon icon={faTrashAlt} />
                           </button>
                         </div>
-                      </td> */}
+                      </td> 
                     </tr>
                   ))}
                 </tbody>

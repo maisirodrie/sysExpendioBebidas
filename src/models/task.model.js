@@ -265,6 +265,10 @@ const tasksSchema = new mongoose.Schema(
       type: String,
       trim: true,
     },
+    produccionorganica:{
+      type:String,
+      trim:true,
+    },
     situacionproduccionagroecologica: {
       type: String,
       trim: true,
@@ -278,7 +282,7 @@ const tasksSchema = new mongoose.Schema(
       trim: true,
     },
     produccionvegetal: {
-      type: String,
+      type: [String],
       trim: true,
     },
     accesoagua: {
@@ -286,7 +290,7 @@ const tasksSchema = new mongoose.Schema(
       trim: true,
     },
     modalidadaccesoagua: {
-      type: String,
+      type: [String],
       trim: true,
     },
     infraestructuraproductiva: {
@@ -294,7 +298,7 @@ const tasksSchema = new mongoose.Schema(
       trim: true,
     },
     cualesinfraestructuraproductiva: {
-      type: String,
+      type: [String],
       trim: true,
     },
     maquinariaproductiva: {
@@ -302,7 +306,7 @@ const tasksSchema = new mongoose.Schema(
       trim: true,
     },
     cualesmaquinariaproductiva: {
-      type: String,
+      type: [String],
       trim: true,
     },
     vendecomercializacion: {
@@ -310,7 +314,7 @@ const tasksSchema = new mongoose.Schema(
       trim: true,
     },
     cualesvendecomercializacion: {
-      type: String,
+      type: [String],
       trim: true,
     },
     feriaperteneciente: {
@@ -350,7 +354,7 @@ const tasksSchema = new mongoose.Schema(
       trim: true,
     },
     cualesagregadovalor: {
-      type: String,
+      type: [String],
       trim: true,
     },
     equipamento: {
@@ -358,7 +362,7 @@ const tasksSchema = new mongoose.Schema(
       trim: true,
     },
     cualesequipamento: {
-      type: String,
+      type: [String],
       trim: true,
     },
     difusion: {
@@ -366,7 +370,7 @@ const tasksSchema = new mongoose.Schema(
       trim: true,
     },
     cualesdifusion: {
-      type: String,
+      type: [String],
       trim: true,
     },
     registroprovincial: {

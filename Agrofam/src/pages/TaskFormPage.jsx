@@ -10,6 +10,11 @@ import { Animal } from "../api/animal.js";
 import { Departamentos } from "../api/departamentos.js";
 import Select from "react-select";
 import "./taskformpage.css";
+import { Vegetal } from "../api/vegetal.js";
+import { Agua } from "../api/agua.js";
+import { Agroecologicas } from "../api/agroecologica.js";
+import { Maquinaria } from "../api/maquinaria.js";
+import { Infraestructura } from "../api/infraestructura.js";
 
 function TaskFormPage() {
   const [startDate, setStartDate] = useState(new Date());
@@ -17,6 +22,35 @@ function TaskFormPage() {
   const { createTask, getTask, updateTask } = useTasks();
   const navigate = useNavigate();
   const params = useParams();
+
+  //Selecciones simples
+  const [selectedGenero1, setSelectedGenero1] = useState("");
+  const [selectedGeneroValue1, setSelectedGeneroValue1] = useState("");
+  const [selectedGenero2, setSelectedGenero2] = useState("");
+  const [selectedGeneroValue2, setSelectedGeneroValue2] = useState("");
+  const [selectedMunicipioFamiliarValue, setSelectedMunicipioFamiliarValue] =
+    useState("");
+  const [selectedMunicipioPredialesValue, setSelectedMunicipioPredialesValue] =
+    useState("");
+  const [selectedDepartamentoFamiliares, setSelectedDepartamentoFamiliarValue] =
+    useState("");
+  const [selectedDepartamentoPrediales, setSelectedDepartamentoPredialesValue] =
+    useState("");
+
+  const [
+    selectedAgroecologicaSituacion,
+    setSelectedAgroecologicaSituacionValue,
+  ] = useState("");
+  const [dniError, setDniError] = useState("");
+
+  //Selecciones multiples
+  const [selectedAnimalValue, setSelectedAnimalValue] = useState();
+  const [selectedVegetalValue, setSelectedVegetalValue] = useState();
+  const [selectedAguaValue, setSelectedAguaValue] = useState();
+  const [selectedInfraestructuraValue, setSelectedInfraestructurasValue] = useState();
+  const [selectedMaquinariaValue, setSelectedMaquinariasValue] = useState();
+
+  //Condiciones
   const [selectedCondicionIntegrantes, setSelectedCondicionIntegrantes] =
     useState("");
   const [selectedCondicionConvive, setSelectedCondicionConvive] = useState("");
@@ -31,22 +65,18 @@ function TaskFormPage() {
     useState("");
   const [selectedProduccionConvencional, setSelectedProduccionConvencional] =
     useState("");
-  const [selectedGenero1, setSelectedGenero1] = useState("");
-  const [selectedGeneroValue1, setSelectedGeneroValue1] = useState("");
-  const [selectedGenero2, setSelectedGenero2] = useState("");
-  const [selectedGeneroValue2, setSelectedGeneroValue2] = useState("");
-  const [selectedMunicipioFamiliarValue, setSelectedMunicipioFamiliarValue] =
-    useState("");
-  const [selectedMunicipioPredialesValue, setSelectedMunicipioPredialesValue] =
-    useState("");
-  const [selectedDepartamentoFamiliares, setSelectedDepartamentoFamiliarValue] =
-    useState("");
-  const [selectedDepartamentoPrediales, setSelectedDepartamentoPredialesValue] =
-    useState("");
-  const [dniError, setDniError] = useState("");
+  const [selectedAccesoAgua, setSelectedAccesoAgua] = useState("");
 
-  const [selectedAnimalValue, setSelectedAnimalValue] = useState();
-  const [selectedVendeComercializacion, setSelectedVendeComercializacion] = useState();
+  const [selectedVendeComercializacion, setSelectedVendeComercializacion] =
+    useState();
+
+  const [selectedAgroecologica, setSelectedAgroecologicaValue] = useState();
+
+  const [selectedOrganica, setSelectedOrganicaValue] = useState();
+
+  const [selectedInfraestructura, setSelectedInfraestructuraValue] = useState();
+
+  const [selectedMaquinaria, setSelectedMaquinariaValue] = useState();
 
   useEffect(() => {
     async function loadTask() {
@@ -81,11 +111,11 @@ function TaskFormPage() {
         setValue("estudiosresp2", task.estudiosresp2);
 
         // Datos del grupo familiar
-        setSelectedCondicionIntegrantes(task.tieneintegrantes ? "SI" : "NO");
+
         setValue("tieneintegrantes", task.tieneintegrantes);
         setValue("cuantosintegrantes", task.cuantosintegrantes);
         setValue("cantidadhijosgrupo", task.cantidadhijosgrupo);
-        setSelectedCondicionConvive(task.convive ? "SI" : "NO");
+
         setValue("convive", task.convive);
         setValue("hijosasisten", task.hijosasisten);
         setValue("nivelinicialfamiliar", task.nivelinicialfamiliar);
@@ -138,6 +168,7 @@ function TaskFormPage() {
           "situacionproduccionagroecologica",
           task.situacionproduccionagroecologica
         );
+        setValue("produccionorganica", task.produccionorganica);
         setValue("produccionconvencional", task.produccionconvencional);
         setValue("produccionanimal", task.produccionanimal);
         setValue("produccionvegetal", task.produccionvegetal);
@@ -185,13 +216,50 @@ function TaskFormPage() {
         setSelectedDepartamentoFamiliarValue(task.departamentofamiliar);
         setSelectedMunicipioPredialesValue(task.municipioprediales);
         setSelectedDepartamentoPredialesValue(task.departamentoprediales);
+        setSelectedAgroecologicaSituacionValue(
+          task.situacionproduccionagroecologica
+        );
 
         //Set multiselector
-        const produccionanimalOptions = task.produccionanimal.map(nombre => ({
+        const produccionanimalOptions = task.produccionanimal.map((nombre) => ({
           value: nombre,
           label: nombre,
         }));
         selectedAnimalValue(produccionanimalOptions);
+
+        const produccionvegetalOptions = task.produccionvegetal.map(
+          (nombre) => ({
+            value: nombre,
+            label: nombre,
+          })
+        );
+        selectedVegetalValue(produccionvegetalOptions);
+
+        const modalidadaccesoaguaOptions = task.modalidadaccesoagua.map(
+          (nombre) => ({
+            value: nombre,
+            label: nombre,
+          })
+        );
+        selectedAguaValue(modalidadaccesoaguaOptions);
+
+        
+
+        const cualesinfraestructuraproductivaOptions = task.cualesinfraestructuraproductiva.map(
+          (nombre) => ({
+            value: nombre,
+            label: nombre,
+          })
+        );
+        setSelectedInfraestructurasValue(cualesinfraestructuraproductivaOptions);
+
+        const cualesmaquinariaproductivaOptions = task.cualesmaquinariaproductiva.map(
+          (nombre) => ({
+            value: nombre,
+            label: nombre,
+          })
+        );
+        setSelectedMaquinariasValue(cualesmaquinariaproductivaOptions);
       }
     }
     loadTask();
@@ -201,7 +269,11 @@ function TaskFormPage() {
     try {
       const updatedData = {
         ...data,
-        // produccionanimal: selectedAnimalValue.map(option => option.value),
+        produccionanimal: selectedAnimalValue.map((option) => option.value),
+        produccionvegetal: selectedVegetalValue.map((option) => option.value),
+        modalidadaccesoagua: selectedAguaValue.map((option) => option.value),
+        cualesinfraestructuraproductiva:selectedInfraestructuraValue.map((option) => option.value),
+        cualesmaquinariaproductiva:selectedMaquinariaValue.map((option) => option.value),
         tieneintegrantes: data.tieneintegrantes === "SI" ? "SI" : "NO",
         convive: data.convive === "SI" ? "SI" : "NO",
         pueblosoriginariosfamiliar:
@@ -222,8 +294,6 @@ function TaskFormPage() {
         agregadovalor: data.agregadovalor === "SI" ? "SI" : "NO",
         equipamento: data.equipamento === "SI" ? "SI" : "NO",
         difusion: data.difusion === "SI" ? "SI" : "NO",
-
-        
       };
 
       console.log("Datos del formulario a enviar:", updatedData);
@@ -261,8 +331,28 @@ function TaskFormPage() {
     setSelectedDepartamentoPredialesValue(event.target.value);
   };
 
+  const handleAgroecologicaSituacionChange = (event) => {
+    setSelectedAgroecologicaSituacionValue(event.target.value);
+  };
+
   const handleProduccionAnimalChange = (selectedOptions) => {
     setSelectedAnimalValue(selectedOptions);
+  };
+
+  const handleProduccionVegetalChange = (selectedOptions) => {
+    setSelectedVegetalValue(selectedOptions);
+  };
+
+  const handleAccesoAguaChange = (selectedOptions) => {
+    setSelectedAguaValue(selectedOptions);
+  };
+
+  const handleMaquinariaChange = (selectedOptions) => {
+    setSelectedMaquinariasValue(selectedOptions);
+  };
+
+  const handleInfraestructuraChange = (selectedOptions) => {
+    setSelectedInfraestructurasValue(selectedOptions);
   };
 
   const handleGeneroChange = (event, selectId) => {
@@ -650,6 +740,8 @@ function TaskFormPage() {
                       className="w-full bg-gray-100 text-black px-4 py-2 rounded-md my-2"
                       placeholder="¿Cuántos?"
                     />
+                    </>
+                )}
                     <label
                       htmlFor="cantidadhijosgrupo"
                       className="block text-sm font-medium text-black"
@@ -769,8 +861,7 @@ function TaskFormPage() {
                         placeholder="Terciaria o Superior"
                       />
                     </>
-                  </>
-                )}
+                  
               </div>
             </div>
             <div>
@@ -875,211 +966,209 @@ function TaskFormPage() {
             </div>
             {selectedDomicilioFamiliar === "SI" && (
               <>
-            <label
-              htmlFor="lotefamiliar"
-              className="block text-sm font-medium text-black"
-            >
-              Lote
-            </label>
-            <input
-              type="text"
-              {...register("lotefamiliar")}
-              className="w-full bg-gray-100 text-black px-4 py-2 rounded-md my-2"
-              placeholder="Lote"
-            />
-            <label
-              htmlFor="parcelafamiliar"
-              className="block text-sm font-medium text-black"
-            >
-              Parcela
-            </label>
-            <input
-              type="text"
-              {...register("parcelafamiliar")}
-              className="w-full bg-gray-100 text-black px-4 py-2 rounded-md my-2"
-              placeholder="Parcela"
-            />
-            <label
-              htmlFor="seccionfamiliar"
-              className="block text-sm font-medium text-black"
-            >
-              Sección
-            </label>
-            <input
-              type="text"
-              {...register("seccionfamiliar")}
-              className="w-full bg-gray-100 text-black px-4 py-2 rounded-md my-2"
-              placeholder="Sección"
-            />
-            <label
-              htmlFor="partidafamiliar"
-              className="block text-sm font-medium text-black"
-            >
-              Partida Inm. N°
-            </label>
-            <input
-              type="text"
-              {...register("partidafamiliar")}
-              className="w-full bg-gray-100 text-black px-4 py-2 rounded-md my-2"
-              placeholder="Partida Inm. N°"
-            />
-            <label
-              htmlFor="coloniaparajefamiliar"
-              className="block text-sm font-medium text-black"
-            >
-              Colonia/Paraje
-            </label>
-            <input
-              type="text"
-              {...register("coloniaparajefamiliar")}
-              className="w-full bg-gray-100 text-black px-4 py-2 rounded-md my-2"
-              placeholder="Colonia/Paraje"
-            />
-            <label
-              htmlFor="municipio"
-              className="block text-sm font-medium text-black"
-            >
-              Municipio
-            </label>
-            <select
-              {...register("municipiofamiliar", { required: true })}
-              value={selectedMunicipioFamiliarValue}
-              className="w-full bg-gray-100 text-black px-4 py-2 rounded-md my-2"
-              onChange={handleMunicipioFamiliarChange}
-            >
-              <option value="">Selecciona un municipio</option>
-              {Municipios.map((municipio) => (
-                <option key={municipio.id} value={municipio.nombre}>
-                  {municipio.nombre}
-                </option>
-              ))}
-            </select>
-            <label
-              htmlFor="departamento"
-              className="block text-sm font-medium text-black"
-            >
-              Departamento
-            </label>
-            <select
-              {...register("departamentofamiliar", { required: true })}
-              value={selectedDepartamentoFamiliares}
-              className="w-full bg-gray-100 text-black px-4 py-2 rounded-md my-2"
-              onChange={handleDepartamentoFamiliarChange}
-            >
-              <option value="">Selecciona un departamento</option>
-              {Departamentos.map((departamento) => (
-                <option key={departamento.id} value={departamento.nombre}>
-                  {departamento.nombre}
-                </option>
-              ))}
-            </select>
-            </>
-)}
+                <label
+                  htmlFor="lotefamiliar"
+                  className="block text-sm font-medium text-black"
+                >
+                  Lote
+                </label>
+                <input
+                  type="text"
+                  {...register("lotefamiliar")}
+                  className="w-full bg-gray-100 text-black px-4 py-2 rounded-md my-2"
+                  placeholder="Lote"
+                />
+                <label
+                  htmlFor="parcelafamiliar"
+                  className="block text-sm font-medium text-black"
+                >
+                  Parcela
+                </label>
+                <input
+                  type="text"
+                  {...register("parcelafamiliar")}
+                  className="w-full bg-gray-100 text-black px-4 py-2 rounded-md my-2"
+                  placeholder="Parcela"
+                />
+                <label
+                  htmlFor="seccionfamiliar"
+                  className="block text-sm font-medium text-black"
+                >
+                  Sección
+                </label>
+                <input
+                  type="text"
+                  {...register("seccionfamiliar")}
+                  className="w-full bg-gray-100 text-black px-4 py-2 rounded-md my-2"
+                  placeholder="Sección"
+                />
+                <label
+                  htmlFor="partidafamiliar"
+                  className="block text-sm font-medium text-black"
+                >
+                  Partida Inm. N°
+                </label>
+                <input
+                  type="text"
+                  {...register("partidafamiliar")}
+                  className="w-full bg-gray-100 text-black px-4 py-2 rounded-md my-2"
+                  placeholder="Partida Inm. N°"
+                />
+                <label
+                  htmlFor="coloniaparajefamiliar"
+                  className="block text-sm font-medium text-black"
+                >
+                  Colonia/Paraje
+                </label>
+                <input
+                  type="text"
+                  {...register("coloniaparajefamiliar")}
+                  className="w-full bg-gray-100 text-black px-4 py-2 rounded-md my-2"
+                  placeholder="Colonia/Paraje"
+                />
+                <label
+                  htmlFor="municipio"
+                  className="block text-sm font-medium text-black"
+                >
+                  Municipio
+                </label>
+                <select
+                  {...register("municipiofamiliar", { required: true })}
+                  value={selectedMunicipioFamiliarValue}
+                  className="w-full bg-gray-100 text-black px-4 py-2 rounded-md my-2"
+                  onChange={handleMunicipioFamiliarChange}
+                >
+                  <option value="">Selecciona un municipio</option>
+                  {Municipios.map((municipio) => (
+                    <option key={municipio.id} value={municipio.nombre}>
+                      {municipio.nombre}
+                    </option>
+                  ))}
+                </select>
+                <label
+                  htmlFor="departamento"
+                  className="block text-sm font-medium text-black"
+                >
+                  Departamento
+                </label>
+                <select
+                  {...register("departamentofamiliar", { required: true })}
+                  value={selectedDepartamentoFamiliares}
+                  className="w-full bg-gray-100 text-black px-4 py-2 rounded-md my-2"
+                  onChange={handleDepartamentoFamiliarChange}
+                >
+                  <option value="">Selecciona un departamento</option>
+                  {Departamentos.map((departamento) => (
+                    <option key={departamento.id} value={departamento.nombre}>
+                      {departamento.nombre}
+                    </option>
+                  ))}
+                </select>
+              </>
+            )}
             {selectedDomicilioFamiliar === "NO" && (
               <>
-            <label
-              htmlFor="loteprediales"
-              className="block text-sm font-medium text-black"
-            >
-              
-              Lote
-            </label>
-            <input
-              type="text"
-              {...register("loteprediales")}
-              className="w-full bg-gray-100 text-black px-4 py-2 rounded-md my-2"
-              placeholder="Lote"
-            />
-            <label
-              htmlFor="parcelaprediales"
-              className="block text-sm font-medium text-black"
-            >
-              Parcela
-            </label>
-            <input
-              type="text"
-              {...register("parcelaprediales")}
-              className="w-full bg-gray-100 text-black px-4 py-2 rounded-md my-2"
-              placeholder="Parcela"
-            />
-            <label
-              htmlFor="seccionfamiliar"
-              className="block text-sm font-medium text-black"
-            >
-              Sección
-            </label>
-            <input
-              type="text"
-              {...register("seccionprediales")}
-              className="w-full bg-gray-100 text-black px-4 py-2 rounded-md my-2"
-              placeholder="Sección"
-            />
-            <label
-              htmlFor="partidaprediales"
-              className="block text-sm font-medium text-black"
-            >
-              Partida Inm. N°
-            </label>
-            <input
-              type="text"
-              {...register("partidaprediales")}
-              className="w-full bg-gray-100 text-black px-4 py-2 rounded-md my-2"
-              placeholder="Partida Inm. N°"
-            />
-            <label
-              htmlFor="coloniaprediales"
-              className="block text-sm font-medium text-black"
-            >
-              Colonia/Paraje
-            </label>
-            <input
-              type="text"
-              {...register("coloniaprediales")}
-              className="w-full bg-gray-100 text-black px-4 py-2 rounded-md my-2"
-              placeholder="Colonia/Paraje"
-            />
-            <label
-              htmlFor="municipio"
-              className="block text-sm font-medium text-black"
-            >
-              Municipio
-            </label>
-            <select
-              {...register("municipioprediales", { required: true })}
-              value={selectedMunicipioPredialesValue}
-              className="w-full bg-gray-100 text-black px-4 py-2 rounded-md my-2"
-              onChange={handleMunicipioPredialesChange}
-            >
-              <option value="">Selecciona un municipio</option>
-              {Municipios.map((municipio) => (
-                <option key={municipio.id} value={municipio.nombre}>
-                  {municipio.nombre}
-                </option>
-              ))}
-            </select>
-            <label
-              htmlFor="departamentoprediales"
-              className="block text-sm font-medium text-black"
-            >
-              Departamento
-            </label>
-            <select
-              {...register("departamentoprediales", { required: true })}
-              value={selectedDepartamentoPrediales}
-              className="w-full bg-gray-100 text-black px-4 py-2 rounded-md my-2"
-              onChange={handleDepartamentoPredialesChange}
-            >
-              <option value="">Selecciona un departamento</option>
-              {Departamentos.map((departamento) => (
-                <option key={departamento.id} value={departamento.nombre}>
-                  {departamento.nombre}
-                </option>
-              ))}
-            </select>
-            </>
+                <label
+                  htmlFor="loteprediales"
+                  className="block text-sm font-medium text-black"
+                >
+                  Lote
+                </label>
+                <input
+                  type="text"
+                  {...register("loteprediales")}
+                  className="w-full bg-gray-100 text-black px-4 py-2 rounded-md my-2"
+                  placeholder="Lote"
+                />
+                <label
+                  htmlFor="parcelaprediales"
+                  className="block text-sm font-medium text-black"
+                >
+                  Parcela
+                </label>
+                <input
+                  type="text"
+                  {...register("parcelaprediales")}
+                  className="w-full bg-gray-100 text-black px-4 py-2 rounded-md my-2"
+                  placeholder="Parcela"
+                />
+                <label
+                  htmlFor="seccionfamiliar"
+                  className="block text-sm font-medium text-black"
+                >
+                  Sección
+                </label>
+                <input
+                  type="text"
+                  {...register("seccionprediales")}
+                  className="w-full bg-gray-100 text-black px-4 py-2 rounded-md my-2"
+                  placeholder="Sección"
+                />
+                <label
+                  htmlFor="partidaprediales"
+                  className="block text-sm font-medium text-black"
+                >
+                  Partida Inm. N°
+                </label>
+                <input
+                  type="text"
+                  {...register("partidaprediales")}
+                  className="w-full bg-gray-100 text-black px-4 py-2 rounded-md my-2"
+                  placeholder="Partida Inm. N°"
+                />
+                <label
+                  htmlFor="coloniaprediales"
+                  className="block text-sm font-medium text-black"
+                >
+                  Colonia/Paraje
+                </label>
+                <input
+                  type="text"
+                  {...register("coloniaprediales")}
+                  className="w-full bg-gray-100 text-black px-4 py-2 rounded-md my-2"
+                  placeholder="Colonia/Paraje"
+                />
+                <label
+                  htmlFor="municipio"
+                  className="block text-sm font-medium text-black"
+                >
+                  Municipio
+                </label>
+                <select
+                  {...register("municipioprediales", { required: true })}
+                  value={selectedMunicipioPredialesValue}
+                  className="w-full bg-gray-100 text-black px-4 py-2 rounded-md my-2"
+                  onChange={handleMunicipioPredialesChange}
+                >
+                  <option value="">Selecciona un municipio</option>
+                  {Municipios.map((municipio) => (
+                    <option key={municipio.id} value={municipio.nombre}>
+                      {municipio.nombre}
+                    </option>
+                  ))}
+                </select>
+                <label
+                  htmlFor="departamentoprediales"
+                  className="block text-sm font-medium text-black"
+                >
+                  Departamento
+                </label>
+                <select
+                  {...register("departamentoprediales", { required: true })}
+                  value={selectedDepartamentoPrediales}
+                  className="w-full bg-gray-100 text-black px-4 py-2 rounded-md my-2"
+                  onChange={handleDepartamentoPredialesChange}
+                >
+                  <option value="">Selecciona un departamento</option>
+                  {Departamentos.map((departamento) => (
+                    <option key={departamento.id} value={departamento.nombre}>
+                      {departamento.nombre}
+                    </option>
+                  ))}
+                </select>
+              </>
             )}
-           
-            
+
             <label
               htmlFor="propiedadproductiva"
               className="block text-sm font-medium text-black"
@@ -1119,57 +1208,56 @@ function TaskFormPage() {
               </label>
             </div>
             {selectedPropiedadProductiva === "NO" && (
-            <>
-            <label
-              htmlFor="propietarioprediales"
-              className="block text-sm font-medium text-black"
-            >
-              Propietario
-            </label>
-            <input
-              type="text"
-              {...register("propietarioprediales")}
-              className="w-full bg-gray-100 text-black px-4 py-2 rounded-md my-2"
-              placeholder="Propietario"
-            />
-            <label
-              htmlFor="condominioprediales"
-              className="block text-sm font-medium text-black"
-            >
-              Condominio
-            </label>
-            <input
-              type="text"
-              {...register("condominioprediales")}
-              className="w-full bg-gray-100 text-black px-4 py-2 rounded-md my-2"
-              placeholder="Condominio"
-            />
-            <label
-              htmlFor="arrendatarioprediales"
-              className="block text-sm font-medium text-black"
-            >
-              Arredatario
-            </label>
-            <input
-              type="text"
-              {...register("arrendatarioprediales")}
-              className="w-full bg-gray-100 text-black px-4 py-2 rounded-md my-2"
-              placeholder="Arredatario"
-            />
-            <label
-              htmlFor="ocupanteprediales"
-              className="block text-sm font-medium text-black"
-            >
-              Ocupante
-            </label>
-            <input
-              type="text"
-              {...register("ocupanteprediales")}
-              className="w-full bg-gray-100 text-black px-4 py-2 rounded-md my-2"
-              placeholder="Ocupante"
-            />
-
-            </>
+              <>
+                <label
+                  htmlFor="propietarioprediales"
+                  className="block text-sm font-medium text-black"
+                >
+                  Propietario
+                </label>
+                <input
+                  type="text"
+                  {...register("propietarioprediales")}
+                  className="w-full bg-gray-100 text-black px-4 py-2 rounded-md my-2"
+                  placeholder="Propietario"
+                />
+                <label
+                  htmlFor="condominioprediales"
+                  className="block text-sm font-medium text-black"
+                >
+                  Condominio
+                </label>
+                <input
+                  type="text"
+                  {...register("condominioprediales")}
+                  className="w-full bg-gray-100 text-black px-4 py-2 rounded-md my-2"
+                  placeholder="Condominio"
+                />
+                <label
+                  htmlFor="arrendatarioprediales"
+                  className="block text-sm font-medium text-black"
+                >
+                  Arredatario
+                </label>
+                <input
+                  type="text"
+                  {...register("arrendatarioprediales")}
+                  className="w-full bg-gray-100 text-black px-4 py-2 rounded-md my-2"
+                  placeholder="Arredatario"
+                />
+                <label
+                  htmlFor="ocupanteprediales"
+                  className="block text-sm font-medium text-black"
+                >
+                  Ocupante
+                </label>
+                <input
+                  type="text"
+                  {...register("ocupanteprediales")}
+                  className="w-full bg-gray-100 text-black px-4 py-2 rounded-md my-2"
+                  placeholder="Ocupante"
+                />
+              </>
             )}
             <label
               htmlFor="superficietotalprediales"
@@ -1296,6 +1384,109 @@ function TaskFormPage() {
               htmlFor="coloniaprediales"
               className="block text-sm font-medium text-black"
             >
+              ¿Realiza Producción Orgánica?
+            </label>
+            <div>
+              <label
+                htmlFor="accesoagua"
+                className="inline-flex items-center mt-3"
+              >
+                <input
+                  type="radio"
+                  name="accesoagua"
+                  value="SI"
+                  checked={selectedOrganica === "SI"}
+                  {...register("produccionorganica")}
+                  onChange={() => setSelectedOrganicaValue("SI")}
+                  className="form-radio h-5 w-5 text-indigo-600"
+                />
+                <span className="ml-2 text-black">SI</span>
+              </label>
+              <label
+                htmlFor="accesoagua"
+                className="inline-flex items-center mt-3 ml-6"
+              >
+                <input
+                  type="radio"
+                  name="vendecomercializacion"
+                  value="NO"
+                  checked={selectedOrganica === "NO"}
+                  {...register("produccionorganica")}
+                  onChange={() => setSelectedOrganicaValue("NO")}
+                  className="form-radio h-5 w-5 text-indigo-600"
+                />
+                <span className="ml-2 text-black">NO</span>
+              </label>
+            </div>
+
+            <label
+              htmlFor="coloniaprediales"
+              className="block text-sm font-medium text-black"
+            >
+              ¿Realiza Producción Agroecológica?
+            </label>
+            <div>
+              <label
+                htmlFor="accesoagua"
+                className="inline-flex items-center mt-3"
+              >
+                <input
+                  type="radio"
+                  name="accesoagua"
+                  value="SI"
+                  checked={selectedAgroecologica === "SI"}
+                  {...register("produccionagroecologica")}
+                  onChange={() => setSelectedAgroecologicaValue("SI")}
+                  className="form-radio h-5 w-5 text-indigo-600"
+                />
+                <span className="ml-2 text-black">SI</span>
+              </label>
+              <label
+                htmlFor="accesoagua"
+                className="inline-flex items-center mt-3 ml-6"
+              >
+                <input
+                  type="radio"
+                  name="vendecomercializacion"
+                  value="NO"
+                  checked={selectedAgroecologica === "NO"}
+                  {...register("produccionagroecologica")}
+                  onChange={() => setSelectedAgroecologicaValue("NO")}
+                  className="form-radio h-5 w-5 text-indigo-600"
+                />
+                <span className="ml-2 text-black">NO</span>
+              </label>
+            </div>
+            {selectedAgroecologica === "SI" && (
+              <>
+                <label
+                  htmlFor="departamentoprediales"
+                  className="block text-sm font-medium text-black"
+                >
+                  Señale la situación
+                </label>
+                <select
+                  {...register("situacionproduccionagroecologica", {
+                    required: true,
+                  })}
+                  value={selectedAgroecologicaSituacion}
+                  className="w-full bg-gray-100 text-black px-4 py-2 rounded-md my-2"
+                  onChange={handleAgroecologicaSituacionChange}
+                >
+                  <option value="">Selecciona la situación</option>
+                  {Agroecologicas.map((agroecologica) => (
+                    <option key={agroecologica.id} value={agroecologica.nombre}>
+                      {agroecologica.nombre}
+                    </option>
+                  ))}
+                </select>
+              </>
+            )}
+
+            <label
+              htmlFor="coloniaprediales"
+              className="block text-sm font-medium text-black"
+            >
               ¿Tiene Producción Convencional?
             </label>
             <div>
@@ -1330,29 +1521,222 @@ function TaskFormPage() {
                 <span className="ml-2 text-black">NO</span>
               </label>
             </div>
-{/* 
+            {selectedProduccionConvencional === "SI" && (
+              <>
+                <label
+                  htmlFor="señale cuales"
+                  className="block text-sm font-medium text-black"
+                >
+                  Señale Cuales
+                </label>
+                <label
+                  htmlFor="produccionanimal"
+                  className="block text-sm font-medium text-black"
+                >
+                  Producción Animal
+                </label>
+                <Select
+                  options={Animal.map((produccionanimal) => ({
+                    value: produccionanimal.nombre,
+                    label: produccionanimal.nombre,
+                  }))}
+                  isMulti
+                  value={selectedAnimalValue}
+                  onChange={handleProduccionAnimalChange}
+                  placeholder="Seleccione la producción animal"
+                />
+
+                <label
+                  htmlFor="produccionvegetal"
+                  className="block text-sm font-medium text-black"
+                >
+                  Producción Vegetal
+                </label>
+                <Select
+                  options={Vegetal.map((produccionvegetal) => ({
+                    value: produccionvegetal.nombre,
+                    label: produccionvegetal.nombre,
+                  }))}
+                  isMulti
+                  value={selectedVegetalValue}
+                  onChange={handleProduccionVegetalChange}
+                  placeholder="Seleccione la producción vegetal"
+                />
+              </>
+            )}
+
             <label
-              htmlFor="señale cuales"
+              htmlFor="coloniaprediales"
               className="block text-sm font-medium text-black"
             >
-              Señale Cuales
-            </label> */}
-            {/* <label
-              htmlFor="produccionanimal"
+              ¿Cuenta con acceso al agua?
+            </label>
+            <div>
+              <label
+                htmlFor="accesoagua"
+                className="inline-flex items-center mt-3"
+              >
+                <input
+                  type="radio"
+                  name="accesoagua"
+                  value="SI"
+                  checked={selectedAccesoAgua === "SI"}
+                  {...register("accesoagua")}
+                  onChange={() => setSelectedAccesoAgua("SI")}
+                  className="form-radio h-5 w-5 text-indigo-600"
+                />
+                <span className="ml-2 text-black">SI</span>
+              </label>
+              <label
+                htmlFor="accesoagua"
+                className="inline-flex items-center mt-3 ml-6"
+              >
+                <input
+                  type="radio"
+                  name="vendecomercializacion"
+                  value="NO"
+                  checked={selectedAccesoAgua === "NO"}
+                  {...register("accesoagua")}
+                  onChange={() => setSelectedAccesoAgua("NO")}
+                  className="form-radio h-5 w-5 text-indigo-600"
+                />
+                <span className="ml-2 text-black">NO</span>
+              </label>
+            </div>
+            {selectedAccesoAgua === "SI" && (
+              <>
+                <label
+                  htmlFor="produccionvegetal"
+                  className="block text-sm font-medium text-black"
+                >
+                  Señale modalidad
+                </label>
+                <Select
+                  options={Agua.map((modalidadaccesoagua) => ({
+                    value: modalidadaccesoagua.nombre,
+                    label: modalidadaccesoagua.nombre,
+                  }))}
+                  isMulti
+                  value={selectedAguaValue}
+                  onChange={handleAccesoAguaChange}
+                  placeholder="Seleccione el acceso al agua"
+                />
+              </>
+            )}
+            <label
+              htmlFor="coloniaprediales"
               className="block text-sm font-medium text-black"
             >
-              Producción Animal
+              ¿Cuenta con infraestructura productiva?
+            </label>
+            <div>
+              <label
+                htmlFor="accesoagua"
+                className="inline-flex items-center mt-3"
+              >
+                <input
+                  type="radio"
+                  name="accesoagua"
+                  value="SI"
+                  checked={selectedInfraestructura === "SI"}
+                  {...register("infraestructuraproductiva")}
+                  onChange={() => setSelectedInfraestructuraValue("SI")}
+                  className="form-radio h-5 w-5 text-indigo-600"
+                />
+                <span className="ml-2 text-black">SI</span>
+              </label>
+              <label
+                htmlFor="accesoagua"
+                className="inline-flex items-center mt-3 ml-6"
+              >
+                <input
+                  type="radio"
+                  name="vendecomercializacion"
+                  value="NO"
+                  checked={selectedInfraestructura === "NO"}
+                  {...register("infraestructuraproductiva")}
+                  onChange={() => setSelectedInfraestructuraValue("NO")}
+                  className="form-radio h-5 w-5 text-indigo-600"
+                />
+                <span className="ml-2 text-black">NO</span>
+              </label>
+            </div>
+            {selectedInfraestructura === "SI" && (
+              <>
+            <label
+              htmlFor="produccionvegetal"
+              className="block text-sm font-medium text-black"
+            >
+              Señale cuales
             </label>
             <Select
-              options={Animal.map(produccionanimal => ({
-                value: produccionanimal.nombre,
-                label: produccionanimal.nombre,
+              options={Infraestructura.map((infraestructura) => ({
+                value: infraestructura.nombre,
+                label: infraestructura.nombre,
               }))}
               isMulti
-              value={selectedAnimalValue}
-              onChange={handleProduccionAnimalChange}
-              placeholder="Seleccione la producción animal"
-            /> */}
+              value={selectedInfraestructuraValue}
+              onChange={handleInfraestructuraChange}
+              placeholder="Seleccione el acceso al agua"
+            />
+          </>)}
+          <label
+              htmlFor="coloniaprediales"
+              className="block text-sm font-medium text-black"
+            >
+              ¿Cuenta con Maquinaria Productiva?
+            </label>
+            <div>
+              <label
+                htmlFor="accesoagua"
+                className="inline-flex items-center mt-3"
+              >
+                <input
+                  type="radio"
+                  name="accesoagua"
+                  value="SI"
+                  checked={selectedMaquinaria === "SI"}
+                  {...register("accesoagua")}
+                  onChange={() => setSelectedMaquinariaValue("SI")}
+                  className="form-radio h-5 w-5 text-indigo-600"
+                />
+                <span className="ml-2 text-black">SI</span>
+              </label>
+              <label
+                htmlFor="accesoagua"
+                className="inline-flex items-center mt-3 ml-6"
+              >
+                <input
+                  type="radio"
+                  name="vendecomercializacion"
+                  value="NO"
+                  checked={selectedMaquinaria === "NO"}
+                  {...register("accesoagua")}
+                  onChange={() => setSelectedMaquinariaValue("NO")}
+                  className="form-radio h-5 w-5 text-indigo-600"
+                />
+                <span className="ml-2 text-black">NO</span>
+              </label>
+            </div>
+            {selectedMaquinaria === "SI" && (
+              <>
+            <label
+              htmlFor="produccionvegetal"
+              className="block text-sm font-medium text-black"
+            >
+              Señale cuales
+            </label>
+            <Select
+              options={Maquinaria.map((maquinaria) => ({
+                value: maquinaria.nombre,
+                label: maquinaria.nombre,
+              }))}
+              isMulti
+              value={selectedMaquinariaValue}
+              onChange={handleMaquinariaChange}
+              placeholder="Seleccione el acceso al agua"
+            />
+          </>)}
             <label
               htmlFor="coloniaprediales"
               className="block text-sm font-medium text-black"
@@ -1391,9 +1775,6 @@ function TaskFormPage() {
                 <span className="ml-2 text-black">NO</span>
               </label>
             </div>
-
-
-
 
             <button
               type="submit"

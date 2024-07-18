@@ -115,165 +115,123 @@ export const creatTaskSchema = z.object({
 
   // //Datos prediales de la unidad productiva
 
-  loteprediales:z.string({
-  }).optional(),
+  loteprediales: z.string({}).optional(),
 
-  parcelaprediales:z.string({
-  }).optional(),
+  parcelaprediales: z.string({}).optional(),
 
-  seccionprediales:z.string({
-  }).optional(),
+  seccionprediales: z.string({}).optional(),
 
-  partidaprediales:z.string({
-  }).optional(),
+  partidaprediales: z.string({}).optional(),
 
-  coloniaprediales:z.string({
-  }).optional(),
+  coloniaprediales: z.string({}).optional(),
 
-  municipioprediales:z.string({
-  }).optional(),
+  municipioprediales: z.string({}).optional(),
 
-  departamentoprediales:z.string({
-  }).optional(),
+  departamentoprediales: z.string({}).optional(),
 
   propiedadproductiva: z.string({}).optional(),
 
-  propietarioprediales:z.string({
-  }).optional(),
+  propietarioprediales: z.string({}).optional(),
 
-  arrendatarioprediales:z.string({
-  }).optional(),
+  arrendatarioprediales: z.string({}).optional(),
 
-  condominioprediales:z.string({
-  }).optional(),
+  condominioprediales: z.string({}).optional(),
 
-  ocupanteprediales:z.string({
-  }).optional(),
+  ocupanteprediales: z.string({}).optional(),
 
-  superficietotalprediales:z.string({
-  }).optional(),
+  superficietotalprediales: z.string({}).optional(),
 
-  supagricprediales:z.string({
-  }).optional(),
+  supagricprediales: z.string({}).optional(),
 
-  supgandprediales:z.string({
-  }).optional(),
+  supgandprediales: z.string({}).optional(),
 
-  monteprediales:z.string({
-  }).optional(),
+  monteprediales: z.string({}).optional(),
 
-  suppiscicolaprediales:z.string({
-  }).optional(),
+  suppiscicolaprediales: z.string({}).optional(),
 
-  supapicolaprediales:z.string({
-  }).optional(),
+  supapicolaprediales: z.string({}).optional(),
 
-  supactindustrialprediales:z.string({
-  }).optional(),
+  supactindustrialprediales: z.string({}).optional(),
 
-  sinusoprediales:z.string({
-  }).optional(),
+  sinusoprediales: z.string({}).optional(),
 
-  otrosprediales:z.string({
-  }).optional(),
+  otrosprediales: z.string({}).optional(),
 
-  puntosgpsprediales:z.string({
-  }).optional(),
+  puntosgpsprediales: z.string({}).optional(),
 
   // //Pefil Productivo
 
   //required_error: "Producción Agroecológica es requerido",
-  
+
   produccionagroecologica: z.string({}).optional(),
-  
+
   situacionproduccionagroecologica: z.string({}).optional(),
 
-  produccionconvencional:z.string({}).optional(),
+  produccionorganica: z.string({}).optional(),
 
-  produccionanimal:z.string({
-  }).optional(),
+  produccionconvencional: z.string({}).optional(),
 
-  produccionvegetal:z.string({
-  }).optional(),
+  produccionanimal: z.array(z.string()).optional(),
 
-  accesoagua:z.string({}).optional(),
+  produccionvegetal: z.array(z.string()).optional(),
 
-  modalidadaccesoagua:z.string({}).optional(),
+  accesoagua: z.string({}).optional(),
 
-  infraestructuraproductiva:z.string({}).optional(),
+  modalidadaccesoagua: z.array(z.string()).optional(),
 
-  cualesinfraestructuraproductiva:z.string({}).optional(),
+  infraestructuraproductiva: z.string({}).optional(),
 
-  maquinariaproductiva:z.string({}).optional(),
+  cualesinfraestructuraproductiva: z.array(z.string()).optional(),
 
-  cualesmaquinariaproductiva:z.string({}).optional(),
+  maquinariaproductiva: z.string({}).optional(),
+
+  cualesmaquinariaproductiva: z.array(z.string()).optional(),
 
   // //Datos de Comercializacion
 
-  vendecomercializacion:z.string({}).optional(),
+  vendecomercializacion: z.string({}).optional(),
 
-  cualesvendecomercializacion:z.string({}).optional(),
+  cualesvendecomercializacion: z.array(z.string()).optional(),
 
-  feriaperteneciente:z.string({
-  }).optional(),
+  feriaperteneciente: z.string({}).optional(),
 
-  puesto:z.string({
-  }).optional(),
+  puesto: z.string({}).optional(),
 
-  carnetmanipulacion:z.string({
-  }).optional(),
+  carnetmanipulacion: z.string({}).optional(),
 
-  vigencia:z.string({
-  }).optional(),
+  vigencia: z.string({}).optional(),
 
-  monotributista:z.string({
-  }).optional(),
+  monotributista: z.string({}).optional(),
 
-  excedenteproduccion:z.string({
-  }).optional(),
+  excedenteproduccion: z.string({}).optional(),
 
-  pedido:z.string({
-  }).optional(),
+  pedido: z.string({}).optional(),
 
-  compraproduccion:z.string({
-  }).optional(),
+  compraproduccion: z.string({}).optional(),
 
-  agregadovalor:z.string({
-  }).optional(),
+  agregadovalor: z.string({}).optional(),
 
-  cualesagregadovalor:z.string({
-  }).optional(),
+  cualesagregadovalor: z.array(z.string()).optional(),
 
-  equipamento:z.string({
-  }).optional(),
+  equipamento: z.string({}).optional(),
 
-  cualesequipamento:z.string({
-  }).optional(),
+  cualesequipamento: z.string({}).optional(),
 
-  difusion:z.string({
-  }).optional(),
+  difusion: z.string({}).optional(),
 
-  cualesdifusion:z.string({
-  }).optional(),
+  cualesdifusion: z.array(z.string()).optional(),
 
   // //Registro asignados
 
-  registroprovincial:z.string({
-  }).optional(),
+  registroprovincial: z.string({}).optional(),
 
-  registroproductor:z.string({
-  }).optional(),
+  registroproductor: z.string({}).optional(),
 
-  rensapa:z.string({
-  }).optional(),
+  rensapa: z.string({}).optional(),
 
-  carnetsanitario:z.string({
-  }).optional(),
+  carnetsanitario: z.string({}).optional(),
 
-  municipioasignados:z.string({
-  }).optional(),
+  municipioasignados: z.string({}).optional(),
 
-  renapa:z.string({
-  }).optional(),
-
+  renapa: z.string({}).optional(),
 });
