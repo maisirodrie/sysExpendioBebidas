@@ -394,7 +394,12 @@ function TaskViewPage() {
               <p className="my-4">
                 <>Donde : </>
               </p>
-              <ul></ul>
+              <ul>
+                {task &&
+                  task.cualesvendecomercializacion.map((vende, index) => (
+                    <li key={index}>{vende}</li>
+                  ))}
+              </ul>
 
               <p className="my-4">
                 <>Feria a la que pertenece : </>

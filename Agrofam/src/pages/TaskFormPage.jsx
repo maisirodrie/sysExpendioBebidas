@@ -15,6 +15,7 @@ import { Agua } from "../api/agua.js";
 import { Agroecologicas } from "../api/agroecologica.js";
 import { Maquinaria } from "../api/maquinaria.js";
 import { Infraestructura } from "../api/infraestructura.js";
+import { Vende } from "../api/vende.js";
 
 function TaskFormPage() {
   const [startDate, setStartDate] = useState(new Date());
@@ -49,6 +50,7 @@ function TaskFormPage() {
   const [selectedAguaValue, setSelectedAguaValue] = useState();
   const [selectedInfraestructuraValue, setSelectedInfraestructurasValue] = useState();
   const [selectedMaquinariaValue, setSelectedMaquinariasValue] = useState();
+  const [selectedVendeValue, setSelectedVendeValue] = useState();
 
   //Condiciones
   const [selectedCondicionIntegrantes, setSelectedCondicionIntegrantes] =
@@ -77,6 +79,24 @@ function TaskFormPage() {
   const [selectedInfraestructura, setSelectedInfraestructuraValue] = useState();
 
   const [selectedMaquinaria, setSelectedMaquinariaValue] = useState();
+
+  const [selectedManipulacion, setSelectedManipulacionValue] = useState();
+
+  const [selectedMonotributista, setSelectedMonotributistaValue] = useState();
+
+  const [selectedExcedente, setSelectedExcedenteValue] = useState();
+
+  const [selectedPedido, setSelectedPedidoValue] = useState();
+
+  const [selectedCompra, setSelectedCompraValue] = useState();
+
+  const [selectedAgregado, setSelectedAgregadoValue] = useState();
+
+  const [selectedEquipamiento, setSelectedEquipamientoValue] = useState();
+
+  const [selectedDifusion, setSelectedDifusionValue] = useState();
+
+
 
   useEffect(() => {
     async function loadTask() {
@@ -260,6 +280,16 @@ function TaskFormPage() {
           })
         );
         setSelectedMaquinariasValue(cualesmaquinariaproductivaOptions);
+
+        const cualesvendecomercializacionOptions = task.cualesvendecomercializacion.map(
+          (nombre) => ({
+            value: nombre,
+            label: nombre,
+          })
+        );
+        setSelectedVendeValue(cualesvendecomercializacionOptions);
+
+      
       }
     }
     loadTask();
@@ -272,6 +302,7 @@ function TaskFormPage() {
         produccionanimal: selectedAnimalValue.map((option) => option.value),
         produccionvegetal: selectedVegetalValue.map((option) => option.value),
         modalidadaccesoagua: selectedAguaValue.map((option) => option.value),
+        cualesvendecomercializacion: selectedVendeValue.map((option) => option.value),
         cualesinfraestructuraproductiva:selectedInfraestructuraValue.map((option) => option.value),
         cualesmaquinariaproductiva:selectedMaquinariaValue.map((option) => option.value),
         tieneintegrantes: data.tieneintegrantes === "SI" ? "SI" : "NO",
@@ -354,6 +385,11 @@ function TaskFormPage() {
   const handleInfraestructuraChange = (selectedOptions) => {
     setSelectedInfraestructurasValue(selectedOptions);
   };
+
+  const handleVendeChange = (selectedOptions) => {
+    setSelectedVendeValue(selectedOptions);
+  };
+  
 
   const handleGeneroChange = (event, selectId) => {
     const value = event.target.value;
@@ -1775,6 +1811,336 @@ function TaskFormPage() {
                 <span className="ml-2 text-black">NO</span>
               </label>
             </div>
+            {selectedVendeComercializacion === "SI" && (
+              <>
+            <label
+              htmlFor="produccionvegetal"
+              className="block text-sm font-medium text-black"
+            >
+              Señale donde
+            </label>
+            <Select
+              options={Vende.map((vende) => ({
+                value: vende.nombre,
+                label: vende.nombre,
+              }))}
+              isMulti
+              value={selectedVendeValue}
+              onChange={handleVendeChange}
+              placeholder="Seleccione donde vende"
+            />
+              <label
+              htmlFor="coloniaprediales"
+              className="block text-sm font-medium text-black"
+            >
+              ¿Presenta carnet de manipulación de alimentos?
+            </label>
+            <div>
+              <label
+                htmlFor="carnetmanipulacion"
+                className="inline-flex items-center mt-3"
+              >
+                <input
+                  type="radio"
+                  name="carnetmanipulacion"
+                  value="SI"
+                  checked={selectedManipulacion === "SI"}
+                  {...register("carnetmanipulacion")}
+                  onChange={() => setSelectedManipulacionValue("SI")}
+                  className="form-radio h-5 w-5 text-indigo-600"
+                />
+                <span className="ml-2 text-black">SI</span>
+              </label>
+              <label
+                htmlFor="carnetmanipulacion"
+                className="inline-flex items-center mt-3 ml-6"
+              >
+                <input
+                  type="radio"
+                  name="carnetmanipulacion"
+                  value="NO"
+                  checked={selectedManipulacion === "NO"}
+                  {...register("carnetmanipulacion")}
+                  onChange={() => setSelectedManipulacionValue("NO")}
+                  className="form-radio h-5 w-5 text-indigo-600"
+                />
+                <span className="ml-2 text-black">NO</span>
+              </label>
+            </div>
+
+            <label
+              htmlFor="coloniaprediales"
+              className="block text-sm font-medium text-black"
+            >
+              ¿Es Monotributista?
+            </label>
+            <div>
+              <label
+                htmlFor="monotributista"
+                className="inline-flex items-center mt-3"
+              >
+                <input
+                  type="radio"
+                  name="monotributista"
+                  value="SI"
+                  checked={selectedMonotributista === "SI"}
+                  {...register("monotributista")}
+                  onChange={() => setSelectedMonotributistaValue("SI")}
+                  className="form-radio h-5 w-5 text-indigo-600"
+                />
+                <span className="ml-2 text-black">SI</span>
+              </label>
+              <label
+                htmlFor="monotributista"
+                className="inline-flex items-center mt-3 ml-6"
+              >
+                <input
+                  type="radio"
+                  name="monotributista"
+                  value="NO"
+                  checked={selectedMonotributista === "NO"}
+                  {...register("monotributista")}
+                  onChange={() => setSelectedMonotributistaValue("NO")}
+                  className="form-radio h-5 w-5 text-indigo-600"
+                />
+                <span className="ml-2 text-black">NO</span>
+              </label>
+            </div>
+
+            <label
+              htmlFor="coloniaprediales"
+              className="block text-sm font-medium text-black"
+            >
+              ¿Actualmente cuenta con excedente de producción?
+            </label>
+            <div>
+              <label
+                htmlFor="monotributista"
+                className="inline-flex items-center mt-3"
+              >
+                <input
+                  type="radio"
+                  name="excedenteproduccion"
+                  value="SI"
+                  checked={selectedExcedente === "SI"}
+                  {...register("excedenteproduccion")}
+                  onChange={() => setSelectedExcedenteValue("SI")}
+                  className="form-radio h-5 w-5 text-indigo-600"
+                />
+                <span className="ml-2 text-black">SI</span>
+              </label>
+              <label
+                htmlFor="excedenteproduccion"
+                className="inline-flex items-center mt-3 ml-6"
+              >
+                <input
+                  type="radio"
+                  name="excedenteproduccion"
+                  value="NO"
+                  checked={selectedExcedente === "NO"}
+                  {...register("excedenteproduccion")}
+                  onChange={() => setSelectedExcedenteValue("NO")}
+                  className="form-radio h-5 w-5 text-indigo-600"
+                />
+                <span className="ml-2 text-black">NO</span>
+              </label>
+            </div>
+
+            <label
+              htmlFor="coloniaprediales"
+              className="block text-sm font-medium text-black"
+            >
+              ¿Realiza su producción solo a pedido?
+            </label>
+            <div>
+              <label
+                htmlFor="pedido"
+                className="inline-flex items-center mt-3"
+              >
+                <input
+                  type="radio"
+                  name="pedido"
+                  value="SI"
+                  checked={selectedPedido === "SI"}
+                  {...register("pedido")}
+                  onChange={() => setSelectedPedidoValue("SI")}
+                  className="form-radio h-5 w-5 text-indigo-600"
+                />
+                <span className="ml-2 text-black">SI</span>
+              </label>
+              <label
+                htmlFor="pedido"
+                className="inline-flex items-center mt-3 ml-6"
+              >
+                <input
+                  type="radio"
+                  name="pedido"
+                  value="NO"
+                  checked={selectedPedido === "NO"}
+                  {...register("pedido")}
+                  onChange={() => setSelectedPedidoValue("NO")}
+                  className="form-radio h-5 w-5 text-indigo-600"
+                />
+                <span className="ml-2 text-black">NO</span>
+              </label>
+            </div>
+
+            <label
+              htmlFor="coloniaprediales"
+              className="block text-sm font-medium text-black"
+            >
+              ¿Compra producción para atender la demanda que tiene?
+            </label>
+            <div>
+              <label
+                htmlFor="compraproduccion"
+                className="inline-flex items-center mt-3"
+              >
+                <input
+                  type="radio"
+                  name="compraproduccion"
+                  value="SI"
+                  checked={selectedCompra === "SI"}
+                  {...register("compraproduccion")}
+                  onChange={() => setSelectedCompraValue("SI")}
+                  className="form-radio h-5 w-5 text-indigo-600"
+                />
+                <span className="ml-2 text-black">SI</span>
+              </label>
+              <label
+                htmlFor="compraproduccion"
+                className="inline-flex items-center mt-3 ml-6"
+              >
+                <input
+                  type="radio"
+                  name="compraproduccion"
+                  value="NO"
+                  checked={selectedCompra === "NO"}
+                  {...register("compraproduccion")}
+                  onChange={() => setSelectedCompraValue("NO")}
+                  className="form-radio h-5 w-5 text-indigo-600"
+                />
+                <span className="ml-2 text-black">NO</span>
+              </label>
+            </div>
+
+            <label
+              htmlFor="coloniaprediales"
+              className="block text-sm font-medium text-black"
+            >
+              ¿Hace Agregado de Valor?
+            </label>
+            <div>
+              <label
+                htmlFor="agregadovalor"
+                className="inline-flex items-center mt-3"
+              >
+                <input
+                  type="radio"
+                  name="agregadovalor"
+                  value="SI"
+                  checked={selectedAgregado === "SI"}
+                  {...register("agregadovalor")}
+                  onChange={() => setSelectedAgregadoValue("SI")}
+                  className="form-radio h-5 w-5 text-indigo-600"
+                />
+                <span className="ml-2 text-black">SI</span>
+              </label>
+              <label
+                htmlFor="agregadovalor"
+                className="inline-flex items-center mt-3 ml-6"
+              >
+                <input
+                  type="radio"
+                  name="agregadovalor"
+                  value="NO"
+                  checked={selectedAgregado === "NO"}
+                  {...register("agregadovalor")}
+                  onChange={() => setSelectedAgregadoValue("NO")}
+                  className="form-radio h-5 w-5 text-indigo-600"
+                />
+                <span className="ml-2 text-black">NO</span>
+              </label>
+            </div>
+
+            <label
+              htmlFor="coloniaprediales"
+              className="block text-sm font-medium text-black"
+            >
+              ¿Posee Equipamiento?
+            </label>
+            <div>
+              <label
+                htmlFor="equipamento"
+                className="inline-flex items-center mt-3"
+              >
+                <input
+                  type="radio"
+                  name="equipamento"
+                  value="SI"
+                  checked={selectedEquipamiento === "SI"}
+                  {...register("equipamento")}
+                  onChange={() => setSelectedEquipamientoValue("SI")}
+                  className="form-radio h-5 w-5 text-indigo-600"
+                />
+                <span className="ml-2 text-black">SI</span>
+              </label>
+              <label
+                htmlFor="equipamento"
+                className="inline-flex items-center mt-3 ml-6"
+              >
+                <input
+                  type="radio"
+                  name="equipamento"
+                  value="NO"
+                  checked={selectedEquipamiento === "NO"}
+                  {...register("equipamento")}
+                  onChange={() => setSelectedEquipamientoValue("NO")}
+                  className="form-radio h-5 w-5 text-indigo-600"
+                />
+                <span className="ml-2 text-black">NO</span>
+              </label>
+            </div>
+
+            <label
+              htmlFor="difusion"
+              className="block text-sm font-medium text-black"
+            >
+              ¿Realiza Difusión y promoción de sus productos?
+            </label>
+            <div>
+              <label
+                htmlFor="difusion"
+                className="inline-flex items-center mt-3"
+              >
+                <input
+                  type="radio"
+                  name="difusion"
+                  value="SI"
+                  checked={selectedDifusion === "SI"}
+                  {...register("difusion")}
+                  onChange={() => setSelectedDifusionValue("SI")}
+                  className="form-radio h-5 w-5 text-indigo-600"
+                />
+                <span className="ml-2 text-black">SI</span>
+              </label>
+              <label
+                htmlFor="difusion"
+                className="inline-flex items-center mt-3 ml-6"
+              >
+                <input
+                  type="radio"
+                  name="difusion"
+                  value="NO"
+                  checked={selectedDifusion === "NO"}
+                  {...register("difusion")}
+                  onChange={() => setSelectedDifusionValue("NO")}
+                  className="form-radio h-5 w-5 text-indigo-600"
+                />
+                <span className="ml-2 text-black">NO</span>
+              </label>
+            </div>
+          </>)}
 
             <button
               type="submit"
