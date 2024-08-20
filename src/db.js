@@ -4,7 +4,7 @@ export const connectDB = async () => {
 
     try {
         
-        await mongoose.connect ('mongodb://127.0.0.1/sysagrofamdb');
+        await mongoose.connect ('mongodb://127.0.0.1/sysarchivodb');
         
         console.log("DB is connected");
     } catch (error) {

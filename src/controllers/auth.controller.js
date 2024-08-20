@@ -1,12 +1,11 @@
-import User from '../models/user.model.js'
-import bcrypt from 'bcryptjs'
-import {createAccessToke} from '../libs/jwt.js'
-import jwt from 'jsonwebtoken'
-import { TOKEN_SECRET } from '../config.js'
-
+import User from '../models/user.model.js';
+import bcrypt from 'bcryptjs';
+import { createAccessToke } from '../libs/jwt.js';
+import jwt from 'jsonwebtoken';
+import { TOKEN_SECRET } from '../config.js';
 
 export const register = async (req, res) => {
-    const { username, email, password, role } = req.body;
+    const { username, email, password, role, nombre, apellido } = req.body;
 
     try {
         const userFoundByUsername = await User.findOne({ username });
@@ -21,7 +20,9 @@ export const register = async (req, res) => {
             username,
             email,
             password: passwordHash,
-            role
+            role,
+            nombre,
+            apellido
         });
 
         const userSaved = await newUser.save();
@@ -32,6 +33,8 @@ export const register = async (req, res) => {
             username: userSaved.username,
             email: userSaved.email,
             role: userSaved.role,
+            nombre: userSaved.nombre,
+            apellido: userSaved.apellido,
             createAt: userSaved.createdAt,
             updateAt: userSaved.updatedAt,
         });
@@ -49,7 +52,7 @@ export const login = async (req, res) => {
 
         if (!userFound) return res.status(400).json({ message: "Usuario incorrecto" });
 
-        const isMatch =  await bcrypt.compare(password, userFound.password);
+        const isMatch = await bcrypt.compare(password, userFound.password);
         if (!isMatch) return res.status(400).json({ message: "Contraseña Incorrecta" });
 
         const token = await createAccessToke({ id: userFound._id });
@@ -59,6 +62,8 @@ export const login = async (req, res) => {
             username: userFound.username,
             email: userFound.email,
             role: userFound.role,
+            nombre: userFound.nombre,
+            apellido: userFound.apellido,
             createAt: userFound.createdAt,
             updateAt: userFound.updatedAt,
         });
@@ -68,47 +73,45 @@ export const login = async (req, res) => {
     }
 };
 
-
-
-export const logout = async (req,res) => {
+export const logout = async (req, res) => {
     res.cookie('token', "", {
         expires: new Date(0)
-    })
-    return res.sendStatus(200)
-
+    });
+    return res.sendStatus(200);
 }
 
+export const profile = async (req, res) => {
+    const userFound = await User.findById(req.user.id);
 
-export const profile = async (req,res) => {
-    const userFound = await User.findById(req.user.id)
+    if (!userFound) return res.status(400).json({ message: "User not found" });
 
-    if (!userFound) return res.status(400).json ({ message : "User not found"})
     return res.json({
         id: userFound._id,
         username: userFound.username,
-        email:userFound.email,
-        role:userFound.role,
+        email: userFound.email,
+        role: userFound.role,
+        nombre: userFound.nombre,
+        apellido: userFound.apellido,
         createAt: userFound.createdAt,
         updateAt: userFound.updatedAt,
-
-    })
-
+    });
 }
-
 
 export const verifyToken = async (req, res) => {
     const { token } = req.cookies;
     if (!token) return res.send(false);
-  
+
     jwt.verify(token, TOKEN_SECRET, async (error, user) => {
-      if (error) return res.sendStatus(401);
-  
-      const userFound = await User.findById(user.id);
-      if (!userFound) return res.sendStatus(401);
-  
-      return res.json({
-        id: userFound._id,
-        username: userFound.username,
-      });
+        if (error) return res.sendStatus(401);
+
+        const userFound = await User.findById(user.id);
+        if (!userFound) return res.sendStatus(401);
+
+        return res.json({
+            id: userFound._id,
+            username: userFound.username,
+            nombre: userFound.nombre,
+            apellido: userFound.apellido,
+        });
     });
-  };
+};

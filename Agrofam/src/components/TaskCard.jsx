@@ -31,27 +31,25 @@ function Table() {
   const filteredTasks = !search
     ? tasks
     : tasks.filter((task) => {
-        const apellidoresp1 = task.apellidoresp1
-          ? task.apellidoresp1.toLowerCase()
+        const expe = task.expe ? task.expe.toLowerCase() : "";
+        const correlativo = task.correlativo
+          ? task.correlativo.toLowerCase()
           : "";
-        const nombreresp1 = task.nombreresp1
-          ? task.nombreresp1.toLowerCase()
-          : "";
-        const dniresp1 = task.dni ? task.dniresp1.toLowerCase() : "";
-        const municipiofamiliar = task.municipiofamiliar
-          ? task.municipiofamiliar.toLowerCase()
-          : "";
-        const superficietotalprediales = task.superficietotalprediales
-          ? task.superficietotalprediales.toLowerCase()
-          : "";
+        const anio = task.dni ? task.anio.toLowerCase() : "";
+        const cuerpo = task.cuerpo ? task.cuerpo.toLowerCase() : "";
+        const fecha = task.fecha ? task.fecha.toLowerCase() : "";
+        const iniciador = task.iniciador ? task.iniciador.toLowerCase() : "";
+        const asunto = task.asunto ? task.asunto.toLowerCase() : "";
         const searchLowerCase = search.toLowerCase();
 
         return (
-          apellidoresp1.includes(searchLowerCase) ||
-          nombreresp1.includes(searchLowerCase) ||
-          dniresp1.includes(searchLowerCase) ||
-          municipiofamiliar.includes(searchLowerCase) ||
-          superficietotalprediales.includes(searchLowerCase)
+          expe.includes(searchLowerCase) ||
+          correlativo.includes(searchLowerCase) ||
+          anio.includes(searchLowerCase) ||
+          cuerpo.includes(searchLowerCase) ||
+          fecha.includes(searchLowerCase) ||
+          iniciador.includes(searchLowerCase) ||
+          asunto.includes(searchLowerCase)
         );
       });
 
@@ -99,119 +97,38 @@ function Table() {
                 <thead>
                   <tr>
                     <th colSpan="12" className="table-title">
-                      Listado de Inscriptos
+                      Listado de Archivos
                     </th>
                   </tr>
                   <tr>
-                    <th>Apellido</th>
-                    <th>Nombre</th>
-                    <th>DNI</th>
-                    <th>Municipio</th>
-                    <th>Género</th>
-                    <th>Superficie Total</th>
-                    <th>Vende lo que produce</th>
-                    <th>Pueblo Originarios</th>
-                    <th>Producción orgánica</th>
-                    <th>Producción agroecológica</th>
-                    <th>Producción convencional</th>
+                    <th>Codigo de Organismo</th>
+                    <th>N° Correlativo</th>
+                    <th>Año</th>
+                    <th>Cuerpo</th>
+                    <th>Fecha</th>
+                    <th>Asunto</th>
                     <th>Ver</th>
-                    {/* <th>Editar</th>
-                    <th>Borrar</th> */}
+                    <th>Editar</th>
+                    <th>Borrar</th>
                   </tr>
                 </thead>
                 <tbody>
                   {currentTasks.map((task) => (
                     <tr key={task._id}>
+                      <td>{task.expe ? task.expe.toUpperCase() : ""}</td>
                       <td>
-                        {task.apellidoresp1
-                          ? task.apellidoresp1.toUpperCase()
-                          : ""}
+                        {task.correlativo ? task.correlativo.toUpperCase() : ""}
+                      </td>
+                      <td>{task.anio ? task.anio.toUpperCase() : ""}</td>
+                      <td>
+                        {task.cuerpo ? task.cuerpo.toUpperCase() : ""}
+                        {task.fecha ? task.fecha.toUpperCase() : ""}
                       </td>
                       <td>
-                        {task.nombreresp1 ? task.nombreresp1.toUpperCase() : ""}
+                        {task.iniciador ? task.iniciador.toUpperCase() : ""}
                       </td>
-                      <td>
-                        {task.dniresp1 ? task.dniresp1.toUpperCase() : ""}
-                      </td>
-                      <td>
-                        {task.municipiofamiliar
-                          ? task.municipiofamiliar.toUpperCase()
-                          : ""}
-                        {task.municipioprediales
-                          ? task.municipioprediales.toUpperCase()
-                          : ""}
-                      </td>
-                      <td>{task.genero1 ? task.genero1.toUpperCase() : ""}</td>
-                      <td>
-                        {task.superficietotalprediales
-                          ? task.superficietotalprediales.toUpperCase()
-                          : ""}
-                      </td>
+                      <td>{task.asunto ? task.asunto.toUpperCase() : ""}</td>
 
-                      <td>
-                        {task.vendecomercializacion
-                          ? task.vendecomercializacion.toUpperCase()
-                          : ""}
-                      </td>
-                      <td>
-                        {task.pueblosoriginariosfamiliar
-                          ? task.pueblosoriginariosfamiliar.toUpperCase()
-                          : ""}
-                      </td>
-                      <td>
-                        {task.produccionorganica
-                          ? task.produccionorganica.toUpperCase()
-                          : ""}
-                      </td>
-                      <td>
-                        {task.produccionagroecologica
-                          ? task.produccionagroecologica.toUpperCase()
-                          : ""}
-                      </td>
-                      
-                      <td>
-                        {task.produccionconvencional
-                          ? task.produccionconvencional.toUpperCase()
-                          : ""}
-                      </td>
-                      
-                      
-                      {/* <td>
-                        {Array.isArray(task.roldirecto) ? task.roldirecto.map(roldirecto => {
-                          if (typeof roldirecto === 'string') {
-                            return roldirecto.toLowerCase();
-                          } else {
-                            return 'No tiene';
-                          }
-                        }).join(', ') : 'No tiene'}
-                      </td>
-                      <td>
-                        {Array.isArray(task.disciplinadirecta) ? task.disciplinadirecta.map(disciplinadirecta => {
-                          if (typeof disciplinadirecta === 'string') {
-                            return disciplinadirecta.toLowerCase();
-                          } else {
-                            return 'No tiene';
-                          }
-                        }).join(', ') : 'No tiene'}
-                      </td>
-                      <td>
-                        {Array.isArray(task.rolindirecto) ? task.rolindirecto.map(rolindirecto => {
-                          if (typeof rolindirecto === 'string') {
-                            return rolindirecto.toLowerCase();
-                          } else {
-                            return 'No tiene';
-                          }
-                        }).join(', ') : 'No tiene'}
-                      </td>
-                      <td>
-                        {Array.isArray(task.disciplinaindirecta) ? task.disciplinaindirecta.map(disciplinaindirecta => {
-                          if (typeof disciplinaindirecta === 'string') {
-                            return disciplinaindirecta.toLowerCase();
-                          } else {
-                            return 'No tiene';
-                          }
-                        }).join(', ') : 'No tiene'}
-                      </td> */}
                       <td>
                         <div className="button-container">
                           <Link
@@ -222,7 +139,7 @@ function Table() {
                           </Link>
                         </div>
                       </td>
-                       <td>
+                      <td>
                         <div className="button-container">
                           <Link
                             className="btn btn-primary"
@@ -241,7 +158,7 @@ function Table() {
                             <FontAwesomeIcon icon={faTrashAlt} />
                           </button>
                         </div>
-                      </td> 
+                      </td>
                     </tr>
                   ))}
                 </tbody>
