@@ -28,7 +28,7 @@ function TaskFormPageEdit() {
         setValue("iniciador", task.iniciador);
         setValue("asunto", task.asunto);
         setValue("iniciador", task.iniciador);
-        setValue("archivo", task.archivo);
+        setValue("file", task.file);
       }
     }
     loadTask();
@@ -166,14 +166,14 @@ function TaskFormPageEdit() {
             placeholder="Asunto"
           />
           <label
-            htmlFor="archivo"
+            htmlFor="file"
             className="block text-sm font-medium text-black"
           >
             Archivo
           </label>
           <input
             type="file"
-            {...register("archivo", { required: true })} multiple onChange={handleFileChange}
+            {...register("file", { required: true })} multiple onChange={handleFileChange}
             className="w-full bg-gray-100 text-black px-4 py-2 rounded-md my-2"
           />
           <button

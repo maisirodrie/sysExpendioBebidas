@@ -12,6 +12,7 @@ function TaskFormPage() {
   const navigate = useNavigate();
   const params = useParams();
   const [selectedFiles, setSelectedFiles] = useState([]);
+  const [file, setFile] = useState(null); // Estado para almacenar el archivo seleccionado
 
   useEffect(() => {
     async function loadTask() {
@@ -33,39 +34,36 @@ function TaskFormPage() {
 
   const onSubmit = handleSubmit(async (data) => {
     try {
-      // Crear FormData
       const formData = new FormData();
-
-      // Agregar campos de texto al FormData
-      Object.keys(data).forEach((key) => {
-        if (key !== 'archivo') {
-          formData.append(key, data[key]);
-        }
-      });
-
-      // Agregar archivos seleccionados al FormData
-      selectedFiles.forEach((file) => {
-        formData.append('archivo', file); // Asegúrate de que el backend maneje múltiples archivos si es necesario
-      });
-
-      console.log("Datos del formulario a enviar:", Array.from(formData.entries())); // Para depurar los datos
-
+      formData.append("expe", data.expe);
+      formData.append("correlativo", data.correlativo);
+      formData.append("anio", data.anio);
+      formData.append("cuerpo", data.cuerpo);
+      formData.append("fecha", data.fecha);
+      formData.append("iniciador", data.iniciador);
+      formData.append("asunto", data.asunto);
+  
+      if (file) {
+        formData.append("file", file); // Asegúrate de que 'file' es el nombre del campo
+      }
+  
       // Enviar el formulario
       if (params.id) {
-        await updateTask(params.id, formData); // Pasar formData para actualizar
+        await updateTask(params.id, formData);
       } else {
-        await createTask(formData); // Pasar formData para crear
+        await createTask(formData);
       }
-
+  
       navigate("/task");
     } catch (error) {
       console.error("Error:", error);
-      // Manejo de errores
     }
   });
+  
 
   const handleFileChange = (e) => {
-    setSelectedFiles(Array.from(e.target.files)); // Almacenar los archivos seleccionados en el estado
+    const selectedFile = e.target.files[0];
+    setFile(selectedFile); // Almacenar el archivo seleccionado en el estado
   };
 
   return (
@@ -86,7 +84,10 @@ function TaskFormPage() {
           </Link>
         </div>
         <form onSubmit={onSubmit}>
-          <label htmlFor="expe" className="block text-sm font-medium text-black">
+          <label
+            htmlFor="expe"
+            className="block text-sm font-medium text-black"
+          >
             Codigo del Organismo
           </label>
           <input
@@ -95,7 +96,10 @@ function TaskFormPage() {
             className="w-full bg-gray-100 text-black px-4 py-2 rounded-md my-2"
             placeholder="Expediente N°"
           />
-          <label htmlFor="correlativo" className="block text-sm font-medium text-black">
+          <label
+            htmlFor="correlativo"
+            className="block text-sm font-medium text-black"
+          >
             N° Correlativo
           </label>
           <input
@@ -104,7 +108,10 @@ function TaskFormPage() {
             className="w-full bg-gray-100 text-black px-4 py-2 rounded-md my-2"
             placeholder="N° Correlativo"
           />
-          <label htmlFor="anio" className="block text-sm font-medium text-black">
+          <label
+            htmlFor="anio"
+            className="block text-sm font-medium text-black"
+          >
             Año
           </label>
           <input
@@ -113,7 +120,10 @@ function TaskFormPage() {
             className="w-full bg-gray-100 text-black px-4 py-2 rounded-md my-2"
             placeholder="Año"
           />
-          <label htmlFor="cuerpo" className="block text-sm font-medium text-black">
+          <label
+            htmlFor="cuerpo"
+            className="block text-sm font-medium text-black"
+          >
             Cuerpo
           </label>
           <input
@@ -122,7 +132,10 @@ function TaskFormPage() {
             className="w-full bg-gray-100 text-black px-4 py-2 rounded-md my-2"
             placeholder="Cuerpo"
           />
-          <label htmlFor="fecha" className="block text-sm font-medium text-black">
+          <label
+            htmlFor="fecha"
+            className="block text-sm font-medium text-black"
+          >
             Fecha
           </label>
           <input
@@ -131,7 +144,10 @@ function TaskFormPage() {
             className="w-full bg-gray-100 text-black px-4 py-2 rounded-md my-2"
             placeholder="Fecha"
           />
-          <label htmlFor="iniciador" className="block text-sm font-medium text-black">
+          <label
+            htmlFor="iniciador"
+            className="block text-sm font-medium text-black"
+          >
             Iniciador
           </label>
           <input
@@ -140,7 +156,10 @@ function TaskFormPage() {
             className="w-full bg-gray-100 text-black px-4 py-2 rounded-md my-2"
             placeholder="Iniciador"
           />
-          <label htmlFor="asunto" className="block text-sm font-medium text-black">
+          <label
+            htmlFor="asunto"
+            className="block text-sm font-medium text-black"
+          >
             Asunto
           </label>
           <input
@@ -150,13 +169,16 @@ function TaskFormPage() {
             placeholder="Asunto"
           />
 
-          <label htmlFor="archivo" className="block text-sm font-medium text-black">
+          <label
+            htmlFor="file"
+            className="block text-sm font-medium text-black"
+          >
             Archivo
           </label>
           <input
             type="file"
+            name="file" // Nombre del campo debe coincidir
             onChange={handleFileChange}
-            multiple
             className="w-full bg-gray-100 text-black px-4 py-2 rounded-md my-2"
           />
 
@@ -173,4 +195,3 @@ function TaskFormPage() {
 }
 
 export default TaskFormPage;
-

@@ -22,5 +22,5 @@ export const creatTaskSchema = z.object({
   asunto: z.string({
     required_error: "El asunto es requerido",
   }),
-  archivo: z.any().optional(), // Correcta utilización de optional
+  file: z.any().optional(), // Correcta utilización de optional
 });

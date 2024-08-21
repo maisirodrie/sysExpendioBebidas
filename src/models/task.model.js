@@ -31,7 +31,7 @@ const tasksSchema = new mongoose.Schema(
       type: String,
       trim: true,
     },
-    archivo:  [{
+    file:  [{
       filename: String,
       bucketName: String,
       mimetype: String,

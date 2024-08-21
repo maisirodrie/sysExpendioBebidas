@@ -29,11 +29,9 @@ export const createTasks = async (req, res) => {
       fecha,
       iniciador,
       asunto,
-      archivo,
-      userRole, // Ensure nombreresp2 is included in the request body
     } = req.body;
 
-    // Check if a task with the same dniresp1 already exists
+    // Verificar si ya existe una tarea con los mismos datos
     const existingTask = await Task.findOne({
       expe: expe,
       correlativo: correlativo,
@@ -41,13 +39,19 @@ export const createTasks = async (req, res) => {
     });
 
     if (existingTask) {
-      // If a task with the same dniresp1 already exists, return an error message
-      return res
-        .status(400)
-        .json({ message: "El expediente ya ha sido cargado." });
+      return res.status(400).json({ message: "El expediente ya ha sido cargado." });
     }
 
-    // Create a new task
+    // Crear un objeto file si existe en la solicitud
+    const file = req.file ? {
+      filename: req.file.filename,
+      bucketName: req.file.bucketName,
+      mimetype: req.file.mimetype,
+      encoding: req.file.encoding,
+      id: req.file.id
+    } : [];
+
+    // Crear una nueva tarea
     const newTask = new Task({
       expe,
       correlativo,
@@ -56,18 +60,16 @@ export const createTasks = async (req, res) => {
       fecha,
       iniciador,
       asunto,
-      archivo,
-      userRole,
-      user: req.user.id, // Assuming req.user.id contains the ID of the authenticated user
+      file: [file], // Asegúrate de pasar un array de archivos si es necesario
+      user: req.user.id,
     });
 
-    // Save the new task to the database
+    // Guardar la nueva tarea en la base de datos
     await newTask.save();
 
-    // Return the newly created task as a response
+    // Retornar la nueva tarea
     res.json(newTask);
   } catch (error) {
-    // Handle any error that occurs during the process
     return res.status(500).json({ message: error.message });
   }
 };
@@ -75,12 +77,13 @@ export const createTasks = async (req, res) => {
 export const getTask = async (req, res) => {
   try {
     const task = await Task.findById(req.params.id).populate("user");
-    if (!task) return res.status(404).json({ message: "Task not found" });
+    if (!task) return res.status(404).json({ message: "Tarea no encontrada" });
     return res.json(task);
   } catch (error) {
     return res.status(500).json({ message: error.message });
   }
 };
+
 
 export const updateTasks = async (req, res) => {
   try {
@@ -92,23 +95,30 @@ export const updateTasks = async (req, res) => {
       fecha,
       iniciador,
       asunto,
-      archivo,
     } = req.body;
 
-    // Buscar si ya existe una tarea con el mismo N° de Expdiente, Correlativo y Año, excluyendo el documento actual
+    // Extraer el archivo de la solicitud, si existe
+    const file = req.file ? {
+      filename: req.file.filename,
+      bucketName: req.file.bucketName,
+      mimetype: req.file.mimetype,
+      encoding: req.file.encoding,
+      id: req.file.id
+    } : undefined;
+
+    // Buscar si ya existe una tarea con los mismos datos excluyendo el documento actual
     const existingTask = await Task.findOne({
-      _id: { $ne: id }, // Excluir el documento actual por ID
+      _id: { $ne: req.params.id }, // Excluir el documento actual
       expe: expe,
       correlativo: correlativo,
       anio: anio,
     });
 
     if (existingTask) {
-      // Si ya existe una tarea con el mismo DNI, devolver un mensaje de error
-      return res.status(400).json({ message: "El DNI ya ha sido cargado." });
+      return res.status(400).json({ message: "El expediente ya ha sido cargado." });
     }
 
-    // Actualizar la tarea, incluyendo el valor actual del municipio
+    // Actualizar la tarea
     const updatedTask = await Task.findByIdAndUpdate(
       req.params.id,
       {
@@ -119,26 +129,28 @@ export const updateTasks = async (req, res) => {
         fecha,
         iniciador,
         asunto,
-        archivo,
+        file: [file], // Actualizar el archivo si existe
       },
       { new: true }
     );
 
-    return res.json(updatedTask);
+    if (!updatedTask) return res.status(404).json({ message: "Tarea no encontrada" });
+
+    res.json(updatedTask);
   } catch (error) {
-    // Manejar cualquier error que ocurra durante el proceso
     return res.status(500).json({ message: error.message });
   }
 };
 
+
 export const deleteTasks = async (req, res) => {
   try {
     const deletedTask = await Task.findByIdAndDelete(req.params.id);
-    if (!deletedTask)
-      return res.status(404).json({ message: "Task not found" });
+    if (!deletedTask) return res.status(404).json({ message: "Tarea no encontrada" });
 
     return res.sendStatus(204);
   } catch (error) {
     return res.status(500).json({ message: error.message });
   }
 };
+
