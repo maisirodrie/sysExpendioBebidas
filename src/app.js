@@ -8,10 +8,16 @@ import path from 'path';
 
 const app = express();
 
+// app.use(cors({
+//     origin: 'http://localhost:5173',
+//     credentials: true,
+// }));
+
 app.use(cors({
-    origin: 'http://localhost:5173',
+    origin: 'www.gestiondearchivos.misiones.gov.ar',
     credentials: true,
 }));
+
 
 app.use(morgan('dev'));
 app.use(express.json());
