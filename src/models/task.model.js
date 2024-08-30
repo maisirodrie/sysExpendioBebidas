@@ -21,6 +21,7 @@ const tasksSchema = new mongoose.Schema(
     },
     fecha: {
       type: String,
+      default: Date.now,
       trim: true,
     },
     iniciador: {

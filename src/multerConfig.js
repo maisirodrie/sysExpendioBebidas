@@ -1,27 +1,49 @@
+// src/multerConfig.js
+
+import mongoose from 'mongoose';
+import { GridFSBucket } from 'mongodb';
 import multer from 'multer';
-import fs from 'fs';
-import path from 'path';
-import { fileURLToPath } from 'url';
-import { dirname } from 'path';
+import { Readable } from 'stream';
 
-// Obtener el directorio actual
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = dirname(__filename);
+// Configura tu URI de MongoDB
+const mongoURI = 'mongodb://127.0.0.1/sysarchivodb';
 
-// Configuración de Multer
-const storage = multer.diskStorage({
-  destination: function (req, file, cb) {
-    const uploadPath = path.join(__dirname, 'files');
-    if (!fs.existsSync(uploadPath)) {
-      fs.mkdirSync(uploadPath);
-    }
-    cb(null, uploadPath);
-  },
-  filename: function (req, file, cb) {
-    cb(null, Date.now() + '-' + file.originalname);
-  }
+// Configura la conexión a MongoDB
+const conn = mongoose.createConnection(mongoURI, {
+  useNewUrlParser: true,
+  useUnifiedTopology: true
 });
 
-const upload = multer({ storage: storage });
+let gfs; // Declarar gfs con let para permitir la asignación
 
-export default upload;
+conn.once('open', () => {
+  gfs = new GridFSBucket(conn.db, { bucketName: 'uploads' });
+});
+
+// Configuración de multer para almacenamiento en memoria
+const storage = multer.memoryStorage();
+const upload = multer({ storage });
+
+// Middleware para subir archivos a GridFS
+const streamUpload = (req, res, next) => {
+  if (!req.file) return next();
+
+  const file = req.file;
+  const filename = file.originalname; // Usar solo el nombre original
+  const uploadStream = gfs.openUploadStream(filename);
+
+  const readableStream = Readable.from(file.buffer);
+  readableStream.pipe(uploadStream);
+
+  uploadStream.on('finish', () => {
+    req.file.filename = filename;
+    req.file.id = uploadStream.id;
+    next();
+  });
+
+  uploadStream.on('error', (err) => {
+    return res.status(500).json({ message: err.message });
+  });
+};
+
+export { upload, streamUpload, gfs };

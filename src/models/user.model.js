@@ -37,7 +37,7 @@ const userSchema = new mongoose.Schema(
       {
         // Referencia a las tareas relacionadas
         type: mongoose.Schema.Types.ObjectId,
-        ref: "Task",
+        ref: "Tasks",
       },
     ],
   },

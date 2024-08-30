@@ -18,7 +18,8 @@ function TaskViewPage() {
         const fetchedTask = await getTask(params.id);
         setTask(fetchedTask);
         if (fetchedTask.file && fetchedTask.file.length > 0) {
-          setPdfUrl(`http://localhost:3007/files/${fetchedTask.file[0].filename}`);
+          // Verifica si la URL es correcta y si el archivo está disponible
+          setPdfUrl(`http://localhost:3007/api/tasks/file/${fetchedTask.file[0].filename}`);
         }
       } catch (error) {
         console.error("Error fetching task:", error);
@@ -31,17 +32,15 @@ function TaskViewPage() {
     try {
       const date = new Date(dateString);
       if (isNaN(date)) {
-        return "Fecha no válida"; // Return a fallback message for invalid dates
+        return "Fecha no válida";
       }
       // Obtener la fecha local
-      const localDate = new Date(
-        date.getTime() + date.getTimezoneOffset() * 60000
-      );
+      const localDate = new Date(date.getTime() + date.getTimezoneOffset() * 60000);
       // Formatear la fecha local
       return format(localDate, "dd/MM/yyyy", { locale: esLocale });
     } catch (error) {
       console.error("Error formatting date:", error);
-      return "Fecha no válida"; // Return a fallback message in case of an error
+      return "Fecha no válida";
     }
   };
 
@@ -49,46 +48,30 @@ function TaskViewPage() {
     <div className="flex items-center justify-center overflow-y-auto my-10">
       <div className="bg-gray-200 max-w-md w-full p-10">
         <div className="flex justify-between items-center mb-4">
-          <h1 className="text-2xl font-bold text-black">
-            Detalles del Registro
-          </h1>
+          <h1 className="text-2xl font-bold text-black">Detalles del Registro</h1>
           <Link to="/task" className="btn btn-success">
             <FontAwesomeIcon icon={faArrowLeft} />
           </Link>
         </div>
         <div className="text-black">
-          {task && (
+          {task ? (
             <>
-              <p className="my-4">
-                <strong>Datos del Encuestador</strong>
-              </p>
-              <p className="my-4">
-                Codigo del Organismo: {task.expe}
-              </p>
-              <p className="my-4">
-                N° Correlativo: {task.correlativo}
-              </p>
-              <p className="my-4">
-                Año: {task.anio}
-              </p>
-              <p className="my-4">
-                Cuerpo: {task.cuerpo}
-              </p>
-              <p className="my-4">
-                Fecha: {formatDate(task.fecha)}
-              </p>
-              <p className="my-4">
-                Iniciador: {task.iniciador}
-              </p>
-              <p className="my-4">
-                Asunto: {task.asunto}
-              </p>
+              <p className="my-4"><strong>Datos del Encuestador</strong></p>
+              <p className="my-4">Codigo del Organismo: {task.expe}</p>
+              <p className="my-4">N° Correlativo: {task.correlativo}</p>
+              <p className="my-4">Año: {task.anio}</p>
+              <p className="my-4">Cuerpo: {task.cuerpo}</p>
+              <p className="my-4">Fecha: {formatDate(task.fecha)}</p>
+              <p className="my-4">Iniciador: {task.iniciador}</p>
+              <p className="my-4">Asunto: {task.asunto}</p>
               {pdfUrl && (
                 <div className="my-4">
                   <a href={pdfUrl} target="_blank" className="btn btn-primary" rel="noopener noreferrer">Ver PDF</a>
                 </div>
               )}
             </>
+          ) : (
+            <p>Cargando...</p> // Mensaje mientras se carga la tarea
           )}
         </div>
       </div>

@@ -8,11 +8,9 @@ import {
   faEye,
   faPlus,
   faSearch,
-  faChevronLeft,
-  faChevronRight,
 } from "@fortawesome/free-solid-svg-icons";
 import "./Table.css";
-import Paginator from "./Paginator"; // Importa el componente del paginador
+import Paginator from "./Paginator";
 
 function Table() {
   const { tasks, deleteTask } = useTasks();
@@ -35,7 +33,7 @@ function Table() {
         const correlativo = task.correlativo
           ? task.correlativo.toLowerCase()
           : "";
-        const anio = task.dni ? task.anio.toLowerCase() : "";
+        const anio = task.anio ? task.anio.toLowerCase() : "";
         const cuerpo = task.cuerpo ? task.cuerpo.toLowerCase() : "";
         const fecha = task.fecha ? task.fecha.toLowerCase() : "";
         const iniciador = task.iniciador ? task.iniciador.toLowerCase() : "";
@@ -60,6 +58,27 @@ function Table() {
 
   const onPageChange = (pageNumber) => {
     setCurrentPage(pageNumber);
+  };
+
+  const formatDate = (dateStr) => {
+    if (!dateStr) return "";
+    
+    // Crear un objeto Date en UTC
+    const utcDate = new Date(dateStr);
+    
+    // Obtener el desfase horario de la zona de Buenos Aires en minutos
+    const offset = 3 * 60; // -3 horas en minutos
+    
+    // Crear una nueva fecha en la zona horaria local
+    const localDate = new Date(utcDate.getTime() + offset * 60 * 1000);
+    
+    // Obtener el día, mes y año en la zona horaria local
+    const day = String(localDate.getUTCDate()).padStart(2, '0');
+    const month = String(localDate.getUTCMonth() + 1).padStart(2, '0'); // Meses empiezan desde 0
+    const year = localDate.getUTCFullYear();
+    
+    // Formatear la fecha en 'dd/MM/yyyy'
+    return `${day}/${month}/${year}`;
   };
 
   return (
@@ -96,7 +115,7 @@ function Table() {
               <table className="table" style={{ textTransform: "uppercase" }}>
                 <thead>
                   <tr>
-                    <th colSpan="12" className="table-title">
+                    <th colSpan="13" className="table-title">
                       Listado de Archivos
                     </th>
                   </tr>
@@ -106,6 +125,7 @@ function Table() {
                     <th>Año</th>
                     <th>Cuerpo</th>
                     <th>Fecha</th>
+                    <th>Iniciador</th>
                     <th>Asunto</th>
                     <th>Ver</th>
                     <th>Editar</th>
@@ -120,9 +140,9 @@ function Table() {
                         {task.correlativo ? task.correlativo.toUpperCase() : ""}
                       </td>
                       <td>{task.anio ? task.anio.toUpperCase() : ""}</td>
+                      <td>{task.cuerpo ? task.cuerpo.toUpperCase() : ""}</td>
                       <td>
-                        {task.cuerpo ? task.cuerpo.toUpperCase() : ""}
-                        {task.fecha ? task.fecha.toUpperCase() : ""}
+                        {formatDate(task.fecha)}
                       </td>
                       <td>
                         {task.iniciador ? task.iniciador.toUpperCase() : ""}

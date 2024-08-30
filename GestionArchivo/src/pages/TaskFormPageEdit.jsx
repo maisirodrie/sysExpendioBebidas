@@ -5,60 +5,85 @@ import { Link, useNavigate, useParams } from "react-router-dom";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faArrowLeft } from "@fortawesome/free-solid-svg-icons";
 import "./taskformpage.css";
+import DatePicker from "react-datepicker";
+import "react-datepicker/dist/react-datepicker.css";
+import { format } from "date-fns";
 
 function TaskFormPageEdit() {
-  const [startDate, setStartDate] = useState(new Date());
   const { register, handleSubmit, setValue } = useForm();
   const { createTask, getTask, updateTask } = useTasks();
   const navigate = useNavigate();
   const params = useParams();
+  const [selectedDate, setSelectedDate] = useState(null);
   const [selectedFiles, setSelectedFiles] = useState([]);
 
   useEffect(() => {
     async function loadTask() {
       if (params.id) {
         const task = await getTask(params.id);
-
-        // Encargado
+  
+        // Convertir la fecha al formato Date y ajustarla a la zona horaria local
+        const utcDate = new Date(task.fecha);
+        const offset = 3 * 60; // Ajusta el desfase a -3 horas para Buenos Aires (UTC-3)
+        const localDate = new Date(utcDate.getTime() + offset * 60 * 1000);
+  
+        console.log("Fecha desde la tarea:", task.fecha);
+        console.log("Fecha convertida:", localDate);
+  
+        // Establecer valores en el formulario
         setValue("expe", task.expe);
         setValue("correlativo", task.correlativo);
         setValue("anio", task.anio);
         setValue("cuerpo", task.cuerpo);
-        setValue("fecha", task.fecha);
+        setSelectedDate(localDate); // Establecer la fecha en el estado
         setValue("iniciador", task.iniciador);
         setValue("asunto", task.asunto);
-        setValue("iniciador", task.iniciador);
-        setValue("file", task.file);
+  
+        // Mostrar información de archivos cargados previamente
+        if (task.file && task.file.length > 0) {
+          setSelectedFiles(task.file); // Establecer los archivos cargados previamente en el estado
+        }
       }
     }
     loadTask();
   }, [params.id, setValue, getTask]);
+  
+  
 
   const onSubmit = handleSubmit(async (data) => {
     try {
-      const updatedData = {
-        ...data,
-      };
-
-      console.log("Datos del formulario a enviar:", updatedData);
-
+      const formData = new FormData();
+      const utcDate = selectedDate ? new Date(selectedDate.getTime() - (-3 * 60 * 60 * 1000)) : ""; // Convertir a UTC
+      
+      // Añadir campos de texto al FormData
+      Object.keys(data).forEach(key => {
+        if (key !== "file") {
+          formData.append(key, data[key]);
+        }
+      });
+  
+      // Añadir fecha en formato ISO para almacenamiento
+      formData.append('fecha', utcDate.toISOString());
+  
+      // Añadir archivos al FormData
+      selectedFiles.forEach(file => {
+        formData.append("file", file);
+      });
+  
       if (params.id) {
-        await updateTask(params.id, updatedData);
+        await updateTask(params.id, formData);
       } else {
-        await createTask(updatedData);
+        await createTask(formData);
       }
+  
       navigate("/task");
     } catch (error) {
-      if (error.response && error.response.status === 400) {
-        setDniError(error.response.data.message);
-      } else {
-        console.error("Error:", error);
-      }
+      console.error("Error:", error);
     }
   });
-
-  //Funciones
-
+  
+  
+  
   const handleFileChange = (e) => {
     setSelectedFiles(Array.from(e.target.files)); // Almacenar los archivos seleccionados en el estado
   };
@@ -135,11 +160,13 @@ function TaskFormPageEdit() {
           >
             Fecha
           </label>
-          <input
-            type="text"
-            {...register("fecha", { required: true })}
+          <DatePicker
+            dateFormat="dd/MM/yyyy"
+            selected={selectedDate} // Usa el estado de fecha seleccionado
+            onChange={(date) => setSelectedDate(date)}
             className="w-full bg-gray-100 text-black px-4 py-2 rounded-md my-2"
-            placeholder="Fecha"
+            placeholderText="Seleccionar fecha"
+            required
           />
           <label
             htmlFor="iniciador"
@@ -173,8 +200,9 @@ function TaskFormPageEdit() {
           </label>
           <input
             type="file"
-            {...register("file", { required: true })} multiple onChange={handleFileChange}
+            onChange={handleFileChange}
             className="w-full bg-gray-100 text-black px-4 py-2 rounded-md my-2"
+            multiple
           />
           <button
             type="submit"
@@ -189,3 +217,4 @@ function TaskFormPageEdit() {
 }
 
 export default TaskFormPageEdit;
+

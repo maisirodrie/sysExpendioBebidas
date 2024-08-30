@@ -17,7 +17,7 @@ export function Navbar() {
       <div className="flex items-center">
         <h1 className="text-2xl font-bold mr-4">
           <Link to={isAuthenticated ? (user.role === 'admin' ? "/task" : "/") : "/"}>
-            <img src="/logos/LOGO IPD Misiones.png" alt="Logo" className="h-20" />
+            <img src="/logos/logoccpm.png" alt="Logo" className="h-20" />
           </Link>
         </h1>
         {isAuthenticated && (

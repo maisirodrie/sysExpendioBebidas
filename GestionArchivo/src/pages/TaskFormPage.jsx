@@ -5,14 +5,17 @@ import { Link, useNavigate, useParams } from "react-router-dom";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faArrowLeft } from "@fortawesome/free-solid-svg-icons";
 import "./taskformpage.css";
+import DatePicker from "react-datepicker";
+import "react-datepicker/dist/react-datepicker.css";
+import { format } from "date-fns";
 
 function TaskFormPage() {
   const { register, handleSubmit, setValue } = useForm();
   const { createTask, getTask, updateTask } = useTasks();
   const navigate = useNavigate();
   const params = useParams();
-  const [selectedFiles, setSelectedFiles] = useState([]);
   const [file, setFile] = useState(null); // Estado para almacenar el archivo seleccionado
+  const [selectedDate, setSelectedDate] = useState(null);
 
   useEffect(() => {
     async function loadTask() {
@@ -24,9 +27,13 @@ function TaskFormPage() {
         setValue("correlativo", task.correlativo);
         setValue("anio", task.anio);
         setValue("cuerpo", task.cuerpo);
-        setValue("fecha", task.fecha);
         setValue("iniciador", task.iniciador);
         setValue("asunto", task.asunto);
+        
+        // Configurar la fecha si existe
+        if (task.fecha) {
+          setSelectedDate(new Date(task.fecha));
+        }
       }
     }
     loadTask();
@@ -34,32 +41,34 @@ function TaskFormPage() {
 
   const onSubmit = handleSubmit(async (data) => {
     try {
+      const formattedDate = selectedDate
+        ? format(selectedDate, "yyyy-MM-dd")
+        : "";
       const formData = new FormData();
       formData.append("expe", data.expe);
       formData.append("correlativo", data.correlativo);
       formData.append("anio", data.anio);
       formData.append("cuerpo", data.cuerpo);
-      formData.append("fecha", data.fecha);
+      formData.append("fecha", formattedDate);
       formData.append("iniciador", data.iniciador);
       formData.append("asunto", data.asunto);
-  
+
       if (file) {
         formData.append("file", file); // Asegúrate de que 'file' es el nombre del campo
       }
-  
+
       // Enviar el formulario
       if (params.id) {
         await updateTask(params.id, formData);
       } else {
         await createTask(formData);
       }
-  
+
       navigate("/task");
     } catch (error) {
       console.error("Error:", error);
     }
   });
-  
 
   const handleFileChange = (e) => {
     const selectedFile = e.target.files[0];
@@ -138,11 +147,13 @@ function TaskFormPage() {
           >
             Fecha
           </label>
-          <input
-            type="text"
-            {...register("fecha", { required: true })}
+          <DatePicker
+            dateFormat="dd/MM/yyyy"
+            selected={selectedDate}
+            onChange={(date) => setSelectedDate(date)}
             className="w-full bg-gray-100 text-black px-4 py-2 rounded-md my-2"
-            placeholder="Fecha"
+            placeholderText="Seleccionar fecha"
+            required
           />
           <label
             htmlFor="iniciador"
@@ -177,7 +188,7 @@ function TaskFormPage() {
           </label>
           <input
             type="file"
-            name="file" // Nombre del campo debe coincidir
+            name="file"
             onChange={handleFileChange}
             className="w-full bg-gray-100 text-black px-4 py-2 rounded-md my-2"
           />

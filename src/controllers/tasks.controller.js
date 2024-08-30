@@ -1,14 +1,7 @@
+// src/controllers/tasks.controller.js
+import mongoose from 'mongoose';
 import Task from "../models/task.model.js";
-
-// export const getTasks = async (req,res) => {
-//     try {
-//         const tasks = await Task.find({ user : req.user.id }).populate("user");
-//         res.json(tasks);
-//       } catch (error) {
-//         return res.status(500).json({ message: error.message });
-//       }
-
-// };
+import { gfs } from '../multerConfig.js'; // Importa gfs desde multerConfig.js
 
 export const getTasks = async (req, res) => {
   try {
@@ -31,7 +24,6 @@ export const createTasks = async (req, res) => {
       asunto,
     } = req.body;
 
-    // Verificar si ya existe una tarea con los mismos datos
     const existingTask = await Task.findOne({
       expe: expe,
       correlativo: correlativo,
@@ -42,7 +34,6 @@ export const createTasks = async (req, res) => {
       return res.status(400).json({ message: "El expediente ya ha sido cargado." });
     }
 
-    // Crear un objeto file si existe en la solicitud
     const file = req.file ? {
       filename: req.file.filename,
       bucketName: req.file.bucketName,
@@ -51,7 +42,6 @@ export const createTasks = async (req, res) => {
       id: req.file.id
     } : [];
 
-    // Crear una nueva tarea
     const newTask = new Task({
       expe,
       correlativo,
@@ -60,14 +50,11 @@ export const createTasks = async (req, res) => {
       fecha,
       iniciador,
       asunto,
-      file: [file], // Asegúrate de pasar un array de archivos si es necesario
+      file: [file],
       user: req.user.id,
     });
 
-    // Guardar la nueva tarea en la base de datos
     await newTask.save();
-
-    // Retornar la nueva tarea
     res.json(newTask);
   } catch (error) {
     return res.status(500).json({ message: error.message });
@@ -84,9 +71,9 @@ export const getTask = async (req, res) => {
   }
 };
 
-
 export const updateTasks = async (req, res) => {
   try {
+    const { id } = req.params;
     const {
       expe,
       correlativo,
@@ -97,8 +84,10 @@ export const updateTasks = async (req, res) => {
       asunto,
     } = req.body;
 
-    // Extraer el archivo de la solicitud, si existe
-    const file = req.file ? {
+    console.log("Request file data:", req.file);
+
+    // Verifica si se proporciona un archivo nuevo
+    let newFile = req.file ? {
       filename: req.file.filename,
       bucketName: req.file.bucketName,
       mimetype: req.file.mimetype,
@@ -106,9 +95,11 @@ export const updateTasks = async (req, res) => {
       id: req.file.id
     } : undefined;
 
-    // Buscar si ya existe una tarea con los mismos datos excluyendo el documento actual
+    console.log("File data to be updated:", newFile);
+
+    // Verifica si la tarea ya existe con los mismos datos, excluyendo el ID actual
     const existingTask = await Task.findOne({
-      _id: { $ne: req.params.id }, // Excluir el documento actual
+      _id: { $ne: id },
       expe: expe,
       correlativo: correlativo,
       anio: anio,
@@ -118,9 +109,29 @@ export const updateTasks = async (req, res) => {
       return res.status(400).json({ message: "El expediente ya ha sido cargado." });
     }
 
-    // Actualizar la tarea
+    // Busca la tarea para obtener el archivo anterior
+    const task = await Task.findById(id);
+    if (!task) {
+      return res.status(404).json({ message: "Tarea no encontrada" });
+    }
+
+    // Elimina el archivo anterior si existe y hay un nuevo archivo
+    if (newFile) {
+      if (task.file && task.file.length > 0) {
+        for (const fileInfo of task.file) {
+          if (fileInfo.id) {
+            await gfs.delete(fileInfo.id);
+          }
+        }
+      }
+    } else {
+      // Si no hay nuevo archivo, mantiene el archivo antiguo
+      newFile = task.file;
+    }
+
+    // Actualiza la tarea con los datos nuevos y el archivo nuevo (si lo hay)
     const updatedTask = await Task.findByIdAndUpdate(
-      req.params.id,
+      id,
       {
         expe,
         correlativo,
@@ -129,28 +140,70 @@ export const updateTasks = async (req, res) => {
         fecha,
         iniciador,
         asunto,
-        file: [file], // Actualizar el archivo si existe
+        file: newFile ? [newFile] : task.file,
       },
       { new: true }
     );
+
+    console.log("Updated task:", updatedTask);
 
     if (!updatedTask) return res.status(404).json({ message: "Tarea no encontrada" });
 
     res.json(updatedTask);
   } catch (error) {
+    console.error("Error updating task:", error);
     return res.status(500).json({ message: error.message });
   }
 };
+
 
 
 export const deleteTasks = async (req, res) => {
   try {
-    const deletedTask = await Task.findByIdAndDelete(req.params.id);
-    if (!deletedTask) return res.status(404).json({ message: "Tarea no encontrada" });
+    // Buscar la tarea por su ID
+    const task = await Task.findById(req.params.id);
+    if (!task) return res.status(404).json({ message: "Tarea no encontrada" });
 
-    return res.sendStatus(204);
+    // Eliminar archivos asociados a la tarea desde GridFS
+    if (task.file && task.file.length > 0) {
+      for (const file of task.file) {
+        gfs.delete(new mongoose.Types.ObjectId(file.id), (err) => {
+          if (err) {
+            if (err.code === 'FileNotFound') {
+              console.error('File not found:', err);
+              return res.status(404).json({ message: 'Archivo no encontrado' });
+            }
+            console.error('Error deleting file:', err);
+            return res.status(500).json({ message: 'Error deleting file', error: err });
+          }
+          console.log(`File ${file.filename} deleted successfully.`);
+        });
+      }
+    }
+
+    // Eliminar el registro de la tarea
+    await Task.findByIdAndDelete(req.params.id);
+    res.sendStatus(204);
   } catch (error) {
-    return res.status(500).json({ message: error.message });
+    console.error('Error deleting task:', error);
+    res.status(500).json({ message: error.message });
   }
 };
 
+export const downloadFile = (req, res) => {
+  const { filename } = req.params;
+
+  try {
+    const readStream = gfs.openDownloadStreamByName(filename);
+
+    readStream.on('error', (err) => {
+      console.error('Error reading file stream:', err);
+      res.status(404).json({ message: 'No such file' });
+    });
+
+    readStream.pipe(res);
+  } catch (error) {
+    console.error('Error downloading file:', error);
+    res.status(500).json({ message: error.message });
+  }
+};
