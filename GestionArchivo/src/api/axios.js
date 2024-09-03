@@ -1,7 +1,7 @@
 import axios from "axios";
 
 const instance = axios.create({
-    baseURL: 'https://www.api.misiones.gov.ar:3001/api',
+    baseURL: 'https://www.api.misiones.gov.ar:3006/api',
     // baseURL: 'http://localhost:3000/api',
     withCredentials:true
 })
