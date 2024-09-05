@@ -14,7 +14,7 @@ const app = express();
 // }));
 
 app.use(cors({
-    origin: 'www.gestiondearchivos.misiones.gov.ar',
+    origin: 'https://www.gestiondearchivos.misiones.gov.ar',
     credentials: true,
 }));
 
