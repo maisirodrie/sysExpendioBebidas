@@ -135,21 +135,21 @@ function Table() {
                 <tbody>
                   {currentTasks.map((task) => (
                     <tr key={task._id}>
-                      <td>{task.expe ? task.expe.toUpperCase() : ""}</td>
-                      <td>
+                      <td data-label ="Codigo de Organismo">{task.expe ? task.expe.toUpperCase() : ""}</td>
+                      <td data-label ="N° Correlativo">
                         {task.correlativo ? task.correlativo.toUpperCase() : ""}
                       </td>
-                      <td>{task.anio ? task.anio.toUpperCase() : ""}</td>
-                      <td>{task.cuerpo ? task.cuerpo.toUpperCase() : ""}</td>
-                      <td>
+                      <td data-label="Año">{task.anio ? task.anio.toUpperCase() : ""}</td>
+                      <td data-label="Cuerpo">{task.cuerpo ? task.cuerpo.toUpperCase() : ""}</td>
+                      <td data-label="Fecha">
                         {formatDate(task.fecha)}
                       </td>
-                      <td>
+                      <td data-label="Iniciador">
                         {task.iniciador ? task.iniciador.toUpperCase() : ""}
                       </td>
-                      <td>{task.asunto ? task.asunto.toUpperCase() : ""}</td>
+                      <td data-label="Asunto">{task.asunto ? task.asunto.toUpperCase() : ""}</td>
 
-                      <td>
+                      <td data-label="Ver">
                         <div className="button-container">
                           <Link
                             className="btn btn-success"
@@ -159,7 +159,7 @@ function Table() {
                           </Link>
                         </div>
                       </td>
-                      <td>
+                      <td data-label="Editar">
                         <div className="button-container">
                           <Link
                             className="btn btn-primary"
@@ -169,7 +169,7 @@ function Table() {
                           </Link>
                         </div>
                       </td>
-                      <td>
+                      <td data-label="Borrar">
                         <div className="button-container">
                           <button
                             className="btn btn-danger"
