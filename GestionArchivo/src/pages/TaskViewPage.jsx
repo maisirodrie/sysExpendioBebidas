@@ -12,14 +12,16 @@ function TaskViewPage() {
   const [task, setTask] = useState(null);
   const [pdfUrl, setPdfUrl] = useState(null);
 
+  const apiUrl = import.meta.env.VITE_API_ARCHIVO;
+
   useEffect(() => {
     async function fetchTask() {
       try {
         const fetchedTask = await getTask(params.id);
         setTask(fetchedTask);
+  
         if (fetchedTask.file && fetchedTask.file.length > 0) {
-          // Verifica si la URL es correcta y si el archivo está disponible
-          setPdfUrl(`http://localhost:3007/api/tasks/file/${fetchedTask.file[0].filename}`);
+          setPdfUrl(`${apiUrl}/tasks/file/${fetchedTask.file[0].filename}`);
         }
       } catch (error) {
         console.error("Error fetching task:", error);
@@ -27,6 +29,9 @@ function TaskViewPage() {
     }
     fetchTask();
   }, [getTask, params.id]);
+  
+  
+  
 
   const formatDate = (dateString) => {
     try {

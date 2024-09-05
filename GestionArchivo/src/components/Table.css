@@ -1,147 +1,354 @@
+/* Estilos generales */
 .container-fluid {
-    margin: 20px;
+  margin: 20px;
 }
 
 .button-container {
-    margin-bottom: 20px;
+  margin-bottom: 20px;
+}
+
+.table-title {
+  font-size: 18px;
+  font-weight: bold;
+  margin-bottom: 10px;
+}
+
+/* Estilos para el contador de registros */
+.record-counter {
+  font-size: 28px;
+  font-weight: bold;
+}
+
+.col-md-6 {
+  display: inline-block;
+  width: 50%; /* Para dividir en dos columnas */
+  vertical-align: top; /* Alinear arriba */
 }
 
 .search-container {
-    margin-bottom: 20px; /* Espacio inferior */
-  }
-  
-  .search-container input {
-    border-radius: 0; /* Borde redondeado */
-  }
-  
-  .search-container .input-group-text {
-    background-color: white; /* Color de fondo */
-    border: none; /* Sin borde */
-  }
+  margin-bottom: 20px; /* Espacio inferior */
+}
 
-  .container {
-    max-width: 100% !important;
+.search-container input {
+  border-radius: 0; /* Borde redondeado */
+}
+
+.search-container .input-group-text {
+  background-color: white; /* Color de fondo */
+  border: none; /* Sin borde */
+}
+
+.container {
+  max-width: 100% !important;
 }
 
 .table {
-    width: 100%;
-    border-collapse: collapse;
-    border: 1px solid #ddd;
-    border-radius: 8px;
-    color: black;
+  width: 100%;
+  border-collapse: collapse;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  color: black;
 }
 
 .table th,
 .table td {
-    padding: 12px;
-    text-align: center;
-    border-bottom: 1px solid #ccc;
-    border-left: 1px solid #ccc;
-    border-right: 1px solid #ccc;
+  padding-top: 12px;
+  padding-right: 12px;
+  padding-bottom: 12px;
+  padding-left: 12px;
+  text-align: center;
+  border-bottom: 1px solid #ccc;
+  border-left: 2px solid #ccc;
+  border-top: 1px solid #ccc;
+  border-right: 2px solid #ccc;
 }
 
 .table th {
-    background-color: #4186DC; /* Fondo de color para el encabezado */
-    color: white; /* Letras blancas */
-    font-weight: bold;
+  background-color: #4186dc; /* Fondo de color para el encabezado */
+  color: white; /* Letras blancas */
+  font-weight: bold;
 }
 
 .table tbody tr:nth-child(even) {
-    background-color: #f9f9f9; /* Intercale color blanco */
+  background-color: #f9f9f9; /* Intercale color blanco */
 }
 
 .table tbody tr:hover {
-    background-color: #f2f2f2; /* Cambio de color al pasar el mouse */
+  background-color: #f2f2f2; /* Cambio de color al pasar el mouse */
 }
 
 .btn {
-    color: white;
-    border: none;
-    border-radius: 4px;
-    cursor: pointer;
-    padding: 8px 16px;
-    text-align: center;
-    text-decoration: none;
-    display: inline-block;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  padding: 8px 16px;
+  text-align: center;
+  text-decoration: none;
+  display: inline-block;
 }
 
 .btn-success {
-    background-color: #28a745;
+  background-color: #28a745;
 }
 
 .btn-primary {
-    background-color: #007bff;
+  background-color: #007bff;
 }
 
 .btn-danger {
-    background-color: #dc3545;
+  background-color: #dc3545;
 }
 
 .btn:hover {
-    opacity: 0.8;
+  opacity: 0.8;
 }
 
 .button-container {
-    justify-content: flex-start;
-    gap: 10px !important;
-    margin-bottom: 0px;
+  justify-content: flex-start;
+  gap: 10px !important;
+  margin-bottom: 0px;
 }
 
-/* .button-container .btn {
-    flex: 1;
-} */
-
 .pagination li {
-    margin-left: .25rem;
-    margin-right: .25rem;
-  }
-  
-  .pagination li .page-link {
-    border-radius: .25rem;
-    border: none;
-    min-width: 2.25rem;
-    text-align: center;
-    color: #007bff;
-  }
-  
-  .pagination li.active .page-link,
-  .pagination li .page-link:hover {
-    background-color: #007bff;
-    color: #fff;
-    font-weight: bold;
-  }
+  margin-left: 0.25rem;
+  margin-right: 0.25rem;
+}
+
+.pagination li .page-link {
+  border-radius: 0.25rem;
+  border: none;
+  min-width: 2.1rem;
+  text-align: center;
+  color: #007bff;
+}
+
+.pagination li.active .page-link,
+.pagination li .page-link:hover {
+  background-color: #007bff;
+  color: #fff;
+  font-weight: bold;
+}
 
 .pagination {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    list-style: none;
-    padding: 0;
-    margin-top: 20px;
-  }
-  
-  .page-item {
-    margin: 0 5px;
-  }
-  
-  .page-link {
-    border: none;
-    color: #007bff;
-    cursor: pointer;
-    padding: 5px 10px;
-    border-radius: 5px;
-  }
-  
-  .page-link.active {
-    background-color: #007bff;
-    color: #fff !important;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  list-style: none;
+  padding: 0;
+  margin-top: 20px;
+}
+
+.page-item {
+  margin: 0 5px;
+}
+
+.page-link {
+  border: none;
+  color: #007bff;
+  cursor: pointer;
+  padding: 5px 10px;
+  border-radius: 5px;
+}
+
+.page-link.active {
+  background-color: #007bff;
+  color: #fff !important;
+}
+
+.pagination-container {
+  margin-top: 10px;
+  display: flex;
+  justify-content: center;
+  width: 100%;
+}
+
+@media only screen and (max-width: 890px) {
+  .pagination li {
+    margin-left: 0.1rem;
+    margin-right: -0.7rem;
   }
 
   .pagination-container {
     margin-top: 10px;
-    display: flex;
+    display: contents;
     justify-content: flex-end;
     width: 100%;
   }
 
-  
+  .table-container {
+    width: 100%;
+    overflow-x: auto;
+  }
+
+  .table-scroll {
+    display: block;
+    overflow-x: auto;
+  }
+
+  .table {
+    width: 100%;
+    border-collapse: collapse;
+  }
+
+  thead {
+    display: none; /* Oculta los encabezados en móviles */
+  }
+
+  tbody,
+  tr {
+    display: block;
+    width: 100%;
+    margin-bottom: 15px;
+    border-bottom: 1px solid #ddd; /* Línea divisoria entre filas */
+    
+  }
+
+  td {
+    display: block;
+    width: 100%;
+    padding: 8px;
+    text-align: left;
+    position: relative;
+    border: none;
+    box-sizing: border-box;
+    border-bottom: 1px solid #ddd; /* Línea divisoria entre celdas */
+    
+  }
+
+  td:before {
+    content: attr(data-label);
+    display: block;
+    margin-bottom: 10px;
+    background-color: #4186dc;
+    color: white;
+    font-weight: bold;
+    padding-bottom: 10px;
+    padding-top: 10px;
+}
+
+
+  .record-counter {
+    font-size: smaller;
+    font-weight: bold;
+  }
+
+  .col-md-6 {
+    display: inline-block;
+    width: fit-content;
+    vertical-align: top;
+  }
+
+  .h-20 {
+    height: auto !important;
+  }
+
+  .table th,
+  .table td {
+    padding-top: 0px;
+    padding-right: 0px;
+    padding-bottom: 10px;
+    padding-left: 0px;
+    text-align: center;
+    border-bottom: 1px solid #ccc;
+    border-left: 2px solid #ccc;
+    border-top: 1px solid #ccc;
+    border-right: 2px solid #ccc;
+  }
+
+  .table {
+    border: 0px solid #ddd;
+    
+  }
+
+  .btn {
+    color: white;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    padding: 5px 10px;
+    text-align: center;
+    text-decoration: none;
+    display: inline-block;
+  }
+}
+
+/* Evitar el desplazamiento horizontal no deseado en pantallas grandes */
+@media only screen and (min-width: 1439px) {
+  body {
+    overflow-x: hidden; /* Oculta el desplazamiento horizontal del body */
+  }
+
+  .container-fluid {
+    overflow-x: hidden; /* Oculta el desplazamiento horizontal del contenedor */
+  }
+}
+
+@media only screen and (max-width: 1425px) {
+  .table{
+    font-size: 12px;
+  }
+
+  .table th, .table td {
+    padding: 10px;
+   
+  }
+}
+
+@media only screen and (max-width: 1222px) {
+
+  .table {
+    font-size: 12px;
+  }
+
+  .table th, .table td {
+    padding: 10px;
+   
+  }
+
+}
+
+@media only screen and (max-width: 1158px) {
+  .table {
+    font-size: 12px;
+  }
+
+  .table th, .table td {
+    padding: 9px;
+   
+  }
+}
+
+@media only screen and (max-width: 980px) {
+  .table {
+    font-size: 12px;
+  }
+
+  .btn {
+    padding: 5px 8px;
+}
+
+  .table th, .table td {
+    padding: 9px;
+   
+  }
+}
+
+ @media only screen and (max-width: 945px) {
+  .table {
+    font-size: 12px;
+  }
+
+  .table th, .table td {
+    padding-top: 0px;
+    padding-right: 0px;
+    padding-bottom: 10px;
+    padding-left: 0px;
+   
+  }
+
+  .pagination li {
+    margin-left: 0.1rem;
+    margin-right: -0.9rem;
+  }
+}
