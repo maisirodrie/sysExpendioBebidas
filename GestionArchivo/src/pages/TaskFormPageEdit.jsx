@@ -46,7 +46,7 @@ function TaskFormPageEdit() {
       // Mostrar SweetAlert2 loading
       Swal.fire({
         title: "Cargando...",
-        text: "Espere mientras se sube el archivo.",
+        text: "Por favor, espere mientras se carga el registro.",
         allowOutsideClick: false,
         didOpen: () => {
           Swal.showLoading();
@@ -75,7 +75,7 @@ function TaskFormPageEdit() {
         Swal.close();
         Swal.fire({
           title: "¡Éxito!",
-          text: "Tarea actualizada correctamente.",
+          text: "Registro actualizado correctamente.",
           icon: "success",
           timer: 2000,
           showConfirmButton: false,
@@ -87,7 +87,7 @@ function TaskFormPageEdit() {
         Swal.close();
         Swal.fire({
           title: "¡Éxito!",
-          text: "Tarea creada correctamente.",
+          text: "Registro actualizado correctamente.",
           icon: "success",
           timer: 2000,
           showConfirmButton: false,
@@ -102,7 +102,7 @@ function TaskFormPageEdit() {
       Swal.close();
       Swal.fire({
         title: "Error",
-        text: "Ocurrió un error al guardar la tarea.",
+        text: "Ocurrió un error al guardar el registro.",
         icon: "error",
         timer: 2000,
         showConfirmButton: false,

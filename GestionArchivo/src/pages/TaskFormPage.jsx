@@ -8,6 +8,7 @@ import "./taskformpage.css";
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 import { format } from "date-fns";
+import Swal from "sweetalert2";
 
 function TaskFormPage() {
   const { register, handleSubmit, setValue } = useForm();
@@ -41,6 +42,17 @@ function TaskFormPage() {
 
   const onSubmit = handleSubmit(async (data) => {
     try {
+      // Mostrar la alerta de carga
+      Swal.fire({
+        title: "Cargando...",
+        text: "Por favor, espere mientras se carga el registro.",
+        allowOutsideClick: false,
+        timer: 5000,
+        didOpen: () => {
+          Swal.showLoading();
+        },
+      });
+
       const formattedDate = selectedDate
         ? format(selectedDate, "yyyy-MM-dd")
         : "";
@@ -64,9 +76,28 @@ function TaskFormPage() {
         await createTask(formData);
       }
 
+      // Cerrar la alerta de carga
+      Swal.close();
+
+      // Mostrar la alerta de éxito
+      Swal.fire({
+        icon: "success",
+        title: "¡Éxito!",
+        text: "Registro cargado correctamente.",
+        confirmButtonText: "OK",
+      });
+
       navigate("/task");
     } catch (error) {
       console.error("Error:", error);
+
+      // Cerrar la alerta de carga y mostrar un error
+      Swal.close();
+      Swal.fire({
+        icon: "error",
+        title: "Error",
+        text: "Ocurrió un error al cargar el registro.",
+      });
     }
   });
 

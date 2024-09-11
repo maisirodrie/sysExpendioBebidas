@@ -24,12 +24,12 @@ function App() {
       <Routes>
           <Route path='/' element={<LoginPage/>} />
           <Route path='/login' element={<LoginPage/>} />
-          <Route path='/register' element={<RegisterPage/>} />
+          
           
           
           
           <Route element={<ProtectedRoute/>}>
-          
+          <Route path='/register' element={<RegisterPage/>} />
           <Route path='/add-task' element={<TaskFormPage/>} />
           <Route path='/task' element={<TaskPage/>}/>
           <Route path='/view/task/:id/' element={<TaskViewPage/>} /> {/* Ruta para ver */}
