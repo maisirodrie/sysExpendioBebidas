@@ -14,16 +14,15 @@ function LoginPage() {
   });
 
   useEffect(() => {
-    if (isAuthenticated && user) {
-      if (user.role === 'admin') {
-        // Si es un administrador, redirige a la página de administrador
+    if (isAuthenticated) {
+      // Redirige a la página de tareas para roles específicos
+      if (user.role === 'admin' || user.role === 'user') {
         navigate("/task");
-      } else if (user.role === 'user') {
-        // Si es un usuario normal y ya está registrado, redirige a su perfil
-        navigate("/");
+      } else if (user.role === 'boss' || user.role === 'viewer') {
+        navigate("/task"); // Puedes ajustar esto según sea necesario
       }
     }
-  }, [isAuthenticated, navigate, user]);
+  }, [isAuthenticated, user, navigate]);
 
   return (
     <section>

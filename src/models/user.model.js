@@ -30,7 +30,7 @@ const userSchema = new mongoose.Schema(
     },
     role: {
       type: String,
-      enum: ["admin", "user", "boss"], // Definir roles permitidos
+      enum: ["admin", "user", "boss", "viewer"], // Definir roles permitidos
       default: "user", // Asignar 'user' como rol por defecto
     },
     tasks: [

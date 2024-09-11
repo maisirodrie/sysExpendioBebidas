@@ -4,10 +4,9 @@ import { useTasks } from "../context/TasksContext";
 import { Link, useNavigate, useParams } from "react-router-dom";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faArrowLeft } from "@fortawesome/free-solid-svg-icons";
-import "./taskformpage.css";
+import Swal from "sweetalert2";
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
-import { format } from "date-fns";
 
 function TaskFormPageEdit() {
   const { register, handleSubmit, setValue } = useForm();
@@ -21,71 +20,98 @@ function TaskFormPageEdit() {
     async function loadTask() {
       if (params.id) {
         const task = await getTask(params.id);
-  
-        // Convertir la fecha al formato Date y ajustarla a la zona horaria local
+
         const utcDate = new Date(task.fecha);
         const offset = 3 * 60; // Ajusta el desfase a -3 horas para Buenos Aires (UTC-3)
         const localDate = new Date(utcDate.getTime() + offset * 60 * 1000);
-  
-        console.log("Fecha desde la tarea:", task.fecha);
-        console.log("Fecha convertida:", localDate);
-  
-        // Establecer valores en el formulario
+
         setValue("expe", task.expe);
         setValue("correlativo", task.correlativo);
         setValue("anio", task.anio);
         setValue("cuerpo", task.cuerpo);
-        setSelectedDate(localDate); // Establecer la fecha en el estado
+        setSelectedDate(localDate);
         setValue("iniciador", task.iniciador);
         setValue("asunto", task.asunto);
-  
-        // Mostrar información de archivos cargados previamente
+
         if (task.file && task.file.length > 0) {
-          setSelectedFiles(task.file); // Establecer los archivos cargados previamente en el estado
+          setSelectedFiles(task.file);
         }
       }
     }
     loadTask();
   }, [params.id, setValue, getTask]);
-  
-  
 
   const onSubmit = handleSubmit(async (data) => {
     try {
+      // Mostrar SweetAlert2 loading
+      Swal.fire({
+        title: "Cargando...",
+        text: "Espere mientras se sube el archivo.",
+        allowOutsideClick: false,
+        didOpen: () => {
+          Swal.showLoading();
+        },
+      });
+
       const formData = new FormData();
-      const utcDate = selectedDate ? new Date(selectedDate.getTime() - (-3 * 60 * 60 * 1000)) : ""; // Convertir a UTC
-      
-      // Añadir campos de texto al FormData
+      const utcDate = selectedDate ? new Date(selectedDate.getTime() - (-3 * 60 * 60 * 1000)) : "";
+
       Object.keys(data).forEach(key => {
         if (key !== "file") {
           formData.append(key, data[key]);
         }
       });
-  
-      // Añadir fecha en formato ISO para almacenamiento
+
       formData.append('fecha', utcDate.toISOString());
-  
-      // Añadir archivos al FormData
+
       selectedFiles.forEach(file => {
         formData.append("file", file);
       });
-  
+
       if (params.id) {
         await updateTask(params.id, formData);
+
+        // Cerrar SweetAlert2 loading y mostrar éxito
+        Swal.close();
+        Swal.fire({
+          title: "¡Éxito!",
+          text: "Tarea actualizada correctamente.",
+          icon: "success",
+          timer: 2000,
+          showConfirmButton: false,
+        });
       } else {
         await createTask(formData);
+
+        // Cerrar SweetAlert2 loading y mostrar éxito
+        Swal.close();
+        Swal.fire({
+          title: "¡Éxito!",
+          text: "Tarea creada correctamente.",
+          icon: "success",
+          timer: 2000,
+          showConfirmButton: false,
+        });
       }
-  
+
       navigate("/task");
     } catch (error) {
       console.error("Error:", error);
+
+      // Cerrar SweetAlert2 loading y mostrar error
+      Swal.close();
+      Swal.fire({
+        title: "Error",
+        text: "Ocurrió un error al guardar la tarea.",
+        icon: "error",
+        timer: 2000,
+        showConfirmButton: false,
+      });
     }
   });
-  
-  
-  
+
   const handleFileChange = (e) => {
-    setSelectedFiles(Array.from(e.target.files)); // Almacenar los archivos seleccionados en el estado
+    setSelectedFiles(Array.from(e.target.files));
   };
 
   return (
