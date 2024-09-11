@@ -47,7 +47,6 @@ function TaskFormPage() {
         title: "Cargando...",
         text: "Por favor, espere mientras se carga el registro.",
         allowOutsideClick: false,
-        timer: 5000,
         didOpen: () => {
           Swal.showLoading();
         },
