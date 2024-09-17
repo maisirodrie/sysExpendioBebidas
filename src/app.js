@@ -4,7 +4,7 @@ import cookieParser from 'cookie-parser';
 import cors from 'cors';
 import authRoutes from './routes/auth.routes.js';
 import tasksRoutes from './routes/tasks.routes.js';
-import path from 'path';
+
 
 const app = express();
 
@@ -16,16 +16,13 @@ const app = express();
 app.use(cors({
     origin: 'https://www.gestiondearchivos.misiones.gov.ar',
     credentials: true,
-}));
+})); 
 
 
 app.use(morgan('dev'));
 app.use(express.json());
 app.use(cookieParser());
 
-// Servir archivos estáticos desde el directorio 'files'
-const __dirname = path.resolve();
-app.use('/files', express.static(path.join(__dirname, 'src', 'files')));
 
 app.use('/api', authRoutes);
 app.use('/api', tasksRoutes);

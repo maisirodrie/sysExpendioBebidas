@@ -2,6 +2,8 @@ import React from 'react';
 import { useAuth } from '../context/AuthContext';
 import { Link, useNavigate } from 'react-router-dom';
 import "./Navbar.css";
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faUser } from '@fortawesome/free-solid-svg-icons'; // Importa el ícono de usuario
 
 export function Navbar() {
   const { isAuthenticated, user, logout } = useAuth();
@@ -25,14 +27,19 @@ export function Navbar() {
         )}
       </div>
       {isAuthenticated && (
-        <div className="flex items-center">
-          <ul className="flex gap-x-">
-            <li>Bienvenido {user.username}</li>
-          </ul>
-          <button onClick={handleLogout} className="custom-button ml-4">
-            Cerrar Sesión
-          </button>
-        </div>
+    <div className="flex items-center">
+    <ul className="flex items-center gap-x-2"> {/* Añadimos gap-x-2 para espaciar el ícono */}
+      <li>
+        <FontAwesomeIcon icon={faUser} className="text-black h-6 w-6" /> {/* Tamaño y color del ícono */}
+      </li>
+      <li>
+        {user.nombre} {user.apellido}
+      </li>
+    </ul>
+    <button onClick={handleLogout} className="custom-button ml-4">
+      Salir
+    </button>
+  </div>
       )}
     </nav>
   );

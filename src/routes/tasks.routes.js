@@ -2,7 +2,7 @@
 
 import { Router } from 'express';
 import { authRequired } from '../middlewares/validateToken.js';
-import { getTask, createTasks, deleteTasks, getTasks, updateTasks, downloadFile  } from '../controllers/tasks.controller.js';
+import { getTask, createTasks, deleteTasks, getTasks, updateTasks, downloadFile, getUserProfileWithTask, getTaskWithUser   } from '../controllers/tasks.controller.js';
 import { validateSchema } from '../middlewares/validator.middleware.js';
 import { creatTaskSchema } from '../schemas/task.schema.js';
 import { upload, streamUpload } from '../multerConfig.js'; // Asegúrate de que esta ruta es correcta
@@ -15,5 +15,8 @@ router.post('/tasks', authRequired, upload.single('file'), streamUpload, validat
 router.delete('/tasks/:id', authRequired, deleteTasks);
 router.put('/tasks/:id', authRequired, upload.single('file'), streamUpload, updateTasks);
 router.get('/tasks/file/:filename', authRequired, downloadFile);
+// Ruta para obtener una tarea con el perfil del usuario asociado
+router.get('/users/:userId/profile', authRequired, getUserProfileWithTask);
+router.get('/tasks/:taskId/user',authRequired, getTaskWithUser);
 
 export default router;

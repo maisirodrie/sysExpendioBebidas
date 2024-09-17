@@ -4,7 +4,7 @@ const userSchema = new mongoose.Schema(
   {
     username: {
       type: String,
-      required: true, // Cambié require a required
+      required: true,
       trim: true,
       unique: true,
     },
@@ -30,16 +30,10 @@ const userSchema = new mongoose.Schema(
     },
     role: {
       type: String,
-      enum: ["admin", "user", "boss", "viewer"], // Definir roles permitidos
-      default: "user", // Asignar 'user' como rol por defecto
+      enum: ["admin", "user", "boss", "viewer"],
+      default: "user",
     },
-    tasks: [
-      {
-        // Referencia a las tareas relacionadas
-        type: mongoose.Schema.Types.ObjectId,
-        ref: "Tasks",
-      },
-    ],
+    // No necesitas el campo 'task' aquí, ya que se manejará la relación inversa desde el modelo 'Task'
   },
   {
     timestamps: true,

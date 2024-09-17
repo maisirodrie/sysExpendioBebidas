@@ -1,8 +1,7 @@
 import mongoose from "mongoose";
 
-const tasksSchema = new mongoose.Schema(
+const taskSchema = new mongoose.Schema(
   {
-    //Encuestador
     expe: {
       type: String,
       trim: true,
@@ -20,9 +19,8 @@ const tasksSchema = new mongoose.Schema(
       trim: true,
     },
     fecha: {
-      type: String,
+      type: Date,
       default: Date.now,
-      trim: true,
     },
     iniciador: {
       type: String,
@@ -32,13 +30,13 @@ const tasksSchema = new mongoose.Schema(
       type: String,
       trim: true,
     },
-    file:  [{
+    file: [{
       filename: String,
       bucketName: String,
       mimetype: String,
       encoding: String,
       id: mongoose.Schema.Types.ObjectId
-  }],
+    }],
     user: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "User",
@@ -50,4 +48,4 @@ const tasksSchema = new mongoose.Schema(
   }
 );
 
-export default mongoose.model("Task", tasksSchema);
+export default mongoose.model("Task", taskSchema);
