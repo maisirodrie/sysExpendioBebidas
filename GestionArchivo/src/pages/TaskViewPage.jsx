@@ -50,7 +50,10 @@ function TaskViewPage() {
   };
 
   return (
-    <div className="flex items-center justify-center overflow-y-auto my-10">
+    <div
+      className="flex items-center justify-center overflow-y-auto"
+      style={{ marginTop: "20px", marginBottom: "20px", paddingRight: "20px", paddingLeft: "20px" }}
+    >
       <div className="bg-gray-300 max-w-screen-md w-full p-10 rounded-md">
         <div className="flex justify-between items-center mb-4">
           <h1 className="text-2xl font-bold text-black">Detalles del Registro</h1>

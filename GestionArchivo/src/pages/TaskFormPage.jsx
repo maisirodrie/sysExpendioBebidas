@@ -108,7 +108,7 @@ function TaskFormPage() {
   return (
     <div
       className="flex items-center justify-center overflow-y-auto"
-      style={{ marginTop: "20px", marginBottom: "20px" }}
+      style={{ marginTop: "20px", marginBottom: "20px", paddingRight: "20px", paddingLeft: "20px" }}
     >
       <div className="bg-gray-300 max-w-screen-md w-full p-10 rounded-md">
         <div className="flex justify-between items-center mb-4">
