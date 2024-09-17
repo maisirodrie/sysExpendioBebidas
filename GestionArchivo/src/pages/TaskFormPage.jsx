@@ -30,7 +30,7 @@ function TaskFormPage() {
         setValue("cuerpo", task.cuerpo);
         setValue("iniciador", task.iniciador);
         setValue("asunto", task.asunto);
-        
+
         // Configurar la fecha si existe
         if (task.fecha) {
           setSelectedDate(new Date(task.fecha));
@@ -203,7 +203,7 @@ function TaskFormPage() {
           >
             Asunto
           </label>
-          <input
+          <textarea
             type="text"
             {...register("asunto", { required: true })}
             className="w-full bg-gray-100 text-black px-4 py-2 rounded-md my-2"

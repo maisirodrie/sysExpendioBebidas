@@ -212,7 +212,7 @@ function TaskFormPageEdit() {
           >
             Asunto
           </label>
-          <input
+          <textarea
             type="text"
             {...register("asunto", { required: true })}
             className="w-full bg-gray-100 text-black px-4 py-2 rounded-md my-2"
