@@ -1,0 +1,143 @@
+[{
+  "_id": {
+    "$oid": "66e35d8b3074bb468e093ef3"
+  },
+  "length": 111264,
+  "chunkSize": 261120,
+  "uploadDate": {
+    "$date": "2024-09-12T21:30:51.968Z"
+  },
+  "filename": "Captura de pantalla 2024-08-14 101755.png"
+},
+{
+  "_id": {
+    "$oid": "66e416373074bb468e093f2d"
+  },
+  "length": 1037757,
+  "chunkSize": 261120,
+  "uploadDate": {
+    "$date": "2024-09-13T10:38:47.654Z"
+  },
+  "filename": "1710-1680-24(1).pdf"
+},
+{
+  "_id": {
+    "$oid": "66e4166e3074bb468e093f5a"
+  },
+  "length": 1037757,
+  "chunkSize": 261120,
+  "uploadDate": {
+    "$date": "2024-09-13T10:39:42.694Z"
+  },
+  "filename": "1710-1680-24(1).pdf"
+},
+{
+  "_id": {
+    "$oid": "66e980d5214fa3efe1aa5d9e"
+  },
+  "length": 2173885,
+  "chunkSize": 261120,
+  "uploadDate": {
+    "$date": "2024-09-17T13:15:01.936Z"
+  },
+  "filename": "1025-26-2021.pdf"
+},
+{
+  "_id": {
+    "$oid": "66e984fe214fa3efe1aa5dd0"
+  },
+  "length": 2254707,
+  "chunkSize": 261120,
+  "uploadDate": {
+    "$date": "2024-09-17T13:32:46.774Z"
+  },
+  "filename": "1400-544-2022.pdf"
+},
+{
+  "_id": {
+    "$oid": "66e985b2214fa3efe1aa5deb"
+  },
+  "length": 1873106,
+  "chunkSize": 261120,
+  "uploadDate": {
+    "$date": "2024-09-17T13:35:46.365Z"
+  },
+  "filename": "1400-545-2022.pdf"
+},
+{
+  "_id": {
+    "$oid": "66e9868e214fa3efe1aa5dfe"
+  },
+  "length": 1733767,
+  "chunkSize": 261120,
+  "uploadDate": {
+    "$date": "2024-09-17T13:39:26.969Z"
+  },
+  "filename": "1400-546-2022.pdf"
+},
+{
+  "_id": {
+    "$oid": "66e98729214fa3efe1aa5e11"
+  },
+  "length": 2605458,
+  "chunkSize": 261120,
+  "uploadDate": {
+    "$date": "2024-09-17T13:42:01.047Z"
+  },
+  "filename": "1450-3740-2022.pdf"
+},
+{
+  "_id": {
+    "$oid": "66e98b6a214fa3efe1aa5e30"
+  },
+  "length": 1944998,
+  "chunkSize": 261120,
+  "uploadDate": {
+    "$date": "2024-09-17T14:00:10.524Z"
+  },
+  "filename": "2000-04-2023.pdf"
+},
+{
+  "_id": {
+    "$oid": "66e98be8214fa3efe1aa5e46"
+  },
+  "length": 2006403,
+  "chunkSize": 261120,
+  "uploadDate": {
+    "$date": "2024-09-17T14:02:16.869Z"
+  },
+  "filename": "2000-1466-2021.pdf"
+},
+{
+  "_id": {
+    "$oid": "66e98c54214fa3efe1aa5e5d"
+  },
+  "length": 2183323,
+  "chunkSize": 261120,
+  "uploadDate": {
+    "$date": "2024-09-17T14:04:04.920Z"
+  },
+  "filename": "2006-134-2022.pdf"
+},
+{
+  "_id": {
+    "$oid": "66e98c93214fa3efe1aa5e76"
+  },
+  "length": 1784406,
+  "chunkSize": 261120,
+  "uploadDate": {
+    "$date": "2024-09-17T14:05:07.812Z"
+  },
+  "filename": "2006-267-2021.pdf"
+},
+{
+  "_id": {
+    "$oid": "66e98f03214fa3efe1aa5ef6"
+  },
+  "length": 1880048,
+  "chunkSize": 261120,
+  "uploadDate": {
+    "$date": "2024-09-17T14:15:31.632Z"
+  },
+  "filename": "Exp 3226-12244.pdf"
+}]

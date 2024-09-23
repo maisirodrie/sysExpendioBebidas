@@ -1,0 +1,76 @@
+[{
+  "_id": {
+    "$oid": "66d9c9e30171120dd245215e"
+  },
+  "username": "administrador",
+  "password": "$2a$10$Pz/.I6IjP/3YBUuGh5nMBuIG1HOH28U5xjulXOgoH4t6HJnlBJUgy",
+  "email": "administrador@gmail.com",
+  "nombre": "Maximiliano Ezequiel",
+  "apellido": "Rodriguez",
+  "role": "admin",
+  "tasks": [],
+  "createdAt": {
+    "$date": "2024-09-05T15:10:27.734Z"
+  },
+  "updatedAt": {
+    "$date": "2024-09-05T15:10:27.734Z"
+  },
+  "__v": 0
+},
+{
+  "_id": {
+    "$oid": "66ded39e4cbaa3256b4b8c39"
+  },
+  "username": "veronica",
+  "password": "$2a$10$ukqNgvbVlJsA6jSPQWzj0uegRLqSF5iwWRUx04UHudim95v3wK4rS",
+  "email": "verog@gmail.com",
+  "nombre": "Veronica",
+  "apellido": "Gonzalez",
+  "role": "admin",
+  "tasks": [],
+  "createdAt": {
+    "$date": "2024-09-09T10:53:18.618Z"
+  },
+  "updatedAt": {
+    "$date": "2024-09-09T10:53:18.618Z"
+  },
+  "__v": 0
+},
+{
+  "_id": {
+    "$oid": "66e19f6a3074bb468e093d08"
+  },
+  "username": "krioka",
+  "password": "$2a$10$pDQ0NlyaCUQ4PS.PI8rteeLLgwHzzM0Dcv5KKb4ET3sjpFjht4DEq",
+  "email": "krioka@gmail.com",
+  "nombre": "Juan Carlos",
+  "apellido": "Krioka",
+  "role": "boss",
+  "tasks": [],
+  "createdAt": {
+    "$date": "2024-09-11T13:47:22.158Z"
+  },
+  "updatedAt": {
+    "$date": "2024-09-11T13:47:22.158Z"
+  },
+  "__v": 0
+},
+{
+  "_id": {
+    "$oid": "66e80ddb3074bb468e09401c"
+  },
+  "username": "marianela",
+  "password": "$2a$10$r5wizE2vs1HGnHKkrrwu8eCLKho4oFFkkG/BjSjvShKMw2g662EYK",
+  "email": "marianela@gmail.com",
+  "nombre": "Marianela",
+  "apellido": "Lezcano Roffignac",
+  "role": "admin",
+  "tasks": [],
+  "createdAt": {
+    "$date": "2024-09-16T10:52:11.288Z"
+  },
+  "updatedAt": {
+    "$date": "2024-09-16T10:52:11.288Z"
+  },
+  "__v": 0
+}]

@@ -4,6 +4,7 @@ import { createAccessToke } from '../libs/jwt.js';
 import jwt from 'jsonwebtoken';
 import { TOKEN_SECRET } from '../config.js';
 
+// Registrar nuevo usuario
 export const register = async (req, res) => {
     const { username, email, password, role, nombre, apellido } = req.body;
 
@@ -35,8 +36,8 @@ export const register = async (req, res) => {
             role: userSaved.role,
             nombre: userSaved.nombre,
             apellido: userSaved.apellido,
-            createAt: userSaved.createdAt,
-            updateAt: userSaved.updatedAt,
+            createdAt: userSaved.createdAt,
+            updatedAt: userSaved.updatedAt,
         });
 
     } catch (error) {
@@ -44,6 +45,7 @@ export const register = async (req, res) => {
     }
 };
 
+// Inicio de sesión
 export const login = async (req, res) => {
     const { username, password } = req.body;
 
@@ -64,8 +66,8 @@ export const login = async (req, res) => {
             role: userFound.role,
             nombre: userFound.nombre,
             apellido: userFound.apellido,
-            createAt: userFound.createdAt,
-            updateAt: userFound.updatedAt,
+            createdAt: userFound.createdAt,
+            updatedAt: userFound.updatedAt,
         });
 
     } catch (error) {
@@ -73,6 +75,7 @@ export const login = async (req, res) => {
     }
 };
 
+// Cerrar sesión
 export const logout = async (req, res) => {
     res.cookie('token', "", {
         expires: new Date(0)
@@ -80,10 +83,11 @@ export const logout = async (req, res) => {
     return res.sendStatus(200);
 }
 
+// Ver perfil de usuario
 export const profile = async (req, res) => {
     const userFound = await User.findById(req.user.id);
 
-    if (!userFound) return res.status(400).json({ message: "User not found" });
+    if (!userFound) return res.status(400).json({ message: "Usuario no encontrado" });
 
     return res.json({
         id: userFound._id,
@@ -92,11 +96,96 @@ export const profile = async (req, res) => {
         role: userFound.role,
         nombre: userFound.nombre,
         apellido: userFound.apellido,
-        createAt: userFound.createdAt,
-        updateAt: userFound.updatedAt,
+        createdAt: userFound.createdAt,
+        updatedAt: userFound.updatedAt,
     });
 }
 
+// Obtener todos los usuarios
+export const getUsers = async (req, res) => {
+    try {
+        const users = await User.find({}, "username email role nombre apellido createdAt updatedAt");
+        res.json(users);
+    } catch (error) {
+        res.status(500).json({ message: error.message });
+    }
+};
+
+// Obtener un usuario por ID
+export const getUser = async (req, res) => {
+    const { id } = req.params;
+
+    try {
+        const userFound = await User.findById(id, "username email role nombre apellido createdAt updatedAt");
+        if (!userFound) return res.status(404).json({ message: "Usuario no encontrado" });
+
+        res.json(userFound);
+    } catch (error) {
+        res.status(500).json({ message: error.message });
+    }
+};
+
+
+// Editar usuario (sin cambiar contraseña)
+export const editUser = async (req, res) => {
+    const { id } = req.params; // ID del usuario
+    const { username, email, role, nombre, apellido } = req.body; // No se incluye el campo password
+
+    try {
+        const userFound = await User.findById(id);
+        if (!userFound) return res.status(404).json({ message: "Usuario no encontrado" });
+
+        // Actualizar los campos que no sean la contraseña
+        userFound.username = username || userFound.username;
+        userFound.email = email || userFound.email;
+        userFound.role = role || userFound.role;
+        userFound.nombre = nombre || userFound.nombre;
+        userFound.apellido = apellido || userFound.apellido;
+
+        const updatedUser = await userFound.save();
+
+        // Devolver la información actualizada del usuario
+        res.json({
+            id: updatedUser._id,
+            username: updatedUser.username,
+            email: updatedUser.email,
+            role: updatedUser.role,
+            nombre: updatedUser.nombre,
+            apellido: updatedUser.apellido,
+            createdAt: updatedUser.createdAt,
+            updatedAt: updatedUser.updatedAt,
+        });
+    } catch (error) {
+        res.status(500).json({ message: error.message });
+    }
+};
+
+// Cambiar contraseña
+export const changePassword = async (req, res) => {
+    const { id } = req.params; // ID del usuario
+    const { oldPassword, newPassword } = req.body;
+
+    try {
+        const userFound = await User.findById(id);
+        if (!userFound) return res.status(404).json({ message: "Usuario no encontrado" });
+
+        // Comparar la contraseña antigua
+        const isMatch = await bcrypt.compare(oldPassword, userFound.password);
+        if (!isMatch) return res.status(400).json({ message: "Contraseña antigua incorrecta" });
+
+        // Hashear y actualizar la nueva contraseña
+        const passwordHash = await bcrypt.hash(newPassword, 10);
+        userFound.password = passwordHash;
+
+        await userFound.save();
+        res.json({ message: "Contraseña cambiada con éxito" });
+
+    } catch (error) {
+        res.status(500).json({ message: error.message });
+    }
+};
+
+// Verificar token de autenticación
 export const verifyToken = async (req, res) => {
     const { token } = req.cookies;
     if (!token) return res.send(false);
