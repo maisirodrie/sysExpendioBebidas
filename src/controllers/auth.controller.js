@@ -3,6 +3,8 @@ import bcrypt from 'bcryptjs';
 import { createAccessToke } from '../libs/jwt.js';
 import jwt from 'jsonwebtoken';
 import { TOKEN_SECRET } from '../config.js';
+import Activity from '../models/activity.model.js'; // Asegúrate de que esta ruta es correcta
+
 
 // Registrar nuevo usuario
 export const register = async (req, res) => {
@@ -100,6 +102,41 @@ export const profile = async (req, res) => {
         updatedAt: userFound.updatedAt,
     });
 }
+
+// Actualizar perfil de usuario
+export const updateProfile = async (req, res) => {
+    try {
+        const userId = req.user.id; // Obtén el ID del usuario autenticado
+        const { nombre, apellido, email } = req.body; // Obtén los datos a actualizar
+
+        // Opcional: Aquí podrías agregar validaciones para los campos
+
+        const updatedUser = await User.findByIdAndUpdate(
+            userId,
+            { nombre, apellido, email },
+            { new: true, runValidators: true } // Devuelve el nuevo documento y valida
+        );
+
+        if (!updatedUser) {
+            return res.status(404).json({ message: "Usuario no encontrado" });
+        }
+
+        return res.json({
+            id: updatedUser._id,
+            username: updatedUser.username,
+            email: updatedUser.email,
+            role: updatedUser.role,
+            nombre: updatedUser.nombre,
+            apellido: updatedUser.apellido,
+            createdAt: updatedUser.createdAt,
+            updatedAt: updatedUser.updatedAt,
+        });
+    } catch (error) {
+        console.error("Error al actualizar el perfil:", error);
+        return res.status(500).json({ message: error.message });
+    }
+};
+
 
 // Obtener todos los usuarios
 export const getUsers = async (req, res) => {
@@ -204,3 +241,109 @@ export const verifyToken = async (req, res) => {
         });
     });
 };
+
+
+export const deleteUser = async (req, res) => {
+    const { id } = req.params;
+  
+    try {
+      const userFound = await User.findById(id);
+      if (!userFound) {
+        return res.status(404).json({ message: "Usuario no encontrado." });
+      }
+  
+      // Usar el método de eliminación
+      await User.findByIdAndDelete(id);
+  
+      res.json({ message: "Usuario eliminado correctamente." });
+    } catch (error) {
+      console.error("Error al eliminar el usuario:", error);
+      return res.status(500).json({ message: error.message });
+    }
+  };
+  
+
+// Cambiar contraseña del usuario autenticado
+export const changeUserPassword = async (req, res) => {
+    const { oldPassword, newPassword } = req.body;
+    const userId = req.user.id; // Obtener el ID del usuario autenticado
+
+    try {
+        const userFound = await User.findById(userId);
+        if (!userFound) return res.status(404).json({ message: "Usuario no encontrado" });
+
+        // Comparar la contraseña antigua
+        const isMatch = await bcrypt.compare(oldPassword, userFound.password);
+        if (!isMatch) return res.status(400).json({ message: "Contraseña antigua incorrecta" });
+
+        // Hashear y actualizar la nueva contraseña
+        const passwordHash = await bcrypt.hash(newPassword, 10);
+        userFound.password = passwordHash;
+
+        await userFound.save();
+        res.json({ message: "Contraseña cambiada con éxito" });
+
+    } catch (error) {
+        res.status(500).json({ message: error.message });
+    }
+};
+
+
+
+
+
+// Cambiar contraseña de un usuario por parte de un administrador
+export const adminChangeUserPassword = async (req, res) => {
+    const { userId } = req.params; // ID del usuario a modificar
+    const { newPassword } = req.body;
+
+    try {
+        const userFound = await User.findById(userId);
+        if (!userFound) return res.status(404).json({ message: "Usuario no encontrado" });
+
+        // Hashear y actualizar la nueva contraseña
+        const passwordHash = await bcrypt.hash(newPassword, 10);
+        userFound.password = passwordHash;
+
+        await userFound.save();
+        res.json({ message: "Contraseña restablecida con éxito" });
+
+    } catch (error) {
+        res.status(500).json({ message: error.message });
+    }
+};
+
+
+
+export const getUserActivities = async (req, res) => {
+    const { userId } = req.params; // Obtener userId de los parámetros de la solicitud
+    try {
+        const activities = await Activity.find({ userId }) // Filtrar actividades por userId
+            .populate('userId', 'nombre apellido'); // Solo incluye nombre y apellido
+        if (activities.length === 0) {
+            return res.status(404).json({ message: "No se encontraron actividades para este usuario." });
+        }
+        res.json(activities);
+    } catch (error) {
+        console.error("Error al obtener actividades del usuario:", error); // Para ver más detalles del error
+        return res.status(500).json({ message: error.message });
+    }
+};
+
+
+// Obtener actividades de todos los usuarios
+export const getAllUserActivities = async (req, res) => {
+    try {
+        const activities = await Activity.find()
+            .populate('userId', 'username email nombre apellido'); // Cambia 'user' a 'userId'
+        res.json(activities);
+    } catch (error) {
+        console.error("Error al obtener actividades:", error); // Para ver más detalles del error
+        return res.status(500).json({ message: error.message });
+    }
+};
+
+
+
+
+  

@@ -22,14 +22,19 @@ import {
   login,
   logout,
   profile,
+  updateProfile,
   editUser,
-  changePassword,
   verifyToken,
+  changeUserPassword,
+  deleteUser,
+  adminChangeUserPassword,
+  getAllUserActivities,
+  getUserActivities
 } from "../controllers/auth.controller.js";
 
 const router = Router();
 
-// Tareas (Tasks)
+// Registros
 router.get("/tasks", authRequired, getTasks);
 router.get("/tasks/:id", authRequired, getTask);
 router.post(
@@ -50,19 +55,33 @@ router.put(
 );
 router.get("/tasks/file/:filename", authRequired, downloadFile);
 
-// Ruta para obtener una tarea con el perfil del usuario asociado
-router.get("/users/:userId/profile", authRequired, getUserProfileWithTask);
-router.get("/tasks/:taskId/user", authRequired, getTaskWithUser);
-
-// Usuarios
-router.get("/users", authRequired, getUsers); // Obtener todos los usuarios
-router.get("/users/:id", authRequired, getUser); // Obtener un usuario por ID
-router.post("/register", register); // Registrar nuevo usuario
+//Autentificación
 router.post("/login", login); // Inicio de sesión
 router.post("/logout", logout); // Cerrar sesión
+
+
+
+// Usuarios
+
+router.get("/user/tasks/:taskId", authRequired, getTaskWithUser);// Ruta para obtener una tarea con el perfil del usuario asociado
 router.get("/profile", authRequired, profile); // Ver perfil de usuario
-router.put("/users/:id", authRequired, editUser); // Editar usuario
-router.put("/users/:id/change-password", authRequired, changePassword); // Cambiar contraseña
+
+router.put("/profile", authRequired, updateProfile);// Editar perfil de usuario
+router.put('/users/change-password', authRequired, changeUserPassword); // Ruta para que un usuario cambie su propia contraseña
 router.get("/verify-token", verifyToken); // Verificar token de autenticación
+
+
+//Administrador
+
+router.put('/admin/users/blanquear-password/:userId', authRequired, adminChangeUserPassword);// Ruta para que un administrador blanquee la contraseña de un usuario
+router.get("/admin/users", authRequired, getUsers); // Obtener todos los usuarios
+router.get("/admin/users/:id", authRequired, getUser); // Obtener un usuario por ID
+router.post("/admin/register", register); // Registrar nuevo usuario
+router.put("/admin/users/:id", authRequired, editUser); // Editar usuario
+router.get("/admin/users/profile/:userId", authRequired, getUserProfileWithTask);// Ruta para obtener el perfil del usuario
+router.get('/admin/activities/user/:userId', authRequired, getUserActivities);// Ruta para obtener todas las actividades de un usuario
+router.get('/admin/activities', authRequired, getAllUserActivities);// Ruta para obtener todas las actividades de los usuarios
+router.delete('/admin/users/:id', authRequired, deleteUser); // Eliminar usuario
+
 
 export default router;
