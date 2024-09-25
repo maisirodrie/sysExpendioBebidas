@@ -3,7 +3,7 @@ import bcrypt from 'bcryptjs';
 import { createAccessToke } from '../libs/jwt.js';
 import jwt from 'jsonwebtoken';
 import { TOKEN_SECRET } from '../config.js';
-
+import Activity from '../models/activity.model.js';
 
 // Registrar nuevo usuario
 export const register = async (req, res) => {
