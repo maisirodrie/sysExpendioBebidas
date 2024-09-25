@@ -95,7 +95,7 @@ function TaskFormPage() {
       Swal.fire({
         icon: "error",
         title: "Error",
-        text: "Ocurrió un error al cargar el registro.",
+        text: "El expediente ya ha sido cargado.",
       });
     }
   });
