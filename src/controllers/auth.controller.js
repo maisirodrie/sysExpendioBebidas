@@ -3,7 +3,6 @@ import bcrypt from 'bcryptjs';
 import { createAccessToke } from '../libs/jwt.js';
 import jwt from 'jsonwebtoken';
 import { TOKEN_SECRET } from '../config.js';
-import Activity from '../models/activity.model.js'; // Asegúrate de que esta ruta es correcta
 
 
 // Registrar nuevo usuario

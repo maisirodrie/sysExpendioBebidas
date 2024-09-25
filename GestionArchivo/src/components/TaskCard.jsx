@@ -39,32 +39,38 @@ function Table() {
     setSearch(e.target.value);
   };
 
-  const filteredTasks = !search
-    ? tasks
-    : tasks.filter((task) => {
-        const expe = task.expe ? task.expe.toLowerCase() : "";
-        const correlativo = task.correlativo ? task.correlativo.toLowerCase() : "";
-        const anio = task.anio ? task.anio.toLowerCase() : "";
-        const cuerpo = task.cuerpo ? task.cuerpo.toLowerCase() : "";
-        const fecha = task.fecha ? task.fecha.toLowerCase() : "";
-        const iniciador = task.iniciador ? task.iniciador.toLowerCase() : "";
-        const asunto = task.asunto ? task.asunto.toLowerCase() : "";
-        const searchLowerCase = search.toLowerCase();
+// Invertir el orden de las tareas al inicio
+const reversedTasks = [...tasks].reverse(); // Crea una copia de tasks y la invierte
 
-        return (
-          expe.includes(searchLowerCase) ||
-          correlativo.includes(searchLowerCase) ||
-          anio.includes(searchLowerCase) ||
-          cuerpo.includes(searchLowerCase) ||
-          fecha.includes(searchLowerCase) ||
-          iniciador.includes(searchLowerCase) ||
-          asunto.includes(searchLowerCase)
-        );
-      });
+const filteredTasks = !search
+  ? reversedTasks // Usa las tareas invertidas directamente si no hay búsqueda
+  : reversedTasks.filter((task) => {
+      const expe = task.expe ? task.expe.toLowerCase() : "";
+      const correlativo = task.correlativo ? task.correlativo.toLowerCase() : "";
+      const anio = task.anio ? task.anio.toLowerCase() : "";
+      const cuerpo = task.cuerpo ? task.cuerpo.toLowerCase() : "";
+      const fecha = task.fecha ? task.fecha.toLowerCase() : "";
+      const iniciador = task.iniciador ? task.iniciador.toLowerCase() : "";
+      const asunto = task.asunto ? task.asunto.toLowerCase() : "";
+      const searchLowerCase = search.toLowerCase();
 
-  const indexOfLastTask = currentPage * tasksPerPage;
-  const indexOfFirstTask = indexOfLastTask - tasksPerPage;
-  const currentTasks = filteredTasks.slice(indexOfFirstTask, indexOfLastTask);
+      return (
+        expe.includes(searchLowerCase) ||
+        correlativo.includes(searchLowerCase) ||
+        anio.includes(searchLowerCase) ||
+        cuerpo.includes(searchLowerCase) ||
+        fecha.includes(searchLowerCase) ||
+        iniciador.includes(searchLowerCase) ||
+        asunto.includes(searchLowerCase)
+      );
+    });
+
+// Calcular los índices para la paginación
+const indexOfLastTask = currentPage * tasksPerPage;
+const indexOfFirstTask = indexOfLastTask - tasksPerPage;
+
+// Slicing para obtener las tareas actuales
+const currentTasks = filteredTasks.slice(indexOfFirstTask, indexOfLastTask);
 
   const onPageChange = (pageNumber) => {
     setCurrentPage(pageNumber);

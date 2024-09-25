@@ -2,23 +2,27 @@ import mongoose from "mongoose";
 import Task from "../models/task.model.js";
 import User from "../models/user.model.js";
 import { gfs } from "../multerConfig.js"; // Importa gfs desde multerConfig.js
-import Activity from "../models/activity.model.js"; // Importa el modelo de actividad
+import Activity from '../models/activity.model.js'; // Asegúrate de que esta ruta es correcta
 
 // Función para registrar la actividad del usuario
 const logActivity = async (userId, action, entity, entityId) => {
   try {
-    const activity = new Activity({
-      user: userId,
-      action,
-      entity,
-      entityId,
-    });
-    await activity.save();
-    console.log("Actividad registrada:", activity);
+      const activity = new Activity({
+          userId,          // Asegúrate de pasar userId
+          taskId: entityId, // Asegúrate de pasar taskId aquí
+          action,
+          entity,
+          entityId,
+      });
+      await activity.save();
+      console.log("Actividad registrada:", activity);
   } catch (error) {
-    console.error("Error registrando la actividad:", error);
+      console.error("Error registrando la actividad:", error);
   }
 };
+
+
+
 export const getTasks = async (req, res) => {
   try {
     const tasks = await Task.find().populate("user");
@@ -163,25 +167,33 @@ export const deleteTasks = async (req, res) => {
 
     if (task.file && task.file.length > 0) {
       for (const file of task.file) {
-        try {
-          await gfs.delete(new mongoose.Types.ObjectId(file.id));
-          console.log(`Archivo ${file.filename} eliminado correctamente.`);
-        } catch (err) {
-          console.error("Error eliminando archivo:", err);
+        if (file.id) { // Verifica que file.id no sea undefined
+          try {
+            console.log(`Intentando eliminar archivo con ID: ${file.id}`);
+            await gfs.delete(new mongoose.Types.ObjectId(file.id)); // Asegúrate de usar 'new' aquí
+            console.log(`Archivo ${file.filename} eliminado correctamente.`);
+          } catch (err) {
+            console.error("Error eliminando archivo:", err);
+          }
+        } else {
+          console.warn("ID del archivo es undefined, no se puede eliminar.");
         }
       }
     }
 
     await Task.findByIdAndDelete(req.params.id);
     await logActivity(req.user.id, "eliminó tarea", "tarea", task._id);
-    // Registrar actividad
-
+    
     res.sendStatus(204);
   } catch (error) {
     console.error("Error eliminando tarea:", error);
     res.status(500).json({ message: error.message });
   }
 };
+
+
+
+
 
 export const downloadFile = (req, res) => {
   const { filename } = req.params;
