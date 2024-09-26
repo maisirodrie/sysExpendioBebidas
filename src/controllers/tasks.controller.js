@@ -88,9 +88,9 @@ export const getTask = async (req, res) => {
 export const updateTasks = async (req, res) => {
   try {
     const { id } = req.params;
-    const { expe, correlativo, anio, cuerpo, fecha, iniciador, asunto } =
-      req.body;
+    const { expe, correlativo, anio, cuerpo, fecha, iniciador, asunto } = req.body;
 
+    // Verificar si hay un nuevo archivo cargado
     let newFile = req.file
       ? {
           filename: req.file.filename,
@@ -99,10 +99,11 @@ export const updateTasks = async (req, res) => {
           encoding: req.file.encoding,
           id: req.file.id,
         }
-      : undefined;
+      : null; // Si no hay archivo, dejar newFile como null
 
+    // Verificar si ya existe una tarea con el mismo 'expe', 'correlativo' y 'anio' (excepto la actual)
     const existingTask = await Task.findOne({
-      _id: { $ne: id },
+      _id: { $ne: id }, // Excluir la tarea actual
       expe,
       correlativo,
       anio,
@@ -111,28 +112,35 @@ export const updateTasks = async (req, res) => {
     if (existingTask) {
       return res
         .status(400)
-        .json({ message: "El expediente ya ha sido cargado." });
+        .json({ message: "El expediente con este correlativo ya ha sido cargado." });
     }
 
+    // Buscar la tarea por ID
     const task = await Task.findById(id);
     if (!task) {
-      return res.status(404).json({ message: "Tarea no encontrada" });
+      return res.status(404).json({ message: "Tarea no encontrada." });
     }
 
-    // Eliminar el archivo anterior si existe y hay un nuevo archivo
+    // Si hay un nuevo archivo, eliminar el archivo anterior de GridFS
     if (newFile) {
       if (task.file && task.file.length > 0) {
         for (const fileInfo of task.file) {
           if (fileInfo.id) {
-            await gfs.delete(fileInfo.id);
+            try {
+              await gfs.delete(new mongoose.Types.ObjectId(fileInfo.id)); // Elimina el archivo anterior de GridFS
+            } catch (error) {
+              console.error("Error deleting file from GridFS:", error);
+              return res.status(500).json({ message: "Error al eliminar el archivo anterior." });
+            }
           }
         }
       }
     } else {
-      // Si no hay nuevo archivo, mantiene el archivo antiguo
+      // Si no se subió un nuevo archivo, mantenemos el archivo existente
       newFile = task.file;
     }
 
+    // Actualizar la tarea con los nuevos valores y el archivo (si corresponde)
     const updatedTask = await Task.findByIdAndUpdate(
       id,
       {
@@ -143,17 +151,19 @@ export const updateTasks = async (req, res) => {
         fecha,
         iniciador,
         asunto,
-        file: newFile ? [newFile] : task.file,
+        file: newFile, // Asignar el nuevo archivo o mantener el archivo existente
       },
-      { new: true }
+      { new: true } // Retornar el documento actualizado
     );
 
-    await logActivity(req.user.id, "actualizó tarea", "tarea", updatedTask._id); // Registrar actividad
+    // Registrar la actividad de usuario
+    await logActivity(req.user.id, "actualizó tarea", "tarea", updatedTask._id);
 
-    if (!updatedTask)
-      return res.status(404).json({ message: "Tarea no encontrada" });
+    if (!updatedTask) {
+      return res.status(404).json({ message: "Tarea no encontrada tras la actualización." });
+    }
 
-    res.json(updatedTask);
+    res.json(updatedTask); // Responder con la tarea actualizada
   } catch (error) {
     console.error("Error updating task:", error);
     return res.status(500).json({ message: error.message });
