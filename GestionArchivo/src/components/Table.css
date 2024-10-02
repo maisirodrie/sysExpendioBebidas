@@ -352,3 +352,9 @@
     margin-right: -0.9rem;
   }
 }
+
+.button-container li {
+  display: flex;
+  gap: 10px; /* Espacio entre los botones */
+}
+

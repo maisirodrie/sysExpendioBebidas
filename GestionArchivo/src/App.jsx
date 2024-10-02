@@ -1,6 +1,7 @@
 import { BrowserRouter, Route, Routes } from "react-router-dom"
 import { AuthProvvider } from "./context/AuthContext"
 
+
 import RegisterPage from "./pages/RegisterPage"
 import LoginPage from "./pages/LoginPage"
 import TaskPage from "./pages/TaskPage"
@@ -13,6 +14,7 @@ import { Navbar } from "./components/Navbar"
 import TaskViewPage from "./pages/TaskViewPage"
 import Footer from "./components/Footer"
 import TaskFormPageEdit from "./pages/TaskFormPageEdit"
+import RegisterPageAdmin from "./pages/RegisterPageAdmin"
 
 function App() {
   return(
@@ -28,8 +30,10 @@ function App() {
           
           
           
+          
           <Route element={<ProtectedRoute/>}>
-          <Route path='/register' element={<RegisterPage/>} />
+          {/* <Route path='/register' element={<RegisterPage/>} /> */}
+          <Route path='/registeradmin' element={<RegisterPageAdmin/>} />
           <Route path='/add-task' element={<TaskFormPage/>} />
           <Route path='/task' element={<TaskPage/>}/>
           <Route path='/view/task/:id/' element={<TaskViewPage/>} /> {/* Ruta para ver */}

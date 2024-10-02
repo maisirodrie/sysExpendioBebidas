@@ -30,7 +30,7 @@ const userSchema = new mongoose.Schema(
     },
     role: {
       type: String,
-      enum: ["admin", "user", "boss", "viewer"],
+      enum: ["admin","editor", "user", "viewer"],
       default: "user",
     },
     // No necesitas el campo 'task' aquí, ya que se manejará la relación inversa desde el modelo 'Task'

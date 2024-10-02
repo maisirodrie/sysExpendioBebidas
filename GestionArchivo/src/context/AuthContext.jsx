@@ -41,18 +41,32 @@ export const AuthProvvider =({children}) => {
       };
 
 
-      const signup = async (user) => {
-        try {
-            const res = await registerRequest(user);
-            console.log(res.data); // Esto mostrará los datos del usuario en la consola
-            const userRole = res.data.role; // Accede al rol del usuario
-            console.log("Rol del usuario:", userRole);
-            setUser(res.data);
-            setIsAuthenticated(true);
-        } catch (error) {
-            console.log(error);
-            setErrors(error.response.data);
-        }
+    //   const signup = async (user) => {
+    //     try {
+    //         const res = await registerRequest(user);
+    //         console.log(res.data); // Esto mostrará los datos del usuario en la consola
+    //         const userRole = res.data.role; // Accede al rol del usuario
+    //         console.log("Rol del usuario:", userRole);
+    //         setUser(res.data);
+    //         setIsAuthenticated(true);
+    //     } catch (error) {
+    //         console.log(error);
+    //         setErrors(error.response.data);
+    //     }
+    // };
+
+    const signup = async (user) => {
+      try {
+        const res = await registerRequest(user);
+        console.log(res.data); // Muestra los datos del nuevo usuario en la consola
+    
+        // Aquí puedes simplemente registrar el nuevo usuario sin cambiar la sesión actual
+        // No se debe establecer el usuario en el contexto para evitar el cambio de sesión
+        console.log("Usuario registrado:", res.data);
+      } catch (error) {
+        console.log(error);
+        setErrors(error.response.data); // Maneja los errores de registro
+      }
     };
 
     const signin = async (user) => {

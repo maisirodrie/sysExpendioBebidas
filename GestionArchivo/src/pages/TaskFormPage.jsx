@@ -82,7 +82,7 @@ function TaskFormPage() {
       Swal.fire({
         icon: "success",
         title: "¡Éxito!",
-        text: "Registro cargado correctamente.",
+        text: "El usuario cargado correctamente.",
         confirmButtonText: "OK",
       });
 
