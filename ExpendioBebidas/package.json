@@ -6,8 +6,8 @@
   "scripts": {
     "dev": "vite",
     "build": "vite build",
-    "build:restart": "vite build && cp -r logos/ build/ && cp -r fondos/ build/ && pm2 restart frontsysarchivo",
-    "build:start": "vite build && cp -r logos/ build/ && cp -r fondos/ build/ && pm2 serve build 3001 --spa --name frontsysarchivo",
+    "build:restart": "vite build && cp -r logos/ build/ && cp -r fondos/ build/ && pm2 restart frontsysexpendio",
+    "build:start": "vite build && cp -r logos/ build/ && cp -r fondos/ build/ && pm2 serve build 3001 --spa --name frontsysexpendio",
     "lint": "eslint . --ext js,jsx --report-unused-disable-directives --max-warnings 0",
     "preview": "vite preview"
   },
