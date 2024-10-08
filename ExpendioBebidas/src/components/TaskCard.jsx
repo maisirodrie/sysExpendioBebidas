@@ -1,4 +1,4 @@
-import React, { useState, useEffect  } from "react";
+import React, { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import { useTasks } from "../context/TasksContext";
 import { useAuth } from "../context/AuthContext";
@@ -10,14 +10,14 @@ import {
   faFileCirclePlus,
   faSearch,
   faUserPlus,
-  faRotate
+  faRotate,
 } from "@fortawesome/free-solid-svg-icons";
 import "./Table.css";
 import Paginator from "./Paginator";
 import Swal from "sweetalert2";
 
 function Table() {
-  const { tasks, deleteTask, getTasks  } = useTasks();
+  const { tasks, deleteTask, getTasks } = useTasks();
   const { user } = useAuth(); // Suponiendo que 'user' contiene el rol del usuario
   const [search, setSearch] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
@@ -45,7 +45,6 @@ function Table() {
   const searcher = (e) => {
     setSearch(e.target.value);
   };
-  
 
   // Invertir el orden de las tareas al inicio
   const reversedTasks = [...tasks].reverse(); // Crea una copia de tasks y la invierte
@@ -53,25 +52,24 @@ function Table() {
   const filteredTasks = !search
     ? reversedTasks // Usa las tareas invertidas directamente si no hay búsqueda
     : reversedTasks.filter((task) => {
-        const expe = task.expe ? task.expe.toLowerCase() : "";
-        const correlativo = task.correlativo
-          ? task.correlativo.toLowerCase()
+        const apellido = task.apellido ? task.apellido.toLowerCase() : "";
+        const nombre = task.nombre
+          ? task.nombre.toLowerCase()
           : "";
-        const anio = task.anio ? task.anio.toLowerCase() : "";
-        const cuerpo = task.cuerpo ? task.cuerpo.toLowerCase() : "";
-        const fecha = task.fecha ? task.fecha.toLowerCase() : "";
-        const iniciador = task.iniciador ? task.iniciador.toLowerCase() : "";
-        const asunto = task.asunto ? task.asunto.toLowerCase() : "";
+        const dni = task.dni ? task.dni.toLowerCase() : "";
+        const localidad = task.localidad ? task.localidad.toLowerCase() : "";
+        const persona = task.persona ? task.persona.toLowerCase() : "";
+        const expendio = task.expendio ? task.expendio.toLowerCase() : "";
         const searchLowerCase = search.toLowerCase();
 
         return (
-          expe.includes(searchLowerCase) ||
-          correlativo.includes(searchLowerCase) ||
-          anio.includes(searchLowerCase) ||
-          cuerpo.includes(searchLowerCase) ||
-          fecha.includes(searchLowerCase) ||
-          iniciador.includes(searchLowerCase) ||
-          asunto.includes(searchLowerCase)
+          apellido.includes(searchLowerCase) ||
+          nombre.includes(searchLowerCase) ||
+          dni.includes(searchLowerCase) ||
+          localidad.includes(searchLowerCase) ||
+          persona.includes(searchLowerCase) ||
+          expendio.includes(searchLowerCase)
+          
         );
       });
 
@@ -101,15 +99,12 @@ function Table() {
 
   const canEdit = ["admin", "editor"].includes(user.role);
   const canDelete = ["admin", "editor"].includes(user.role);
-  const canAddUser = !["user", "viewer","editor"].includes(user.role);
+  const canAddUser = !["user", "viewer", "editor"].includes(user.role);
   const canAddTask = !["user", "viewer"].includes(user.role);
-
 
   const handleRefresh = async () => {
     await getTasks(); // Vuelve a obtener las tareas al hacer clic en "Refrescar Tabla"
-};
-
-  
+  };
 
   return (
     <div className="container-fluid bg-primary vh-100 vw-100 d-flex align-items-center justify-content-center">
@@ -133,44 +128,43 @@ function Table() {
                 <FontAwesomeIcon icon={faSearch} className="ml-2" />
               </span>
             </div>
-            
-              <ul className="button-container">
-                <li className="d-flex gap-2">
-                  {" "}
-                  {/* Usamos d-flex y gap-2 para separar los botones */}
-                  {canAddTask && (
+
+            <ul className="button-container">
+              <li className="d-flex gap-2">
+                {" "}
+                {/* Usamos d-flex y gap-2 para separar los botones */}
+                {canAddTask && (
                   <Link to="/add-task" className="btn btn-success">
-                  <FontAwesomeIcon icon={faFileCirclePlus } />
+                    <FontAwesomeIcon icon={faFileCirclePlus} />
                   </Link>
-                  )}
-                  {canAddUser && (
+                )}
+                {canAddUser && (
                   <Link to="/registeradmin" className="btn btn-success">
                     <FontAwesomeIcon icon={faUserPlus} />
                   </Link>
-                  )}
-                  <Link onClick={handleRefresh} className="btn btn-success">
-                    <FontAwesomeIcon icon={faRotate} />
-                  </Link>
-                </li>
-              </ul>
-            
+                )}
+                <Link onClick={handleRefresh} className="btn btn-success">
+                  <FontAwesomeIcon icon={faRotate} />
+                </Link>
+              </li>
+            </ul>
+
             <br />
             <div className="table-scroll">
               <table className="table" style={{ textTransform: "uppercase" }}>
                 <thead>
                   <tr>
-                    <th colSpan="13" className="table-title">
+                    <th colSpan="9" className="table-title">
                       Listado de Archivos
                     </th>
                   </tr>
                   <tr>
-                    <th>Codigo de Organismo</th>
-                    <th>N° Correlativo</th>
-                    <th>Año</th>
-                    <th>Cuerpo</th>
-                    <th>Fecha</th>
-                    <th>Iniciador</th>
-                    <th>Asunto</th>
+                    <th>Apellido</th>
+                    <th>Nombre</th>
+                    <th>DNI</th>
+                    <th>Localidad</th>
+                    <th>Tipo de Persona</th>
+                    <th>Tipo de Expendio</th>
                     <th>Ver</th>
                     {canEdit && <th>Editar</th>}
                     {canDelete && <th>Borrar</th>}
@@ -179,24 +173,23 @@ function Table() {
                 <tbody>
                   {currentTasks.map((task) => (
                     <tr key={task._id}>
-                      <td data-label="Codigo de Organismo">
-                        {task.expe ? task.expe.toUpperCase() : ""}
+                      <td data-label="Apellido">
+                        {task.apellido ? task.apellido.toUpperCase() : ""}
                       </td>
-                      <td data-label="N° Correlativo">
-                        {task.correlativo ? task.correlativo.toUpperCase() : ""}
+                      <td data-label="Nombre">
+                        {task.nombre ? task.nombre.toUpperCase() : ""}
                       </td>
-                      <td data-label="Año">
-                        {task.anio ? task.anio.toUpperCase() : ""}
+                      <td data-label="DNI">
+                        {task.dni ? task.dni.toUpperCase() : ""}
                       </td>
-                      <td data-label="Cuerpo">
-                        {task.cuerpo ? task.cuerpo.toUpperCase() : ""}
+                      <td data-label="Localidad">
+                        {task.localidad ? task.localidad.toUpperCase() : ""}
                       </td>
-                      <td data-label="Fecha">{formatDate(task.fecha)}</td>
-                      <td data-label="Iniciador">
-                        {task.iniciador ? task.iniciador.toUpperCase() : ""}
+                      <td data-label="Tipo de Persona">
+                        {task.persona ? task.persona.toUpperCase() : ""}
                       </td>
-                      <td data-label="Asunto">
-                        {task.asunto ? task.asunto.toUpperCase() : ""}
+                      <td data-label="Tipo de Evento">
+                        {task.expendio ? task.expendio.toUpperCase() : ""}
                       </td>
                       <td data-label="Ver">
                         <div className="button-container">

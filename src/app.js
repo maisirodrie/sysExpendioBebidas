@@ -8,15 +8,15 @@ import tasksRoutes from './routes/tasks.routes.js';
 
 const app = express();
 
-// app.use(cors({
-//     origin: 'http://localhost:5173',
-//     credentials: true,
-// }));
-
 app.use(cors({
-    origin: 'https://www.gestiondearchivos.misiones.gov.ar',
+    origin: 'http://localhost:5173',
     credentials: true,
-})); 
+}));
+
+// app.use(cors({
+//     origin: 'https://www.expendiobebidas.misiones.gov.ar',
+//     credentials: true,
+// })); 
 
 
 app.use(morgan('dev'));

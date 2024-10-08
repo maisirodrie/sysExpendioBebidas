@@ -2,31 +2,75 @@ import mongoose from "mongoose";
 
 const taskSchema = new mongoose.Schema(
   {
-    expe: {
+    expendio: {
       type: String,
       trim: true,
     },
-    correlativo: {
+    persona: {
       type: String,
       trim: true,
     },
-    anio: {
+    dni : {
       type: String,
       trim: true,
     },
-    cuerpo: {
+    apellido : {
       type: String,
       trim: true,
     },
-    fecha: {
-      type: Date,
-      default: Date.now,
-    },
-    iniciador: {
+    nombre : {
       type: String,
       trim: true,
     },
-    asunto: {
+    localidad : {
+      type: String,
+      trim: true,
+    },
+    domicilio : {
+      type: String,
+      trim: true,
+    },
+    lugar : {
+      type: String,
+      trim: true,
+    },
+    dias : {
+      type: String,
+      trim: true,
+    },
+    horarios : {
+      type: String,
+      trim: true,
+    },
+    tipoevento : {
+      type: String,
+      trim: true,
+    },
+    email : {
+      type: String,
+      trim: true,
+    },
+    contacto : {
+      type: String,
+      trim: true,
+    },
+    nroHabilitacion : {
+      type: String,
+      trim: true,
+    },
+    domicilioLocalComercial : {
+      type: String,
+      trim: true,
+    },
+    rubro : {
+      type: String,
+      trim: true,
+    },
+    horarioAtencion : {
+      type: String,
+      trim: true,
+    },
+    habilitacionComercial : {
       type: String,
       trim: true,
     },
@@ -49,3 +93,4 @@ const taskSchema = new mongoose.Schema(
 );
 
 export default mongoose.model("Task", taskSchema);
+
