@@ -49,6 +49,10 @@ function TaskViewPage() {
     }
   };
 
+
+  const tipoExpendio = task?.expendio;
+  const tipoPersona = task?.persona;
+
   return (
     <div
       className="flex items-center justify-center overflow-y-auto"
@@ -64,14 +68,87 @@ function TaskViewPage() {
         <div className="text-black">
           {task ? (
             <>
-              <p className="my-4"><strong>Datos del Encuestador</strong></p>
-              <p className="my-4">Codigo del Organismo: {task.expe}</p>
-              <p className="my-4">N° Correlativo: {task.correlativo}</p>
-              <p className="my-4">Año: {task.anio}</p>
-              <p className="my-4">Cuerpo: {task.cuerpo}</p>
-              <p className="my-4">Fecha: {formatDate(task.fecha)}</p>
-              <p className="my-4">Iniciador: {task.iniciador}</p>
-              <p className="my-4">Asunto: {task.asunto}</p>
+              <p className="my-4"><strong>Datos del Registro</strong></p>
+  
+              {tipoExpendio && tipoPersona && (
+                <>
+                  {/* Evento Particular */}
+                  {tipoExpendio === "Evento Particular" && tipoPersona === "física" && (
+                    <>
+                      <p className="my-4">Tipo de Persona: {task.persona}</p>
+                      <p className="my-4">Tipo de Expendio: {task.expendio}</p>
+                      <p className="my-4">DNI: {task.dni}</p>
+                      <p className="my-4">Apellido: {task.apellido}</p>
+                      <p className="my-4">Nombre: {task.nombre}</p>
+                      <p className="my-4">Localidad: {task.localidad}</p>
+                      <p className="my-4">Domicilio Particular: {task.domicilio}</p>
+                      <p className="my-4">Lugar de Realización del evento: {task.lugar}</p>
+                      <p className="my-4">Días del evento: {task.dias}</p>
+                      <p className="my-4">Horarios del evento: {task.horarios}</p>
+                      <p className="my-4">Tipo de Evento: {task.tipoevento}</p>
+                      <p className="my-4">Email particular: {task.email}</p>
+                      <p className="my-4">Nro de WhatsApp: {task.contacto}</p>
+                    </>
+                  )}
+  
+                  {tipoExpendio === "Evento Particular" && tipoPersona === "jurídica" && (
+                    <>
+                      <p className="my-4">Tipo de Persona: {task.persona}</p>
+                      <p className="my-4">Tipo de Expendio: {task.expendio}</p>
+                      <p className="my-4">Número de Habilitación Municipal: {task.nroHabilitacion}</p>
+                      <p className="my-4">DNI del Propietario: {task.dni}</p>
+                      <p className="my-4">Apellido: {task.apellido}</p>
+                      <p className="my-4">Nombre: {task.nombre}</p>
+                      <p className="my-4">Localidad: {task.localidad}</p>
+                      <p className="my-4">Domicilio Particular: {task.domicilio}</p>
+                      <p className="my-4">Lugar de Realización del evento: {task.lugar}</p>
+                      <p className="my-4">Días del evento: {task.dias}</p>
+                      <p className="my-4">Horarios del evento: {task.horarios}</p>
+                      <p className="my-4">Tipo de Evento: {task.tipoevento}</p>
+                      <p className="my-4">Email particular: {task.email}</p>
+                      <p className="my-4">Nro de WhatsApp: {task.contacto}</p>
+                    </>
+                  )}
+  
+                  {/* Local Comercial */}
+                  {tipoExpendio === "Local Comercial" && tipoPersona === "física" && (
+                    <>
+                      <p className="my-4">Tipo de Persona: {task.persona}</p>
+                      <p className="my-4">Tipo de Expendio: {task.expendio}</p>
+                      <p className="my-4">DNI del Propietario: {task.dni}</p>
+                      <p className="my-4">Apellido: {task.apellido}</p>
+                      <p className="my-4">Nombre: {task.nombre}</p>
+                      <p className="my-4">Localidad: {task.localidad}</p>
+                      <p className="my-4">Domicilio Particular: {task.domicilio}</p>
+                      <p className="my-4">Nro de Habilitación Municipal: {task.nroHabilitacion}</p>
+                      <p className="my-4">Domicilio del Local Comercial: {task.domicilioLocalComercial}</p>
+                      <p className="my-4">Horario de atención: {task.horarioAtencion}</p>
+                      <p className="my-4">Rubro: {task.horarios}</p>
+                      <p className="my-4">Email particular: {task.email}</p>
+                      <p className="my-4">Nro de WhatsApp: {task.contacto}</p>
+                    </>
+                  )}
+  
+                  {tipoExpendio === "Local Comercial" && tipoPersona === "jurídica" && (
+                    <>
+                      <p className="my-4">Tipo de Persona: {task.persona}</p>
+                      <p className="my-4">Tipo de Expendio: {task.expendio}</p>
+                      <p className="my-4">DNI del Propietario: {task.dni}</p>
+                      <p className="my-4">Apellido: {task.apellido}</p>
+                      <p className="my-4">Nombre: {task.nombre}</p>
+                      <p className="my-4">Localidad: {task.localidad}</p>
+                      <p className="my-4">Domicilio Particular: {task.domicilio}</p>
+                      <p className="my-4">Nro de Habilitación Municipal: {task.nroHabilitacion}</p>
+                      <p className="my-4">Domicilio del Local Comercial: {task.domicilioLocalComercial}</p>
+                      <p className="my-4">Horario de atención: {task.horarioAtencion}</p>
+                      <p className="my-4">Rubro: {task.horarios}</p>
+                      <p className="my-4">Email particular: {task.email}</p>
+                      <p className="my-4">Nro de WhatsApp: {task.contacto}</p>
+                    </>
+                  )}
+                </>
+              )}
+  
               {pdfUrl && (
                 <div className="my-4">
                   <a href={pdfUrl} target="_blank" className="btn btn-primary" rel="noopener noreferrer">Ver PDF</a>
@@ -79,12 +156,13 @@ function TaskViewPage() {
               )}
             </>
           ) : (
-            <p>Cargando...</p> // Mensaje mientras se carga la tarea
+            <p>Cargando...</p>
           )}
         </div>
       </div>
     </div>
   );
+  
 }
 
 export default TaskViewPage;

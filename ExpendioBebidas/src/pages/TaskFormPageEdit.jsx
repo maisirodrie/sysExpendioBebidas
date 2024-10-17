@@ -1,116 +1,127 @@
 import React, { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { useTasks } from "../context/TasksContext";
-import { useNavigate, useParams, Link } from "react-router-dom";
-import DatePicker from "react-datepicker";
-import Swal from "sweetalert2";
-import "react-datepicker/dist/react-datepicker.css";
+import { Link, useNavigate, useParams } from "react-router-dom";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faArrowLeft } from "@fortawesome/free-solid-svg-icons";
+import "./taskformpage.css";
+import Swal from "sweetalert2";
 
 function TaskFormPageEdit() {
+
   const { register, handleSubmit, setValue } = useForm();
   const { getTask, updateTask } = useTasks();
   const navigate = useNavigate();
   const params = useParams();
-  const [selectedDate, setSelectedDate] = useState(null);
+  const [tipoExpendio, setTipoExpendio] = useState("");
+  const [tipoPersona, setTipoPersona] = useState("");
   const [selectedFiles, setSelectedFiles] = useState([]);
   const [pdfUrl, setPdfUrl] = useState(null); // URL del archivo actual
   const apiUrl = import.meta.env.VITE_API_ARCHIVO;
 
-  // Cargar la tarea actual al montar el componente
   useEffect(() => {
     async function loadTask() {
       if (params.id) {
-        const task = await getTask(params.id);
-
-        // Ajustar fecha local (UTC -3 para Buenos Aires)
-        const utcDate = new Date(task.fecha);
-        const offset = 3 * 60; // UTC -3
-        const localDate = new Date(utcDate.getTime() + offset * 60 * 1000);
-
-        // Asignar los valores de la tarea al formulario
-        setValue("expe", task.expe);
-        setValue("correlativo", task.correlativo);
-        setValue("anio", task.anio);
-        setValue("cuerpo", task.cuerpo);
-        setSelectedDate(localDate);
-        setValue("iniciador", task.iniciador);
-        setValue("asunto", task.asunto);
-
-        // Si existe un archivo, mostrar el enlace al archivo actual
+            const task = await getTask(params.id);
+            // Rellenar los valores del formulario con la tarea existente
+            setValue("expendio", task.expendio);
+            setValue("persona", task.persona);
+            setValue("dni", task.dni);
+            setValue("apellido", task.apellido);
+            setValue("nombre", task.nombre);
+            setValue("localidad", task.localidad);
+            setValue("domicilio", task.domicilio);
+            setValue("lugar", task.lugar);
+            setValue("dias", task.dias);
+            setValue("horarios", task.horarios);
+            setValue("tipoevento", task.tipoevento);
+            setValue("email", task.email);
+            setValue("contacto", task.contacto);
+            setValue("nroHabilitacion", task.nroHabilitacion);
+            setValue("domicilioLocalComercial", task.domicilioLocalComercial);
+            setValue("rubro", task.rubro);
+            setValue("horarioAtencion", task.horarioAtencion);
+            setValue("habilitacionComercial", task.habilitacionComercial);
+            setTipoExpendio(task.expendio);
+            setTipoPersona(task.persona);
+            // Si existe un archivo, mostrar el enlace al archivo actual
         if (task.file && task.file.length > 0) {
           const fileUrl = `${apiUrl}/tasks/file/${task.file[0].filename}`;
           setPdfUrl(fileUrl);
           setSelectedFiles(task.file); // Mantiene referencia al archivo actual
         }
-      }
     }
+  }
     loadTask();
   }, [params.id, setValue, getTask]);
 
-  // Manejo de la selección de archivo
-  const handleFileChange = (e) => {
-    setSelectedFiles(Array.from(e.target.files));
-  };
+    // Manejo de la selección de archivo
+    const handleFileChange = (e) => {
+      setSelectedFiles(Array.from(e.target.files));
+    };
 
-  // Enviar el formulario
-  const onSubmit = handleSubmit(async (data) => {
-    try {
-      Swal.fire({
-        title: "Cargando...",
-        text: "Por favor, espere mientras se carga el registro.",
-        allowOutsideClick: false,
-        didOpen: () => Swal.showLoading(),
-      });
-
-      const formData = new FormData();
-      const utcDate = selectedDate
-        ? new Date(selectedDate.getTime() - -3 * 60 * 60 * 1000) // Convertir a UTC -3
-        : "";
-
-      // Agregar todos los campos, excepto el archivo
-      Object.keys(data).forEach((key) => {
-        if (key !== "file") {
-          formData.append(key, data[key]);
-        }
-      });
-
-      formData.append("fecha", utcDate.toISOString());
-
-      // Si se selecciona un nuevo archivo, añadirlo al formData
-      if (selectedFiles.length > 0) {
-        selectedFiles.forEach((file) => {
-          formData.append("file", file);
+    const onSubmit = handleSubmit(async (data) => {
+      try {
+        Swal.fire({
+          title: "Cargando...",
+          text: "Por favor, espere mientras se carga el registro.",
+          allowOutsideClick: false,
+          didOpen: () => {
+            Swal.showLoading();
+          },
         });
-      }
-
-      // Si existe un ID, actualizar la tarea
-      if (params.id) {
-        await updateTask(params.id, formData);
+    
+        const formData = new FormData();
+        Object.keys(data).forEach((key) => {
+          if (key !== "file") {
+            formData.append(key, data[key]);
+          }
+        });
+    
+        // Log para ver el contenido de formData
+        console.log("Datos a enviar:", Object.fromEntries(formData));
+    
+        if (selectedFiles.length > 0) {
+          selectedFiles.forEach((file) => {
+            formData.append("file", file);
+          });
+        }
+    
+        if (params.id) {
+          await updateTask(params.id, formData);
+          Swal.close();
+          Swal.fire({
+            title: "¡Éxito!",
+            text: "Registro actualizado correctamente.",
+            icon: "success",
+            timer: 2000,
+            showConfirmButton: false,
+          });
+        }
+    
+        navigate("/task");
+      } catch (error) {
+        console.error("Error:", error);
         Swal.close();
         Swal.fire({
-          title: "¡Éxito!",
-          text: "Registro actualizado correctamente.",
-          icon: "success",
+          title: "Error",
+          text: "Ocurrió un error al guardar el registro.",
+          icon: "error",
           timer: 2000,
           showConfirmButton: false,
         });
       }
+    });
 
-      navigate("/task");
-    } catch (error) {
-      console.error("Error:", error);
-      Swal.close();
-      Swal.fire({
-        title: "Error",
-        text: "Ocurrió un error al guardar el registro.",
-        icon: "error",
-        timer: 2000,
-        showConfirmButton: false,
-      });
-    }
-  });
+  const handleTipoExpendioChange = (e) => {
+    setTipoExpendio(e.target.value);
+    setValue("tipoexpendio", e.target.value);
+  };
+
+  const handleTipoPersonaChange = (e) => {
+    setTipoPersona(e.target.value);
+    setValue("persona", e.target.value);
+  };
 
   return (
     <div
@@ -124,125 +135,693 @@ function TaskFormPageEdit() {
     >
       <div className="bg-gray-300 max-w-screen-md w-full p-10 rounded-md">
         <div className="flex justify-between items-center mb-4">
-          <h1 className="text-2xl font-bold text-black">Editar Archivo</h1>
+          <h1 className="text-2xl font-bold text-black">
+            Editar Registro de Archivo
+          </h1>
           <Link
             to="/task"
             className="btn btn-success"
             onClick={() => navigate("/")}
           >
             <FontAwesomeIcon icon={faArrowLeft} />{" "}
+            {/* Ícono de flecha hacia la izquierda */}
           </Link>
         </div>
-        <form onSubmit={onSubmit}>
+        <form onSubmit={handleSubmit(onSubmit)} className="mt-4">
+          {/* Selección de Tipo de Evento */}
           <label
-            htmlFor="expe"
+            htmlFor="Evento"
             className="block text-sm font-medium text-black"
           >
-            Codigo del Organismo
+            Tipo de Expendio Expendio de Bebidas
           </label>
-          <input
-            type="text"
-            {...register("expe", { required: true })}
+          <select
+            id="expendio"
+            {...register("expendio", { required: true })}
+            onChange={handleTipoExpendioChange}
             className="w-full bg-gray-100 text-black px-4 py-2 rounded-md my-2"
-            placeholder="Expediente N°"
-          />
-
-          <label
-            htmlFor="correlativo"
-            className="block text-sm font-medium text-black"
           >
-            Número de Correlativo
-          </label>
-          <input
-            type="text"
-            {...register("correlativo", { required: true })}
-            className="w-full bg-gray-100 text-black px-4 py-2 rounded-md my-2"
-            placeholder="Número correlativo"
-          />
+            <option value="">Seleccione un tipo de Expendio de Bebidas</option>
+            <option value="Evento Particular">Evento Particular</option>
+            <option value="Local Comercial">
+              Habilitación de Venta de Bebidas para Local Comercial
+            </option>
+          </select>
 
-          <label
-            htmlFor="anio"
-            className="block text-sm font-medium text-black"
-          >
-            Año
-          </label>
-          <input
-            type="text"
-            {...register("anio", { required: true })}
-            className="w-full bg-gray-100 text-black px-4 py-2 rounded-md my-2"
-            placeholder="Año"
-          />
+          {tipoExpendio && (
+            <>
+              {/* Selección de Tipo de Persona */}
+              <label
+                htmlFor="tipoPersona"
+                className="block text-sm font-medium text-black"
+              >
+                Tipo de Persona
+              </label>
+              <select
+                id="persona"
+                {...register("persona", { required: true })}
+                onChange={handleTipoPersonaChange}
+                className="w-full bg-gray-100 text-black px-4 py-2 rounded-md my-2"
+              >
+                <option value="">Seleccione un tipo de persona</option>
+                <option value="física">Persona Física</option>
+                <option value="jurídica">Persona Jurídica</option>
+              </select>
+            </>
+          )}
 
-          <label
-            htmlFor="fecha"
-            className="block text-sm font-medium text-black"
-          >
-            Fecha
-          </label>
-          <DatePicker
-            selected={selectedDate}
-            onChange={(date) => setSelectedDate(date)}
-            className="w-full bg-gray-100 text-black px-4 py-2 rounded-md my-2"
-            dateFormat="dd/MM/yyyy"
-          />
+          {tipoExpendio && tipoPersona && (
+            <div>
+              {tipoExpendio === "Evento Particular" &&
+                tipoPersona === "física" && (
+                  <>
+                    {/* Campos para Evento Particular - Persona Física */}
+                    <label
+                      htmlFor="dni"
+                      className="block text-sm font-medium text-black"
+                    >
+                      DNI
+                    </label>
+                    <input
+                      type="text"
+                      {...register("dni", { required: true })}
+                      className="w-full bg-gray-100 text-black px-4 py-2 rounded-md my-2"
+                      placeholder="DNI"
+                    />
 
-          <label
-            htmlFor="iniciador"
-            className="block text-sm font-medium text-black"
-          >
-            Iniciador
-          </label>
-          <input
-            type="text"
-            {...register("iniciador", { required: true })}
-            className="w-full bg-gray-100 text-black px-4 py-2 rounded-md my-2"
-            placeholder="Iniciador"
-          />
+                    <label
+                      htmlFor="apellido"
+                      className="block text-sm font-medium text-black"
+                    >
+                      Apellido
+                    </label>
+                    <input
+                      type="text"
+                      {...register("apellido", { required: true })}
+                      className="w-full bg-gray-100 text-black px-4 py-2 rounded-md my-2"
+                      placeholder="Apellido"
+                    />
 
-          <label
-            htmlFor="asunto"
-            className="block text-sm font-medium text-black"
-          >
-            Asunto
-          </label>
-          <textarea
-            {...register("asunto", { required: true })}
-            className="w-full bg-gray-100 text-black px-4 py-2 rounded-md my-2"
-            placeholder="Asunto"
-          />
+                    <label
+                      htmlFor="nombrePersona"
+                      className="block text-sm font-medium text-black"
+                    >
+                      Nombre
+                    </label>
+                    <input
+                      type="text"
+                      {...register("nombre", { required: true })}
+                      className="w-full bg-gray-100 text-black px-4 py-2 rounded-md my-2"
+                      placeholder="Nombre"
+                    />
 
-          <label
-            htmlFor="cuerpo"
-            className="block text-sm font-medium text-black"
-          >
-            Cuerpo
-          </label>
-          <textarea
-            {...register("cuerpo", { required: true })}
-            className="w-full bg-gray-100 text-black px-4 py-2 rounded-md my-2"
-            placeholder="Cuerpo"
-          />
+                    <label
+                      htmlFor="localidad"
+                      className="block text-sm font-medium text-black"
+                    >
+                      Localidad
+                    </label>
+                    <input
+                      type="text"
+                      {...register("localidad", { required: true })}
+                      className="w-full bg-gray-100 text-black px-4 py-2 rounded-md my-2"
+                      placeholder="Localidad"
+                    />
 
-          {/* Mostrar el archivo actual si existe */}
-          {pdfUrl && (
-   <div className="my-4">
-   <label
-     htmlFor="archivo"
-     className="block text-sm font-medium text-black mb-2" // Agregué mb-2 para margen inferior
-   >
-     Archivo actual:
-   </label>
-   <div></div>
-   <a
-     href={pdfUrl}
-     target="_blank"
-     rel="noopener noreferrer"
-     className="bg-blue-500 text-white px-4 py-2 rounded-md mt-4 cursor-pointer"
-   >
-     Ver
-   </a>
- </div>
- 
+                    <label
+                      htmlFor="domicilio"
+                      className="block text-sm font-medium text-black"
+                    >
+                      Domicilio Particular
+                    </label>
+                    <input
+                      type="text"
+                      {...register("domicilio", { required: true })}
+                      className="w-full bg-gray-100 text-black px-4 py-2 rounded-md my-2"
+                      placeholder="Domicilio"
+                    />
+
+                    <label
+                      htmlFor="lugar"
+                      className="block text-sm font-medium text-black"
+                    >
+                      Lugar de Realización del vento
+                    </label>
+                    <input
+                      type="text"
+                      {...register("lugar", { required: true })}
+                      className="w-full bg-gray-100 text-black px-4 py-2 rounded-md my-2"
+                      placeholder="Lugar de Realización del evento"
+                    />
+
+                    <label
+                      htmlFor="dias"
+                      className="block text-sm font-medium text-black"
+                    >
+                      Días del evento
+                    </label>
+                    <input
+                      type="text"
+                      {...register("dias", { required: true })}
+                      className="w-full bg-gray-100 text-black px-4 py-2 rounded-md my-2"
+                      placeholder="Días"
+                    />
+
+                    <label
+                      htmlFor="horarios"
+                      className="block text-sm font-medium text-black"
+                    >
+                      Horarios del evento
+                    </label>
+                    <input
+                      type="text"
+                      {...register("horarios", { required: true })}
+                      className="w-full bg-gray-100 text-black px-4 py-2 rounded-md my-2"
+                      placeholder="Horarios"
+                    />
+
+                    <label
+                      htmlFor="tipoevento"
+                      className="block text-sm font-medium text-black"
+                    >
+                      Tipo de Evento
+                    </label>
+                    <input
+                      type="text"
+                      {...register("tipoevento", { required: true })}
+                      className="w-full bg-gray-100 text-black px-4 py-2 rounded-md my-2"
+                      placeholder="Tipo de Evento"
+                    />
+
+                    <label
+                      htmlFor="email"
+                      className="block text-sm font-medium text-black"
+                    >
+                      Email particular
+                    </label>
+                    <input
+                      type="text"
+                      {...register("email", { required: true })}
+                      className="w-full bg-gray-100 text-black px-4 py-2 rounded-md my-2"
+                      placeholder="Email"
+                    />
+
+                    <label
+                      htmlFor="contacto"
+                      className="block text-sm font-medium text-black"
+                    >
+                      Nro de WhatsApp
+                    </label>
+                    <input
+                      type="text"
+                      {...register("contacto", { required: true })}
+                      className="w-full bg-gray-100 text-black px-4 py-2 rounded-md my-2"
+                      placeholder="Teléfono de Contacto"
+                    />
+                  </>
+                )}
+
+              {tipoExpendio === "Evento Particular" &&
+                tipoPersona === "jurídica" && (
+                  <>
+                    {/* Campos para Evento Particular - Persona Jurídica */}
+                    <label
+                      htmlFor="nroHabilitacion"
+                      className="block text-sm font-medium text-black"
+                    >
+                      Número de Habilitación Municipal
+                    </label>
+                    <input
+                      type="text"
+                      {...register("nroHabilitacion", { required: true })}
+                      className="w-full bg-gray-100 text-black px-4 py-2 rounded-md my-2"
+                      placeholder="Número de Habilitación"
+                    />
+
+                    <label
+                      htmlFor="dni"
+                      className="block text-sm font-medium text-black"
+                    >
+                      DNI del Propietario
+                    </label>
+                    <input
+                      type="text"
+                      {...register("dni", { required: true })}
+                      className="w-full bg-gray-100 text-black px-4 py-2 rounded-md my-2"
+                      placeholder="DNI del Propietario"
+                    />
+
+                    <label
+                      htmlFor="apellido"
+                      className="block text-sm font-medium text-black"
+                    >
+                      Apellido
+                    </label>
+                    <input
+                      type="text"
+                      {...register("apellido", { required: true })}
+                      className="w-full bg-gray-100 text-black px-4 py-2 rounded-md my-2"
+                      placeholder="Apellido"
+                    />
+
+                    <label
+                      htmlFor="nombrePersona"
+                      className="block text-sm font-medium text-black"
+                    >
+                      Nombre
+                    </label>
+                    <input
+                      type="text"
+                      {...register("nombre", { required: true })}
+                      className="w-full bg-gray-100 text-black px-4 py-2 rounded-md my-2"
+                      placeholder="Nombre"
+                    />
+
+                    <label
+                      htmlFor="localidad"
+                      className="block text-sm font-medium text-black"
+                    >
+                      Localidad
+                    </label>
+                    <input
+                      type="text"
+                      {...register("localidad", { required: true })}
+                      className="w-full bg-gray-100 text-black px-4 py-2 rounded-md my-2"
+                      placeholder="Localidad"
+                    />
+
+                    <label
+                      htmlFor="domicilio"
+                      className="block text-sm font-medium text-black"
+                    >
+                      Domicilio particular
+                    </label>
+                    <input
+                      type="text"
+                      {...register("domicilio", { required: true })}
+                      className="w-full bg-gray-100 text-black px-4 py-2 rounded-md my-2"
+                      placeholder="Domicilio"
+                    />
+
+                    <label
+                      htmlFor="lugar"
+                      className="block text-sm font-medium text-black"
+                    >
+                      Lugar de Realización del evento
+                    </label>
+                    <input
+                      type="text"
+                      {...register("lugar", { required: true })}
+                      className="w-full bg-gray-100 text-black px-4 py-2 rounded-md my-2"
+                      placeholder="Lugar de Realización del evento"
+                    />
+
+                    <label
+                      htmlFor="dias"
+                      className="block text-sm font-medium text-black"
+                    >
+                      Días del evento
+                    </label>
+                    <input
+                      type="text"
+                      {...register("dias", { required: true })}
+                      className="w-full bg-gray-100 text-black px-4 py-2 rounded-md my-2"
+                      placeholder="Días"
+                    />
+
+                    <label
+                      htmlFor="horarios"
+                      className="block text-sm font-medium text-black"
+                    >
+                      Horarios del evento
+                    </label>
+                    <input
+                      type="text"
+                      {...register("horarios", { required: true })}
+                      className="w-full bg-gray-100 text-black px-4 py-2 rounded-md my-2"
+                      placeholder="Horarios"
+                    />
+
+                    <label
+                      htmlFor="tipo"
+                      className="block text-sm font-medium text-black"
+                    >
+                      Tipo de Evento
+                    </label>
+                    <input
+                      type="text"
+                      {...register("tipoevento", { required: true })}
+                      className="w-full bg-gray-100 text-black px-4 py-2 rounded-md my-2"
+                      placeholder="Tipo de Evento"
+                    />
+
+                    <label
+                      htmlFor="email"
+                      className="block text-sm font-medium text-black"
+                    >
+                      Email
+                    </label>
+                    <input
+                      type="text"
+                      {...register("email", { required: true })}
+                      className="w-full bg-gray-100 text-black px-4 py-2 rounded-md my-2"
+                      placeholder="Email"
+                    />
+
+                    <label
+                      htmlFor="contacto"
+                      className="block text-sm font-medium text-black"
+                    >
+                      Nro de Whatsapp
+                    </label>
+                    <input
+                      type="text"
+                      {...register("contacto", { required: true })}
+                      className="w-full bg-gray-100 text-black px-4 py-2 rounded-md my-2"
+                      placeholder="Teléfono de Contacto"
+                    />
+                  </>
+                )}
+
+              {tipoExpendio === "Local Comercial" &&
+                tipoPersona === "física" && (
+                  <>
+                    {/* Campos para Habilitación de Venta de Bebidas */}
+                    <label
+                      htmlFor="dniPropietario"
+                      className="block text-sm font-medium text-black"
+                    >
+                      DNI del Propietario
+                    </label>
+                    <input
+                      type="text"
+                      {...register("dni", { required: true })}
+                      className="w-full bg-gray-100 text-black px-4 py-2 rounded-md my-2"
+                      placeholder="DNI del Propietario"
+                    />
+
+                    <label
+                      htmlFor="apellidoPropietario"
+                      className="block text-sm font-medium text-black"
+                    >
+                      Apellido
+                    </label>
+                    <input
+                      type="text"
+                      {...register("apellido", { required: true })}
+                      className="w-full bg-gray-100 text-black px-4 py-2 rounded-md my-2"
+                      placeholder="Apellido del Propietario"
+                    />
+
+                    <label
+                      htmlFor="nombrePropietario"
+                      className="block text-sm font-medium text-black"
+                    >
+                      Nombre
+                    </label>
+                    <input
+                      type="text"
+                      {...register("nombre", { required: true })}
+                      className="w-full bg-gray-100 text-black px-4 py-2 rounded-md my-2"
+                      placeholder="Nombre del Propietario"
+                    />
+
+                    <label
+                      htmlFor="localidad"
+                      className="block text-sm font-medium text-black"
+                    >
+                      Localidad
+                    </label>
+                    <input
+                      type="text"
+                      {...register("localidad", { required: true })}
+                      className="w-full bg-gray-100 text-black px-4 py-2 rounded-md my-2"
+                      placeholder="Localidad"
+                    />
+
+                    <label
+                      htmlFor="domicilio"
+                      className="block text-sm font-medium text-black"
+                    >
+                      Domicilio particular
+                    </label>
+                    <input
+                      type="text"
+                      {...register("domicilio", { required: true })}
+                      className="w-full bg-gray-100 text-black px-4 py-2 rounded-md my-2"
+                      placeholder="Domicilio"
+                    />
+
+                    <label
+                      htmlFor="nroHabilitacion"
+                      className="block text-sm font-medium text-black"
+                    >
+                      Nro de Habilitación Municipal
+                    </label>
+                    <input
+                      type="text"
+                      {...register("nroHabilitacion", { required: true })}
+                      className="w-full bg-gray-100 text-black px-4 py-2 rounded-md my-2"
+                      placeholder="Nro de Habilitación Municipal"
+                    />
+
+                    <label
+                      htmlFor="horarios"
+                      className="block text-sm font-medium text-black"
+                    >
+                      Domicilio del Local Comercial
+                    </label>
+                    <input
+                      type="text"
+                      {...register("domicilioLocalComercial", {
+                        required: true,
+                      })}
+                      className="w-full bg-gray-100 text-black px-4 py-2 rounded-md my-2"
+                      placeholder="Domicilio del Local Comercial"
+                    />
+
+                    <label
+                      htmlFor="dias"
+                      className="block text-sm font-medium text-black"
+                    >
+                      Horario de atención
+                    </label>
+                    <input
+                      type="text"
+                      {...register("horarioAtencion", { required: true })}
+                      className="w-full bg-gray-100 text-black px-4 py-2 rounded-md my-2"
+                      placeholder="Horario de atención"
+                    />
+
+                    <label
+                      htmlFor="dias"
+                      className="block text-sm font-medium text-black"
+                    >
+                      Rubro
+                    </label>
+                    <input
+                      type="text"
+                      {...register("rubro", { required: true })}
+                      className="w-full bg-gray-100 text-black px-4 py-2 rounded-md my-2"
+                      placeholder="Rubro"
+                    />
+
+                    <label
+                      htmlFor="email"
+                      className="block text-sm font-medium text-black"
+                    >
+                      Email
+                    </label>
+                    <input
+                      type="text"
+                      {...register("email", { required: true })}
+                      className="w-full bg-gray-100 text-black px-4 py-2 rounded-md my-2"
+                      placeholder="Email"
+                    />
+
+                    <label
+                      htmlFor="contacto"
+                      className="block text-sm font-medium text-black"
+                    >
+                      Nro de Whatsapp
+                    </label>
+                    <input
+                      type="text"
+                      {...register("contacto", { required: true })}
+                      className="w-full bg-gray-100 text-black px-4 py-2 rounded-md my-2"
+                      placeholder="Teléfono de Contacto"
+                    />
+                  </>
+                )}
+
+              {tipoExpendio === "Local Comercial" &&
+                tipoPersona === "jurídica" && (
+                  <>
+                    {/* Campos para Habilitación de Venta de Bebidas */}
+                    <label
+                      htmlFor="dniPropietario"
+                      className="block text-sm font-medium text-black"
+                    >
+                      DNI del Propietario
+                    </label>
+                    <input
+                      type="text"
+                      {...register("dni", { required: true })}
+                      className="w-full bg-gray-100 text-black px-4 py-2 rounded-md my-2"
+                      placeholder="DNI del Propietario"
+                    />
+
+                    <label
+                      htmlFor="apellidoPropietario"
+                      className="block text-sm font-medium text-black"
+                    >
+                      Apellido
+                    </label>
+                    <input
+                      type="text"
+                      {...register("apellido", { required: true })}
+                      className="w-full bg-gray-100 text-black px-4 py-2 rounded-md my-2"
+                      placeholder="Apellido del Propietario"
+                    />
+
+                    <label
+                      htmlFor="nombrePropietario"
+                      className="block text-sm font-medium text-black"
+                    >
+                      Nombre
+                    </label>
+                    <input
+                      type="text"
+                      {...register("nombre", { required: true })}
+                      className="w-full bg-gray-100 text-black px-4 py-2 rounded-md my-2"
+                      placeholder="Nombre del Propietario"
+                    />
+
+                    <label
+                      htmlFor="localidad"
+                      className="block text-sm font-medium text-black"
+                    >
+                      Localidad
+                    </label>
+                    <input
+                      type="text"
+                      {...register("localidad", { required: true })}
+                      className="w-full bg-gray-100 text-black px-4 py-2 rounded-md my-2"
+                      placeholder="Localidad"
+                    />
+
+                    <label
+                      htmlFor="domicilio"
+                      className="block text-sm font-medium text-black"
+                    >
+                      Domicilio particular
+                    </label>
+                    <input
+                      type="text"
+                      {...register("domicilio", { required: true })}
+                      className="w-full bg-gray-100 text-black px-4 py-2 rounded-md my-2"
+                      placeholder="Domicilio"
+                    />
+
+                    <label
+                      htmlFor="habilitacionComercial"
+                      className="block text-sm font-medium text-black"
+                    >
+                      Nro de Habilitación Comercial
+                    </label>
+                    <input
+                      type="text"
+                      {...register("habilitacionComercial", { required: true })}
+                      className="w-full bg-gray-100 text-black px-4 py-2 rounded-md my-2"
+                      placeholder="Nro de Habilitación Comercial"
+                    />
+
+                    <label
+                      htmlFor="domicilioLocalComercial"
+                      className="block text-sm font-medium text-black"
+                    >
+                      Domicilio del Local Comercial
+                    </label>
+                    <input
+                      type="text"
+                      {...register("domicilioLocalComercial", {
+                        required: true,
+                      })}
+                      className="w-full bg-gray-100 text-black px-4 py-2 rounded-md my-2"
+                      placeholder="Domicilio del Local Comercial"
+                    />
+
+                    <label
+                      htmlFor="horarioAtencion"
+                      className="block text-sm font-medium text-black"
+                    >
+                      Horario de atención
+                    </label>
+                    <input
+                      type="text"
+                      {...register("horarioAtencion", { required: true })}
+                      className="w-full bg-gray-100 text-black px-4 py-2 rounded-md my-2"
+                      placeholder="Horario de atención"
+                    />
+
+                    <label
+                      htmlFor="rubro"
+                      className="block text-sm font-medium text-black"
+                    >
+                      Rubro
+                    </label>
+                    <input
+                      type="text"
+                      {...register("rubro", { required: true })}
+                      className="w-full bg-gray-100 text-black px-4 py-2 rounded-md my-2"
+                      placeholder="Rubro"
+                    />
+
+                    <label
+                      htmlFor="email"
+                      className="block text-sm font-medium text-black"
+                    >
+                      Email
+                    </label>
+                    <input
+                      type="text"
+                      {...register("email", { required: true })}
+                      className="w-full bg-gray-100 text-black px-4 py-2 rounded-md my-2"
+                      placeholder="Email"
+                    />
+
+                    <label
+                      htmlFor="contacto"
+                      className="block text-sm font-medium text-black"
+                    >
+                      Nro de Whatsapp
+                    </label>
+                    <input
+                      type="text"
+                      {...register("contacto", { required: true })}
+                      className="w-full bg-gray-100 text-black px-4 py-2 rounded-md my-2"
+                      placeholder="Teléfono de Contacto"
+                    />
+                  </>
+                )}
+              {pdfUrl && (
+            <div className="my-4">
+              <label
+                htmlFor="archivo"
+                className="block text-sm font-medium text-black mb-2" // Agregué mb-2 para margen inferior
+              >
+                Archivo actual:
+              </label>
+              <div></div>
+              <a
+                href={pdfUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="bg-blue-500 text-white px-4 py-2 rounded-md mt-4 cursor-pointer"
+              >
+                Ver
+              </a>
+            </div>
           )}
 
           <label
@@ -257,6 +836,8 @@ function TaskFormPageEdit() {
             className="w-full bg-gray-100 text-black px-4 py-2 rounded-md my-2"
             multiple
           />
+          </div>
+          )}
 
           <button
             type="submit"
@@ -269,5 +850,4 @@ function TaskFormPageEdit() {
     </div>
   );
 }
-
 export default TaskFormPageEdit;

@@ -250,7 +250,7 @@ function TaskFormPage() {
                       htmlFor="domicilio"
                       className="block text-sm font-medium text-black"
                     >
-                      Domicilio
+                      Domicilio Particular
                     </label>
                     <input
                       type="text"
@@ -263,7 +263,7 @@ function TaskFormPage() {
                       htmlFor="lugar"
                       className="block text-sm font-medium text-black"
                     >
-                      Lugar de Realización del evento
+                      Lugar de Realización del vento
                     </label>
                     <input
                       type="text"
@@ -276,7 +276,7 @@ function TaskFormPage() {
                       htmlFor="dias"
                       className="block text-sm font-medium text-black"
                     >
-                      Días
+                      Días del evento
                     </label>
                     <input
                       type="text"
@@ -289,7 +289,7 @@ function TaskFormPage() {
                       htmlFor="horarios"
                       className="block text-sm font-medium text-black"
                     >
-                      Horarios
+                      Horarios del evento
                     </label>
                     <input
                       type="text"
@@ -315,7 +315,7 @@ function TaskFormPage() {
                       htmlFor="email"
                       className="block text-sm font-medium text-black"
                     >
-                      Email
+                      Email particular
                     </label>
                     <input
                       type="text"
@@ -328,7 +328,7 @@ function TaskFormPage() {
                       htmlFor="contacto"
                       className="block text-sm font-medium text-black"
                     >
-                      Teléfono de Contacto
+                      Nro de WhatsApp
                     </label>
                     <input
                       type="text"
@@ -347,7 +347,7 @@ function TaskFormPage() {
                       htmlFor="nroHabilitacion"
                       className="block text-sm font-medium text-black"
                     >
-                      Número de Habilitación
+                      Número de Habilitación Municipal
                     </label>
                     <input
                       type="text"
@@ -360,13 +360,13 @@ function TaskFormPage() {
                       htmlFor="dni"
                       className="block text-sm font-medium text-black"
                     >
-                      DNI
+                      DNI del Propietario
                     </label>
                     <input
                       type="text"
                       {...register("dni", { required: true })}
                       className="w-full bg-gray-100 text-black px-4 py-2 rounded-md my-2"
-                      placeholder="DNI"
+                      placeholder="DNI del Propietario"
                     />
 
                     <label
@@ -412,7 +412,7 @@ function TaskFormPage() {
                       htmlFor="domicilio"
                       className="block text-sm font-medium text-black"
                     >
-                      Domicilio
+                      Domicilio particular
                     </label>
                     <input
                       type="text"
@@ -438,7 +438,7 @@ function TaskFormPage() {
                       htmlFor="dias"
                       className="block text-sm font-medium text-black"
                     >
-                      Días
+                      Días del evento
                     </label>
                     <input
                       type="text"
@@ -451,7 +451,7 @@ function TaskFormPage() {
                       htmlFor="horarios"
                       className="block text-sm font-medium text-black"
                     >
-                      Horarios
+                      Horarios del evento
                     </label>
                     <input
                       type="text"
@@ -490,7 +490,7 @@ function TaskFormPage() {
                       htmlFor="contacto"
                       className="block text-sm font-medium text-black"
                     >
-                      Teléfono de Contacto
+                      Nro de Whatsapp
                     </label>
                     <input
                       type="text"
@@ -509,7 +509,7 @@ function TaskFormPage() {
                       htmlFor="dniPropietario"
                       className="block text-sm font-medium text-black"
                     >
-                      DNI
+                      DNI del Propietario
                     </label>
                     <input
                       type="text"
@@ -561,7 +561,7 @@ function TaskFormPage() {
                       htmlFor="domicilio"
                       className="block text-sm font-medium text-black"
                     >
-                      Domicilio
+                      Domicilio particular
                     </label>
                     <input
                       type="text"
@@ -641,7 +641,7 @@ function TaskFormPage() {
                       htmlFor="contacto"
                       className="block text-sm font-medium text-black"
                     >
-                      Teléfono de Contacto
+                      Nro de Whatsapp
                     </label>
                     <input
                       type="text"
@@ -660,7 +660,7 @@ function TaskFormPage() {
                       htmlFor="dniPropietario"
                       className="block text-sm font-medium text-black"
                     >
-                      DNI
+                      DNI del Propietario
                     </label>
                     <input
                       type="text"
@@ -712,7 +712,7 @@ function TaskFormPage() {
                       htmlFor="domicilio"
                       className="block text-sm font-medium text-black"
                     >
-                      Domicilio
+                      Domicilio particular
                     </label>
                     <input
                       type="text"
@@ -792,7 +792,7 @@ function TaskFormPage() {
                       htmlFor="contacto"
                       className="block text-sm font-medium text-black"
                     >
-                      Teléfono de Contacto
+                      Nro de Whatsapp
                     </label>
                     <input
                       type="text"
@@ -802,21 +802,21 @@ function TaskFormPage() {
                     />
                   </>
                 )}
+              <label
+                htmlFor="file"
+                className="block text-sm font-medium text-black"
+              >
+                Archivo
+              </label>
+              <input
+                type="file"
+                name="file"
+                onChange={handleFileChange}
+                className="w-full bg-gray-100 text-black px-4 py-2 rounded-md my-2"
+              />
             </div>
           )}
 
-          <label
-            htmlFor="file"
-            className="block text-sm font-medium text-black"
-          >
-            Archivo
-          </label>
-          <input
-            type="file"
-            name="file"
-            onChange={handleFileChange}
-            className="w-full bg-gray-100 text-black px-4 py-2 rounded-md my-2"
-          />
 
           <button
             type="submit"

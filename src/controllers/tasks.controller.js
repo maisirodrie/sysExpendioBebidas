@@ -146,24 +146,32 @@ export const updateTasks = async (req, res) => {
         }
       : null;
 
-    const task = await Task.findById(id);
-    if (!task) return res.status(404).json({ message: "Tarea no encontrada" });
+   // Buscar la tarea por ID
+   const task = await Task.findById(id);
+   if (!task) {
+     return res.status(404).json({ message: "Tarea no encontrada." });
+   }
 
-    if (newFile) {
-      for (const fileInfo of task.file) {
-        if (fileInfo.id) {
-          try {
-            await gfs.delete(new mongoose.Types.ObjectId(fileInfo.id));
-          } catch (error) {
-            return res
-              .status(500)
-              .json({ message: "Error al eliminar el archivo anterior." });
-          }
-        }
-      }
-    } else {
-      newFile = task.file;
-    }
+   // Si hay un nuevo archivo, eliminar el archivo anterior de GridFS
+   if (newFile) {
+     if (task.file && task.file.length > 0) {
+       for (const fileInfo of task.file) {
+         if (fileInfo.id) {
+           try {
+             await gfs.delete(new mongoose.Types.ObjectId(fileInfo.id)); // Elimina el archivo anterior de GridFS
+           } catch (error) {
+             console.error("Error deleting file from GridFS:", error);
+             return res
+               .status(500)
+               .json({ message: "Error al eliminar el archivo anterior." });
+           }
+         }
+       }
+     }
+   } else {
+     // Si no se subió un nuevo archivo, mantenemos el archivo existente
+     newFile = task.file;
+   }
 
     const updatedTask = await Task.findByIdAndUpdate(
       id,
@@ -180,7 +188,7 @@ export const updateTasks = async (req, res) => {
         tipoEvento,
         email,
         contacto,
-        nroHabilitacion: persona === "juridica" ? nroHabilitacion : null,
+        nroHabilitacion,
         domicilioLocalComercial,
         rubro,
         horarioAtencion,
@@ -190,7 +198,14 @@ export const updateTasks = async (req, res) => {
       { new: true }
     );
 
+    // Registrar la actividad de usuario
     await logActivity(req.user.id, "actualizó tarea", "tarea", updatedTask._id);
+
+    if (!updatedTask) {
+      return res
+        .status(404)
+        .json({ message: "Tarea no encontrada tras la actualización." });
+    }
 
     res.json(updatedTask);
   } catch (error) {
