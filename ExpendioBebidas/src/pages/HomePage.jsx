@@ -21,14 +21,14 @@ function HomePage() {
       >
         <div className="bg-dark-overlay absolute inset-0"></div> {/* Superposición de color oscuro */}
         <div className="container mx-auto relative z-10 text-center"> {/* Contenido del encabezado */}
-        <h1 className="text-5xl font-bold mb-4">Sistema de Registro Oficial de Hacedores y Trabajadores de la Danza en la Provincia de Misiones</h1>
-          <p className="text-md mb-8">
+        <h1 className="text-5xl font-bold mb-4">Solicitud Provincial de expendio de bebidas</h1>
+          {/* <p className="text-md mb-8">
             “La Danza abarca todas las formas de expresión artística corporal
             en sus diversos géneros, estilos y formatos interpretativos”
-          </p>
+          </p> */}
           <Link
   className="hover:bg-blue-600 hover:border-blue-600 hover:text-white bg-blue-500 text-white border-blue-500 border-2 px-4 py-2 rounded-md inline-block"
-  to="/login"
+  to="/register"
 >
   Bienvenido
 </Link>  

@@ -9,18 +9,14 @@ import { Readable } from 'stream';
 const mongoURI = 'mongodb://127.0.0.1/sysexpendiobebidasdb';
 
 // Configura la conexión a MongoDB
-const conn = mongoose.createConnection(mongoURI, {
-  // Las siguientes opciones ya no son necesarias en las versiones más recientes de Mongoose
-  // useNewUrlParser: true,
-  // useUnifiedTopology: true
-});
+const conn = mongoose.createConnection(mongoURI);
 
 // Manejo de la conexión a la base de datos
 conn.on('error', (err) => {
   console.error('Error en la conexión a MongoDB:', err);
 });
 
-let gfs; // Declarar gfs con let para permitir la asignación
+let gfs;
 
 conn.once('open', () => {
   gfs = new GridFSBucket(conn.db, { bucketName: 'uploads' });
@@ -33,26 +29,38 @@ const upload = multer({ storage });
 
 // Middleware para subir archivos a GridFS
 const streamUpload = (req, res, next) => {
-  if (!req.file) return next();
+  if (!req.files) return next(); // Cambiar de req.file a req.files
 
-  const file = req.file;
-  const filename = file.originalname; // Usar solo el nombre original
-  const uploadStream = gfs.openUploadStream(filename);
+  const files = req.files; // Acceder a los archivos subidos
+  const uploadPromises = files.map((file) => {
+    return new Promise((resolve, reject) => {
+      const filename = file.originalname; // Usar solo el nombre original
+      const uploadStream = gfs.openUploadStream(filename);
+      
+      const readableStream = Readable.from(file.buffer);
+      readableStream.pipe(uploadStream);
 
-  const readableStream = Readable.from(file.buffer);
-  readableStream.pipe(uploadStream);
+      uploadStream.on('finish', () => {
+        file.filename = filename; // Guardar el nombre del archivo
+        file.id = uploadStream.id; // Guardar el ID del archivo en GridFS
+        resolve();
+      });
 
-  uploadStream.on('finish', () => {
-    req.file.filename = filename;
-    req.file.id = uploadStream.id;
-    next();
+      uploadStream.on('error', (err) => {
+        console.error('Error al subir el archivo:', err);
+        reject(err);
+      });
+    });
   });
 
-  uploadStream.on('error', (err) => {
-    console.error('Error al subir el archivo:', err);
-    return res.status(500).json({ message: 'Error al subir el archivo', error: err.message });
-  });
+  Promise.all(uploadPromises)
+    .then(() => {
+      next(); // Continuar al siguiente middleware
+    })
+    .catch((err) => {
+      return res.status(500).json({ message: 'Error al subir uno o más archivos', error: err.message });
+    });
 };
 
-// Exportar upload, streamUpload y gfs
+// Exportar upload y streamUpload
 export { upload, streamUpload, gfs };

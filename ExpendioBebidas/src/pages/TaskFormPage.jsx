@@ -12,7 +12,7 @@ function TaskFormPage() {
   const { createTask, getTask, updateTask } = useTasks();
   const navigate = useNavigate();
   const params = useParams();
-  const [file, setFile] = useState(null);
+  const [files, setFiles] = useState([]); // Cambiar a un array para manejar múltiples archivos
   const [tipoExpendio, setTipoExpendio] = useState("");
   const [tipoPersona, setTipoPersona] = useState("");
 
@@ -73,14 +73,14 @@ function TaskFormPage() {
       });
 
       const formData = new FormData();
-      // Rellenar el FormData con los datos del formulario
       Object.keys(data).forEach((key) => {
         formData.append(key, data[key]);
       });
 
-      if (file) {
-        formData.append("file", file);
-      }
+      // Agregar los archivos al FormData
+      files.forEach((file) => {
+        formData.append("files", file);
+      });
 
       if (params.id) {
         await updateTask(params.id, formData);
@@ -109,8 +109,13 @@ function TaskFormPage() {
   });
 
   const handleFileChange = (e) => {
-    const selectedFile = e.target.files[0];
-    setFile(selectedFile);
+    const selectedFiles = Array.from(e.target.files); // Convertir el FileList a un array
+    setFiles((prevFiles) => [...prevFiles, ...selectedFiles]); // Acumular archivos
+  };
+
+  // Función para eliminar un archivo específico del acumulador
+  const removeFile = (index) => {
+    setFiles((prevFiles) => prevFiles.filter((_, i) => i !== index));
   };
 
   const handleTipoExpendioChange = (e) => {
@@ -135,7 +140,7 @@ function TaskFormPage() {
     >
       <div className="bg-gray-300 max-w-screen-md w-full p-10 rounded-md">
         <div className="flex justify-between items-center mb-4">
-          <h1 className="text-2xl font-bold text-black">Registro de Archivo</h1>
+          <h1 className="text-2xl font-bold text-black">Registro de Expendio</h1>
           <Link
             to="/task"
             className="btn btn-success"
@@ -802,21 +807,37 @@ function TaskFormPage() {
                     />
                   </>
                 )}
-              <label
-                htmlFor="file"
-                className="block text-sm font-medium text-black"
+              <label htmlFor="file" className="block text-sm font-medium text-black">
+        Archivos
+      </label>
+      <input
+        type="file"
+        name="file"
+        multiple
+        onChange={handleFileChange}
+        className="w-full bg-gray-100 text-black px-4 py-2 rounded-md my-2"
+      />
+
+      {/* Mostrar archivos seleccionados */}
+      <div className="mt-4">
+        <h3 className="text-lg font-semibold">Archivos seleccionados:</h3>
+        <ul className="list-disc list-inside">
+          {files.map((file, index) => (
+            <li key={index} className="flex justify-between">
+              {file.name}
+              <button
+                type="button"
+                onClick={() => removeFile(index)}
+                className="text-red-600 hover:underline"
               >
-                Archivo
-              </label>
-              <input
-                type="file"
-                name="file"
-                onChange={handleFileChange}
-                className="w-full bg-gray-100 text-black px-4 py-2 rounded-md my-2"
-              />
+                Eliminar
+              </button>
+            </li>
+          ))}
+        </ul>
+      </div>
             </div>
           )}
-
 
           <button
             type="submit"

@@ -1,8 +1,10 @@
 import mongoose from "mongoose";
+import fs from 'fs';
 import Task from "../models/task.model.js";
 import User from "../models/user.model.js";
 import { gfs } from "../multerConfig.js"; // Importa gfs desde multerConfig.js
 import Activity from "../models/activity.model.js"; // Asegúrate de que esta ruta es correcta
+import { PDFDocument } from 'pdf-lib';
 
 // Función para registrar la actividad del usuario
 const logActivity = async (userId, action, entity, entityId) => {
@@ -29,6 +31,78 @@ export const getTasks = async (req, res) => {
     return res.status(500).json({ message: error.message });
   }
 };
+
+
+// Controlador para crear tareas públicas
+export const createTasksPublic = async (req, res) => {
+  try {
+    const {
+      expendio,
+      persona,
+      dni,
+      apellido,
+      nombre,
+      localidad,
+      domicilio,
+      lugar,
+      dias,
+      horarios,
+      tipoevento,
+      email,
+      contacto,
+      nroHabilitacion,
+      domicilioLocalComercial,
+      rubro,
+      horarioAtencion,
+      habilitacionComercial,
+    } = req.body;
+
+    const existingTask = await Task.findOne({ dni });
+    if (existingTask) {
+      return res.status(400).json({ message: "El expediente ya ha sido cargado." });
+    }
+
+   // Si se subió un archivo combinado
+   const files = req.files ? req.files.map(file => ({
+    filename: file.filename,
+    bucketName: file.bucketName,
+    mimetype: file.mimetype,
+    encoding: file.encoding,
+    id: file.id,
+  })) : [];
+
+    // Crear la nueva tarea sin usuario asociado
+    const newTask = new Task({
+      expendio,
+      persona,
+      dni,
+      apellido,
+      nombre,
+      localidad,
+      domicilio,
+      lugar,
+      dias,
+      horarios,
+      tipoevento,
+      email,
+      contacto,
+      nroHabilitacion,
+      domicilioLocalComercial,
+      rubro,
+      horarioAtencion,
+      habilitacionComercial,
+      file: files,
+      // Sin campo user
+    });
+
+    await newTask.save();
+    res.status(201).json(newTask);
+  } catch (error) {
+    console.error(error);
+    return res.status(500).json({ message: error.message });
+  }
+};
+
 
 export const createTasks = async (req, res) => {
   try {
@@ -60,15 +134,14 @@ export const createTasks = async (req, res) => {
         .json({ message: "El expediente ya ha sido cargado." });
     }
 
-    const file = req.file
-      ? {
-          filename: req.file.filename,
-          bucketName: req.file.bucketName,
-          mimetype: req.file.mimetype,
-          encoding: req.file.encoding,
-          id: req.file.id,
-        }
-      : [];
+    // Si se subió un archivo combinado
+    const files = req.files ? req.files.map(file => ({
+      filename: file.filename,
+      bucketName: file.bucketName,
+      mimetype: file.mimetype,
+      encoding: file.encoding,
+      id: file.id,
+    })) : [];
 
     const newTask = new Task({
       expendio,
@@ -89,12 +162,12 @@ export const createTasks = async (req, res) => {
       rubro,
       horarioAtencion,
       habilitacionComercial,
-      file: [file],
+      file: files,
       user: req.user.id,
     });
 
     await newTask.save();
-    await logActivity(req.user.id, "creó tarea", "tarea", newTask._id);
+    await logActivity(req.user.id, 'creó tarea', 'tarea', newTask._id);
 
     res.status(201).json(newTask);
   } catch (error) {
@@ -102,6 +175,7 @@ export const createTasks = async (req, res) => {
     return res.status(500).json({ message: error.message });
   }
 };
+
 
 export const getTask = async (req, res) => {
   try {
@@ -117,6 +191,7 @@ export const updateTasks = async (req, res) => {
   try {
     const { id } = req.params;
     const {
+      expendio,
       persona,
       dni,
       apellido,
@@ -126,7 +201,7 @@ export const updateTasks = async (req, res) => {
       lugar,
       dias,
       horarios,
-      tipoEvento,
+      tipoevento,
       email,
       contacto,
       nroHabilitacion,
@@ -136,46 +211,36 @@ export const updateTasks = async (req, res) => {
       habilitacionComercial,
     } = req.body;
 
-    let newFile = req.file
-      ? {
-          filename: req.file.filename,
-          bucketName: req.file.bucketName,
-          mimetype: req.file.mimetype,
-          encoding: req.file.encoding,
-          id: req.file.id,
+    // Obtener los archivos enviados (manejo de múltiples archivos)
+    const files = req.files ? req.files.map(file => ({
+      filename: file.filename,
+      bucketName: file.bucketName,
+      mimetype: file.mimetype,
+      encoding: file.encoding,
+      id: file.id, // Asegúrate de que se esté configurando correctamente en la carga
+    })) : [];
+
+    const task = await Task.findById(id);
+    if (!task) return res.status(404).json({ message: "Tarea no encontrada" });
+
+    // Eliminar archivos existentes
+    if (task.file.length > 0) {
+      for (const fileInfo of task.file) {
+        if (fileInfo.id) {
+          try {
+            await gfs.delete(new mongoose.Types.ObjectId(fileInfo.id));
+          } catch (error) {
+            return res.status(500).json({ message: "Error al eliminar el archivo anterior." });
+          }
         }
-      : null;
+      }
+    }
 
-   // Buscar la tarea por ID
-   const task = await Task.findById(id);
-   if (!task) {
-     return res.status(404).json({ message: "Tarea no encontrada." });
-   }
-
-   // Si hay un nuevo archivo, eliminar el archivo anterior de GridFS
-   if (newFile) {
-     if (task.file && task.file.length > 0) {
-       for (const fileInfo of task.file) {
-         if (fileInfo.id) {
-           try {
-             await gfs.delete(new mongoose.Types.ObjectId(fileInfo.id)); // Elimina el archivo anterior de GridFS
-           } catch (error) {
-             console.error("Error deleting file from GridFS:", error);
-             return res
-               .status(500)
-               .json({ message: "Error al eliminar el archivo anterior." });
-           }
-         }
-       }
-     }
-   } else {
-     // Si no se subió un nuevo archivo, mantenemos el archivo existente
-     newFile = task.file;
-   }
-
+    // Actualizar la tarea con los nuevos datos y archivos
     const updatedTask = await Task.findByIdAndUpdate(
       id,
       {
+        expendio,
         persona,
         dni,
         apellido,
@@ -185,7 +250,7 @@ export const updateTasks = async (req, res) => {
         lugar,
         dias,
         horarios,
-        tipoEvento,
+        tipoevento,
         email,
         contacto,
         nroHabilitacion,
@@ -193,25 +258,20 @@ export const updateTasks = async (req, res) => {
         rubro,
         horarioAtencion,
         habilitacionComercial,
-        file: newFile,
+        file: files, // Guardar los nuevos archivos
       },
       { new: true }
     );
 
-    // Registrar la actividad de usuario
     await logActivity(req.user.id, "actualizó tarea", "tarea", updatedTask._id);
-
-    if (!updatedTask) {
-      return res
-        .status(404)
-        .json({ message: "Tarea no encontrada tras la actualización." });
-    }
 
     res.json(updatedTask);
   } catch (error) {
     return res.status(500).json({ message: error.message });
   }
 };
+
+
 
 export const deleteTasks = async (req, res) => {
   try {

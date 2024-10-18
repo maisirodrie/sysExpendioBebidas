@@ -30,6 +30,7 @@
     "mongoose": "^8.3.1",
     "morgan": "^1.10.0",
     "multer": "^1.4.5-lts.1",
+    "pdf-lib": "^1.17.1",
     "pdfjs-dist": "^3.11.174",
     "react-datepicker": "^6.9.0",
     "react-multi-select-component": "^4.3.4",

@@ -8,11 +8,11 @@ import "./taskformpage.css";
 import Swal from "sweetalert2";
 
 function TaskFormPageEdit() {
-
   const { register, handleSubmit, setValue } = useForm();
   const { getTask, updateTask } = useTasks();
   const navigate = useNavigate();
   const params = useParams();
+  const [files, setFiles] = useState([]); // Cambiar a un array para manejar múltiples archivos
   const [tipoExpendio, setTipoExpendio] = useState("");
   const [tipoPersona, setTipoPersona] = useState("");
   const [selectedFiles, setSelectedFiles] = useState([]);
@@ -22,96 +22,102 @@ function TaskFormPageEdit() {
   useEffect(() => {
     async function loadTask() {
       if (params.id) {
-            const task = await getTask(params.id);
-            // Rellenar los valores del formulario con la tarea existente
-            setValue("expendio", task.expendio);
-            setValue("persona", task.persona);
-            setValue("dni", task.dni);
-            setValue("apellido", task.apellido);
-            setValue("nombre", task.nombre);
-            setValue("localidad", task.localidad);
-            setValue("domicilio", task.domicilio);
-            setValue("lugar", task.lugar);
-            setValue("dias", task.dias);
-            setValue("horarios", task.horarios);
-            setValue("tipoevento", task.tipoevento);
-            setValue("email", task.email);
-            setValue("contacto", task.contacto);
-            setValue("nroHabilitacion", task.nroHabilitacion);
-            setValue("domicilioLocalComercial", task.domicilioLocalComercial);
-            setValue("rubro", task.rubro);
-            setValue("horarioAtencion", task.horarioAtencion);
-            setValue("habilitacionComercial", task.habilitacionComercial);
-            setTipoExpendio(task.expendio);
-            setTipoPersona(task.persona);
-            // Si existe un archivo, mostrar el enlace al archivo actual
+        const task = await getTask(params.id);
+        // Rellenar los valores del formulario con la tarea existente
+        setValue("expendio", task.expendio);
+        setValue("persona", task.persona);
+        setValue("dni", task.dni);
+        setValue("apellido", task.apellido);
+        setValue("nombre", task.nombre);
+        setValue("localidad", task.localidad);
+        setValue("domicilio", task.domicilio);
+        setValue("lugar", task.lugar);
+        setValue("dias", task.dias);
+        setValue("horarios", task.horarios);
+        setValue("tipoevento", task.tipoevento);
+        setValue("email", task.email);
+        setValue("contacto", task.contacto);
+        setValue("nroHabilitacion", task.nroHabilitacion);
+        setValue("domicilioLocalComercial", task.domicilioLocalComercial);
+        setValue("rubro", task.rubro);
+        setValue("horarioAtencion", task.horarioAtencion);
+        setValue("habilitacionComercial", task.habilitacionComercial);
+        setTipoExpendio(task.expendio);
+        setTipoPersona(task.persona);
+        // Si existen archivos, mostrar los enlaces
         if (task.file && task.file.length > 0) {
-          const fileUrl = `${apiUrl}/tasks/file/${task.file[0].filename}`;
-          setPdfUrl(fileUrl);
-          setSelectedFiles(task.file); // Mantiene referencia al archivo actual
+          const fileUrls = task.file.map(
+            (file) => `${apiUrl}/tasks/file/${file.filename}`
+          );
+          setPdfUrl(fileUrls);
+          setSelectedFiles(task.file);
         }
+      }
     }
-  }
     loadTask();
   }, [params.id, setValue, getTask]);
 
-    // Manejo de la selección de archivo
-    const handleFileChange = (e) => {
-      setSelectedFiles(Array.from(e.target.files));
-    };
 
-    const onSubmit = handleSubmit(async (data) => {
-      try {
-        Swal.fire({
-          title: "Cargando...",
-          text: "Por favor, espere mientras se carga el registro.",
-          allowOutsideClick: false,
-          didOpen: () => {
-            Swal.showLoading();
-          },
-        });
-    
-        const formData = new FormData();
-        Object.keys(data).forEach((key) => {
-          if (key !== "file") {
-            formData.append(key, data[key]);
-          }
-        });
-    
-        // Log para ver el contenido de formData
-        console.log("Datos a enviar:", Object.fromEntries(formData));
-    
-        if (selectedFiles.length > 0) {
-          selectedFiles.forEach((file) => {
-            formData.append("file", file);
-          });
+
+  const onSubmit = handleSubmit(async (data) => {
+    try {
+      Swal.fire({
+        title: "Cargando...",
+        text: "Por favor, espere mientras se carga el registro.",
+        allowOutsideClick: false,
+        didOpen: () => {
+          Swal.showLoading();
+        },
+      });
+  
+      const formData = new FormData();
+      Object.keys(data).forEach((key) => {
+        if (key !== "file") {
+          formData.append(key, data[key]);
         }
-    
-        if (params.id) {
-          await updateTask(params.id, formData);
-          Swal.close();
-          Swal.fire({
-            title: "¡Éxito!",
-            text: "Registro actualizado correctamente.",
-            icon: "success",
-            timer: 2000,
-            showConfirmButton: false,
-          });
-        }
-    
-        navigate("/task");
-      } catch (error) {
-        console.error("Error:", error);
+      });
+  
+      // Añadir archivos existentes y seleccionados al formData
+      [...selectedFiles, ...files].forEach((file) => {
+        formData.append("files", file); // Asegúrate de usar "files" si así lo espera tu backend
+      });
+  
+      if (params.id) {
+        await updateTask(params.id, formData);
         Swal.close();
         Swal.fire({
-          title: "Error",
-          text: "Ocurrió un error al guardar el registro.",
-          icon: "error",
+          title: "¡Éxito!",
+          text: "Registro actualizado correctamente.",
+          icon: "success",
           timer: 2000,
           showConfirmButton: false,
         });
       }
-    });
+  
+      navigate("/task");
+    } catch (error) {
+      console.error("Error:", error);
+      Swal.close();
+      Swal.fire({
+        title: "Error",
+        text: "Ocurrió un error al guardar el registro.",
+        icon: "error",
+        timer: 2000,
+        showConfirmButton: false,
+      });
+    }
+  });
+
+
+  const handleFileChange = (e) => {
+    const selectedFiles = Array.from(e.target.files); // Convertir el FileList a un array
+    setFiles((prevFiles) => [...prevFiles, ...selectedFiles]); // Acumular archivos
+  };
+
+  // Función para eliminar un archivo específico del acumulador
+  const removeFile = (index) => {
+    setFiles((prevFiles) => prevFiles.filter((_, i) => i !== index));
+  };
 
   const handleTipoExpendioChange = (e) => {
     setTipoExpendio(e.target.value);
@@ -340,7 +346,6 @@ function TaskFormPageEdit() {
                     />
                   </>
                 )}
-
               {tipoExpendio === "Evento Particular" &&
                 tipoPersona === "jurídica" && (
                   <>
@@ -502,7 +507,6 @@ function TaskFormPageEdit() {
                     />
                   </>
                 )}
-
               {tipoExpendio === "Local Comercial" &&
                 tipoPersona === "física" && (
                   <>
@@ -653,7 +657,6 @@ function TaskFormPageEdit() {
                     />
                   </>
                 )}
-
               {tipoExpendio === "Local Comercial" &&
                 tipoPersona === "jurídica" && (
                   <>
@@ -804,39 +807,59 @@ function TaskFormPageEdit() {
                     />
                   </>
                 )}
-              {pdfUrl && (
-            <div className="my-4">
-              <label
-                htmlFor="archivo"
-                className="block text-sm font-medium text-black mb-2" // Agregué mb-2 para margen inferior
-              >
-                Archivo actual:
-              </label>
-              <div></div>
-              <a
-                href={pdfUrl}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="bg-blue-500 text-white px-4 py-2 rounded-md mt-4 cursor-pointer"
-              >
-                Ver
-              </a>
-            </div>
-          )}
+              
+              {/* Visualización de los archivos actuales */}
+              {pdfUrl.length > 0 && (
+                <div className="my-4">
+                  <label className="block text-sm font-medium text-black mb-2">
+                    Archivos actuales:
+                  </label>
+                  {pdfUrl.map((url, index) => (
+                    <div key={index}>
+                      <a
+                        href={url}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="bg-blue-500 text-white px-4 py-2 rounded-md mt-2 block"
+                      >
+                        Ver Archivo {index + 1}
+                      </a>
+                    </div>
+                  ))}
+                </div>
+              )}
+              {/* Entrada para reemplazar archivo */}
+              
+              <label htmlFor="file" className="block text-sm font-medium text-black">
+        Archivos
+      </label>
+      <input
+        type="file"
+        name="file"
+        multiple
+        onChange={handleFileChange}
+        className="w-full bg-gray-100 text-black px-4 py-2 rounded-md my-2"
+      />
 
-          <label
-            htmlFor="file"
-            className="block text-sm font-medium text-black"
-          >
-            Reemplazar Archivo (opcional)
-          </label>
-          <input
-            type="file"
-            onChange={handleFileChange}
-            className="w-full bg-gray-100 text-black px-4 py-2 rounded-md my-2"
-            multiple
-          />
-          </div>
+      {/* Mostrar archivos seleccionados */}
+      <div className="mt-4">
+        <h3 className="text-lg font-semibold">Archivos seleccionados:</h3>
+        <ul className="list-disc list-inside">
+          {files.map((file, index) => (
+            <li key={index} className="flex justify-between">
+              {file.name}
+              <button
+                type="button"
+                onClick={() => removeFile(index)}
+                className="text-red-600 hover:underline"
+              >
+                Eliminar
+              </button>
+            </li>
+          ))}
+        </ul>
+      </div>
+            </div>
           )}
 
           <button

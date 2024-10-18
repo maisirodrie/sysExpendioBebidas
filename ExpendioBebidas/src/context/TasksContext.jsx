@@ -1,5 +1,5 @@
 import { createContext, useContext, useState } from "react";
-import { createTasksRequest, deleteTasksRequest, getTaskRequest, getTasksRequest, updateTasksRequest } from "../api/tasks";
+import { createTasksRequest,createTasksPublicRequest, deleteTasksRequest, getTaskRequest, getTasksRequest, updateTasksRequest } from "../api/tasks";
 import { trusted } from "mongoose";
 
 const TaskContext = createContext()
@@ -34,6 +34,11 @@ export function TaskProvider({ children }) {
         console.log(task)
     }
 
+    const createTasksPublic  = async (task) => {
+        const res = await createTasksPublicRequest(task)
+        console.log(task)
+    }
+
     
     const deleteTask = async (id) => {
         try {
@@ -58,7 +63,7 @@ export function TaskProvider({ children }) {
 
 
     return (
-        <TaskContext.Provider value={{ tasks, createTask, getTasks, deleteTask, getTask, updateTask }}>
+        <TaskContext.Provider value={{ tasks, createTask,createTasksPublic , getTasks, deleteTask, getTask, updateTask }}>
             {children}
         </TaskContext.Provider>
     )
