@@ -96,7 +96,7 @@ function RegisterPage() {
         confirmButtonText: "OK",
       });
 
-      navigate("/profile");
+      navigate("/");
     } catch (error) {
       console.error("Error:", error);
       Swal.close();
