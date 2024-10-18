@@ -14,7 +14,7 @@ const app = express();
 // }));
 
 app.use(cors({
-    origin: 'https://www.expendiobebidas.misiones.gov.ar/',
+    origin: 'https://www.expendiobebidas.misiones.gov.ar',
     credentials: true,
 })); 
 
