@@ -148,16 +148,20 @@ function RegisterPage() {
     setValue("persona", e.target.value);
   };
 
-  const downloadFile = async (url) => {
+  const downloadFile = async (filePath) => {
     try {
-        const response = await axios.get(url, { responseType: 'blob' });
-        const urlBlob = window.URL.createObjectURL(new Blob([response.data]));
+        const response = await axios.get(filePath, {
+            responseType: 'blob', // Asegúrate de especificar que es un blob
+        });
+
+        // Crear un enlace para descargar el archivo
+        const url = window.URL.createObjectURL(new Blob([response.data]));
         const link = document.createElement('a');
-        link.href = urlBlob;
-        link.setAttribute('download', 'documento.pdf'); // Nombre por defecto del archivo
+        link.href = url;
+        link.setAttribute('download', filePath.split('/').pop()); // Usa el nombre del archivo para descargar
         document.body.appendChild(link);
         link.click();
-        link.remove();
+        link.parentNode.removeChild(link);
     } catch (error) {
         console.error('Error al descargar el archivo:', error);
         alert('Se ha producido un error al cargar el documento PDF.');
@@ -198,22 +202,21 @@ function RegisterPage() {
             Antes de proceder con el registro, es fundamental que leas y comprendas los requisitos necesarios para completar el proceso de manera efectiva. Por favor, asegúrate de tener los siguientes documentos listos:
         </p>
         <div className="flex space-x-2 justify-center mt-2">
-        <button
-    onClick={() => downloadFile('/documentos/requisitos-local.pdf')} // Ruta relativa
-    className="bg-blue-500 text-white py-2 px-4 rounded hover:bg-blue-700"
->
-    Descargar para habilitación de local
-</button>
-<button
-    onClick={() => downloadFile('/documentos/requisitos-eventos.pdf')} // Ruta relativa
-    className="bg-blue-500 text-white py-2 px-4 rounded hover:bg-blue-700"
->
-    Descargar para habilitación de eventos
-</button>
+            <button
+                onClick={() => downloadFile(`${import.meta.env.VITE_API_ARCHIVO}/documentos/requisitos-local.pdf`)} // Ruta absoluta
+                className="bg-blue-500 text-white py-2 px-4 rounded hover:bg-blue-700"
+            >
+                Descargar para habilitación de local
+            </button>
+            <button
+                onClick={() => downloadFile(`${import.meta.env.VITE_API_ARCHIVO}/documentos/requisitos-eventos.pdf`)} // Ruta absoluta
+                className="bg-blue-500 text-white py-2 px-4 rounded hover:bg-blue-700"
+            >
+                Descargar para habilitación de eventos
+            </button>
         </div>
     </div>
 )}
-
         <form onSubmit={handleSubmit(onSubmit)} className="mt-4">
           {/* Selección de Tipo de Evento */}
           <label
