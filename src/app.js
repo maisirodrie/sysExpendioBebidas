@@ -27,7 +27,9 @@ const __dirname = path.dirname(__filename);
 // Define la ruta a tus documentos en producción
 const documentsPath = path.join(__dirname, 'documentos'); // Asegúrate de que esta ruta sea correcta
 // Sirve archivos estáticos desde la carpeta de documentos
-app.use('/documentos', express.static(documentsPath));
+// Sirve archivos estáticos desde la carpeta 'documentos'
+app.use('/api/documentos', express.static(path.join(__dirname, '../documentos')));
+
 
 app.use(morgan('dev'));
 app.use(express.json());

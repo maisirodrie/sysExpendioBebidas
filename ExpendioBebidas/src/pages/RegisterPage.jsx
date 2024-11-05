@@ -154,6 +154,7 @@ function RegisterPage() {
     a.click();
     document.body.removeChild(a);
   };
+  
 
   return (
     <div
@@ -179,30 +180,29 @@ function RegisterPage() {
             {/* Ícono de flecha hacia la izquierda */}
           </Link>
         </div>
-        {/* Sección de Requisitos con documentos descargables */}
-        {showRequisitos && (
-  <div className="relative mb-4 bg-yellow-200 p-4 rounded-md shadow-lg">
-    <h2 className="font-bold text-lg">Importante:</h2>
-    <p className="text-sm text-gray-700 mt-2">
-      Antes de proceder con el registro, es fundamental que leas y comprendas los requisitos necesarios para completar el proceso de manera efectiva. Por favor, asegúrate de tener los siguientes documentos listos:
-    </p>
-    <div className="flex space-x-2 justify-center mt-2">
-      <button
-        onClick={() => downloadFile("/documentos/requisitos-local.pdf")}
-        className="bg-blue-500 text-white py-2 px-4 rounded hover:bg-blue-700"
-      >
-        Descargar para habilitación de local
-      </button>
-      <button
-        onClick={() => downloadFile("/documentos/requisitos-eventos.pdf")}
-        className="bg-blue-500 text-white py-2 px-4 rounded hover:bg-blue-700"
-      >
-        Descargar para habilitación de eventos
-      </button>
-    </div>
-  </div>
-)}
-
+      {/* Sección de Requisitos con documentos descargables */}
+      {showRequisitos && (
+        <div className="relative mb-4 bg-yellow-200 p-4 rounded-md shadow-lg">
+          <h2 className="font-bold text-lg">Importante:</h2>
+          <p className="text-sm text-gray-700 mt-2">
+            Antes de proceder con el registro, es fundamental que leas y comprendas los requisitos necesarios para completar el proceso de manera efectiva. Por favor, asegúrate de tener los siguientes documentos listos:
+          </p>
+          <div className="flex space-x-2 justify-center mt-2">
+            <button
+              onClick={() => downloadFile(`${process.env.REACT_APP_API_BASE_URL}/documentos/requisitos-local.pdf`)} // Ruta que apunta a tu API
+              className="bg-blue-500 text-white py-2 px-4 rounded hover:bg-blue-700"
+            >
+              Descargar para habilitación de local
+            </button>
+            <button
+              onClick={() => downloadFile(`${process.env.REACT_APP_API_BASE_URL}/documentos/requisitos-eventos.pdf`)} // Ruta que apunta a tu API
+              className="bg-blue-500 text-white py-2 px-4 rounded hover:bg-blue-700"
+            >
+              Descargar para habilitación de eventos
+            </button>
+          </div>
+        </div>
+      )}
         <form onSubmit={handleSubmit(onSubmit)} className="mt-4">
           {/* Selección de Tipo de Evento */}
           <label
