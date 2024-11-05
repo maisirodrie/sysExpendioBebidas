@@ -138,6 +138,15 @@ function RegisterPage() {
     setValue("persona", e.target.value);
   };
 
+  const downloadFile = (url) => {
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = url.split("/").pop(); // Extraer el nombre del archivo de la URL
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+  };
+
   return (
     <div
       className="flex items-center justify-center overflow-y-auto"
@@ -173,16 +182,20 @@ function RegisterPage() {
               documentos listos:
             </p>
             <div className="flex space-x-2 justify-center mt-2">
-              <a href="/documentos/requisitos-local.pdf" download>
-                <button className="bg-blue-500 text-white py-2 px-4 rounded hover:bg-blue-700">
-                  Descargar para habilitación de local
-                </button>
-              </a>
-              <a href="/documentos/requisitos-eventos.pdf" download>
-                <button className="bg-blue-500 text-white py-2 px-4 rounded hover:bg-blue-700">
-                  Descargar para habilitación de eventos
-                </button>
-              </a>
+              <button
+                onClick={() => downloadFile("/documentos/requisitos-local.pdf")}
+                className="bg-blue-500 text-white py-2 px-4 rounded hover:bg-blue-700"
+              >
+                Descargar para habilitación de local
+              </button>
+              <button
+                onClick={() =>
+                  downloadFile("/documentos/requisitos-eventos.pdf")
+                }
+                className="bg-blue-500 text-white py-2 px-4 rounded hover:bg-blue-700"
+              >
+                Descargar para habilitación de eventos
+              </button>
             </div>
           </div>
         )}
@@ -246,9 +259,10 @@ function RegisterPage() {
                 type="text"
                 {...register("persona", { required: true })}
                 className="w-full bg-gray-100 text-black px-4 py-2 rounded-md my-2"
-                value="Física"
+                 defaultValue="Física"
+                 disabled
               />
-              
+
               <label
                 htmlFor="dni"
                 className="block text-sm font-medium text-black"
