@@ -24,13 +24,8 @@ app.use(cors({
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
-// Define la ruta a tus documentos
-const documentsPath = path.join(__dirname, '../documentos'); // Ajusta según la estructura de directorios
- // Ajusta según la estructura de directorios
-// Asegúrate de que esta ruta sea correcta
+app.use('/documentos', express.static(path.join(__dirname, '../../documentos')));
 
-// Sirve archivos estáticos desde la carpeta de documentos
-app.use('/documentos', express.static(documentsPath));
 
 // Middleware
 app.use(morgan('dev'));
