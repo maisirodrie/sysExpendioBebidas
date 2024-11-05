@@ -42,7 +42,7 @@ function TaskViewPage() {
   const renderTaskDetails = () => {
     if (!task) return null;
 
-    const { expendio, persona, dni, apellido, nombre, localidad, domicilio, lugar, dias, rubro, tipoevento, email, contacto, nroHabilitacion, domicilioLocalComercial, horarioAtencion } = task;
+    const { expendio, persona, dni, apellido, nombre, localidad, domicilio,horarios, lugar, dias, rubro, tipoevento, email, contacto, nroHabilitacion, domicilioLocalComercial, horarioAtencion } = task;
 
     const isEventoParticular = expendio === "Evento Particular";
     const isLocalComercial = expendio === "Local Comercial";

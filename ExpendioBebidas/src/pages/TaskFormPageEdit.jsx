@@ -57,6 +57,8 @@ function TaskFormPageEdit() {
     loadTask();
   }, [params.id, setValue, getTask]);
 
+
+
   const onSubmit = handleSubmit(async (data) => {
     try {
       Swal.fire({
@@ -67,20 +69,28 @@ function TaskFormPageEdit() {
           Swal.showLoading();
         },
       });
-
+  
       const formData = new FormData();
-      Object.keys(data).forEach((key) => {
-        if (key !== "file") {
-          formData.append(key, data[key]);
+        Object.keys(data).forEach((key) => {
+            if (key !== "file") {
+                formData.append(key, data[key]);
+            }
+        });
+
+        // Agregar archivos existentes primero (si hay)
+        if (selectedFiles && selectedFiles.length > 0) {
+            selectedFiles.forEach((file) => {
+                formData.append("files", file); // Asegúrate de usar el nombre correcto del campo
+            });
         }
-      });
 
-      // Añadir archivos seleccionados y cargados previamente al formData
-      selectedFiles.forEach((file) =>
-        formData.append("existingFiles", file.filename)
-      ); // Enviar solo el nombre de archivo
-      files.forEach((file) => formData.append("files", file)); // Enviar archivo completo para los nuevos
-
+        // Luego agregar los nuevos archivos
+        if (files && files.length > 0) {
+            files.forEach((file) => {
+                formData.append("files", file);
+            });
+        }
+  
       if (params.id) {
         await updateTask(params.id, formData);
         Swal.close();
@@ -92,7 +102,7 @@ function TaskFormPageEdit() {
           showConfirmButton: false,
         });
       }
-
+  
       navigate("/task");
     } catch (error) {
       console.error("Error:", error);
@@ -107,18 +117,14 @@ function TaskFormPageEdit() {
     }
   });
 
+
   const handleFileChange = (e) => {
     const selectedFiles = Array.from(e.target.files); // Convertir el FileList a un array
     setFiles((prevFiles) => [...prevFiles, ...selectedFiles]); // Acumular archivos
   };
 
-  // Función para eliminar un archivo existente
-  const removeExistingFile = (index) => {
-    setSelectedFiles((prevFiles) => prevFiles.filter((_, i) => i !== index));
-  };
-
-  // Función para eliminar un archivo recién seleccionado
-  const removeNewFile = (index) => {
+  // Función para eliminar un archivo específico del acumulador
+  const removeFile = (index) => {
     setFiles((prevFiles) => prevFiles.filter((_, i) => i !== index));
   };
 
@@ -218,7 +224,7 @@ function TaskFormPageEdit() {
                 className="w-full bg-gray-100 text-black px-4 py-2 rounded-md my-2"
                 value="Física"
               />
-
+              
               <label
                 htmlFor="dni"
                 className="block text-sm font-medium text-black"
@@ -513,8 +519,9 @@ function TaskFormPageEdit() {
               />
             </>
           )}
-          {/* Visualización de los archivos actuales */}
-{pdfUrl.length > 0 && (
+              
+              {/* Visualización de los archivos actuales */}
+              {pdfUrl.length > 0 && (
   <div className="my-4">
     <label className="block text-sm font-medium text-black mb-2">
       Archivos actuales:
@@ -550,7 +557,6 @@ function TaskFormPageEdit() {
 <div className="mt-4">
   <h3 className="text-lg font-semibold">Archivos seleccionados:</h3>
   <ul className="list-disc list-inside">
-    {/* Archivos recién seleccionados, excluyendo archivos actuales */}
     {files.length > 0 && files.map((file, index) => (
       <li key={`new-${index}`} className="flex justify-between">
         {file.name}
@@ -565,6 +571,7 @@ function TaskFormPageEdit() {
     ))}
   </ul>
 </div>
+          
 
 
           <button

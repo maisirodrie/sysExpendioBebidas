@@ -223,8 +223,9 @@ export const updateTasks = async (req, res) => {
     const task = await Task.findById(id);
     if (!task) return res.status(404).json({ message: "Tarea no encontrada" });
 
-    // Eliminar archivos existentes
-    if (task.file.length > 0) {
+    // Solo eliminar archivos si se han subido nuevos archivos
+    if (files.length > 0) {
+      // Eliminar archivos existentes
       for (const fileInfo of task.file) {
         if (fileInfo.id) {
           try {
@@ -234,6 +235,9 @@ export const updateTasks = async (req, res) => {
           }
         }
       }
+    } else {
+      // Si no se están subiendo nuevos archivos, mantenemos los archivos existentes
+      files.push(...task.file); // Conservar archivos existentes
     }
 
     // Actualizar la tarea con los nuevos datos y archivos
@@ -258,7 +262,7 @@ export const updateTasks = async (req, res) => {
         rubro,
         horarioAtencion,
         habilitacionComercial,
-        file: files, // Guardar los nuevos archivos
+        file: files, // Guardar los nuevos archivos o los existentes
       },
       { new: true }
     );
