@@ -7,25 +7,20 @@ import tasksRoutes from './routes/tasks.routes.js';
 import path from 'path';
 import { fileURLToPath } from 'url';
 
-
-
 const app = express();
 
-// app.use(cors({
-//     origin: 'http://localhost:5173',
-//     credentials: true,
-// }));
-
+// Middleware de CORS
 app.use(cors({
-    origin: 'https://www.expendiobebidas.misiones.gov.ar',
+    origin: ['http://localhost:5173', 'https://www.expendiobebidas.misiones.gov.ar'],
     credentials: true,
-})); 
+}));
 
+// Obtener el directorio actual
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
-app.use('/documentos', express.static(path.join(__dirname, '../../documentos')));
-
+// Servir archivos estáticos
+app.use('/documentos', express.static(path.join(__dirname, 'documentos')));
 
 // Middleware
 app.use(morgan('dev'));
