@@ -187,22 +187,18 @@ function RegisterPage() {
       Antes de proceder con el registro, es fundamental que leas y comprendas los requisitos necesarios para completar el proceso de manera efectiva. Por favor, asegúrate de tener los siguientes documentos listos:
     </p>
     <div className="flex space-x-2 justify-center mt-2">
-      <a
-        href="/documentos/requisitos-local.pdf" // Ruta relativa
-        target="_blank"
-        rel="noopener noreferrer"
+      <button
+        onClick={() => downloadFile("/documentos/requisitos-local.pdf")}
         className="bg-blue-500 text-white py-2 px-4 rounded hover:bg-blue-700"
       >
         Descargar para habilitación de local
-      </a>
-      <a
-        href="/documentos/requisitos-eventos.pdf" // Ruta relativa
-        target="_blank"
-        rel="noopener noreferrer"
+      </button>
+      <button
+        onClick={() => downloadFile("/documentos/requisitos-eventos.pdf")}
         className="bg-blue-500 text-white py-2 px-4 rounded hover:bg-blue-700"
       >
         Descargar para habilitación de eventos
-      </a>
+      </button>
     </div>
   </div>
 )}

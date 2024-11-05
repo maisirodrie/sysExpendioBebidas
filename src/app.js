@@ -4,6 +4,9 @@ import cookieParser from 'cookie-parser';
 import cors from 'cors';
 import authRoutes from './routes/auth.routes.js';
 import tasksRoutes from './routes/tasks.routes.js';
+import path from 'path';
+import { fileURLToPath } from 'url';
+
 
 
 const app = express();
@@ -17,6 +20,9 @@ app.use(cors({
     origin: 'https://www.expendiobebidas.misiones.gov.ar',
     credentials: true,
 })); 
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
 // Define la ruta a tus documentos en producción
 const documentsPath = path.join(__dirname, 'documentos'); // Asegúrate de que esta ruta sea correcta
