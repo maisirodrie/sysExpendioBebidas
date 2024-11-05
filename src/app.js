@@ -18,6 +18,10 @@ app.use(cors({
     credentials: true,
 })); 
 
+// Define la ruta a tus documentos en producción
+const documentsPath = path.join(__dirname, 'documentos'); // Asegúrate de que esta ruta sea correcta
+// Sirve archivos estáticos desde la carpeta de documentos
+app.use('/documentos', express.static(documentsPath));
 
 app.use(morgan('dev'));
 app.use(express.json());

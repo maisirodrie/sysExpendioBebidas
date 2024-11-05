@@ -129,8 +129,16 @@ function RegisterPage() {
   };
 
   const handleTipoExpendioChange = (e) => {
-    setTipoExpendio(e.target.value);
-    setValue("tipoexpendio", e.target.value);
+    const selectedExpendio = e.target.value;
+    setTipoExpendio(selectedExpendio);
+    setValue("expendio", selectedExpendio); // Actualiza el valor en el formulario
+
+    // Si se selecciona "Evento Particular", establecer persona como "Física"
+    if (selectedExpendio === "Evento Particular") {
+      setValue("persona", "Física"); // Asegura que el valor en el formulario sea "Física"
+    } else {
+      setValue("persona", ""); // Limpia el campo de persona si es "Local Comercial"
+    }
   };
 
   const handleTipoPersonaChange = (e) => {
@@ -173,32 +181,32 @@ function RegisterPage() {
         </div>
         {/* Sección de Requisitos con documentos descargables */}
         {showRequisitos && (
-          <div className="relative mb-4 bg-yellow-200 p-4 rounded-md shadow-lg">
-            <h2 className="font-bold text-lg">Importante:</h2>
-            <p className="text-sm text-gray-700 mt-2">
-              Antes de proceder con el registro, es fundamental que leas y
-              comprendas los requisitos necesarios para completar el proceso de
-              manera efectiva. Por favor, asegúrate de tener los siguientes
-              documentos listos:
-            </p>
-            <div className="flex space-x-2 justify-center mt-2">
-              <button
-                onClick={() => downloadFile("/documentos/requisitos-local.pdf")}
-                className="bg-blue-500 text-white py-2 px-4 rounded hover:bg-blue-700"
-              >
-                Descargar para habilitación de local
-              </button>
-              <button
-                onClick={() =>
-                  downloadFile("/documentos/requisitos-eventos.pdf")
-                }
-                className="bg-blue-500 text-white py-2 px-4 rounded hover:bg-blue-700"
-              >
-                Descargar para habilitación de eventos
-              </button>
-            </div>
-          </div>
-        )}
+  <div className="relative mb-4 bg-yellow-200 p-4 rounded-md shadow-lg">
+    <h2 className="font-bold text-lg">Importante:</h2>
+    <p className="text-sm text-gray-700 mt-2">
+      Antes de proceder con el registro, es fundamental que leas y comprendas los requisitos necesarios para completar el proceso de manera efectiva. Por favor, asegúrate de tener los siguientes documentos listos:
+    </p>
+    <div className="flex space-x-2 justify-center mt-2">
+      <a
+        href="/documentos/requisitos-local.pdf" // Ruta relativa
+        target="_blank"
+        rel="noopener noreferrer"
+        className="bg-blue-500 text-white py-2 px-4 rounded hover:bg-blue-700"
+      >
+        Descargar para habilitación de local
+      </a>
+      <a
+        href="/documentos/requisitos-eventos.pdf" // Ruta relativa
+        target="_blank"
+        rel="noopener noreferrer"
+        className="bg-blue-500 text-white py-2 px-4 rounded hover:bg-blue-700"
+      >
+        Descargar para habilitación de eventos
+      </a>
+    </div>
+  </div>
+)}
+
         <form onSubmit={handleSubmit(onSubmit)} className="mt-4">
           {/* Selección de Tipo de Evento */}
           <label
@@ -259,8 +267,8 @@ function RegisterPage() {
                 type="text"
                 {...register("persona", { required: true })}
                 className="w-full bg-gray-100 text-black px-4 py-2 rounded-md my-2"
-                 defaultValue="Física"
-                 disabled
+                 Value="Física"
+                 readOnly
               />
 
               <label
