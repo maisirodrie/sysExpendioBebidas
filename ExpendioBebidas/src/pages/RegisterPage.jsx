@@ -3,6 +3,8 @@ import { useForm } from "react-hook-form";
 import { useTasks } from "../context/TasksContext";
 import { Link, useNavigate, useParams } from "react-router-dom";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import axios from 'axios';
+
 import { faArrowLeft, faTimes } from "@fortawesome/free-solid-svg-icons";
 import Swal from "sweetalert2";
 import "./taskformpage.css";
@@ -146,14 +148,20 @@ function RegisterPage() {
     setValue("persona", e.target.value);
   };
 
-  const downloadFile = (url) => {
-    const a = document.createElement("a");
-    a.href = url;
-    a.download = url.split("/").pop(); // Extraer el nombre del archivo de la URL
-    document.body.appendChild(a);
-    a.click();
-    document.body.removeChild(a);
-  };
+  const downloadFile = async (url) => {
+    try {
+        const response = await axios.get(url, { responseType: 'blob' });
+        const urlBlob = window.URL.createObjectURL(new Blob([response.data]));
+        const link = document.createElement('a');
+        link.href = urlBlob;
+        link.setAttribute('download', url.split('/').pop()); // Nombre del archivo
+        document.body.appendChild(link);
+        link.click();
+        link.remove();
+    } catch (error) {
+        console.error('Error al descargar el archivo:', error);
+    }
+};
   
 
   return (
@@ -182,27 +190,28 @@ function RegisterPage() {
         </div>
       {/* Sección de Requisitos con documentos descargables */}
       {showRequisitos && (
-        <div className="relative mb-4 bg-yellow-200 p-4 rounded-md shadow-lg">
-          <h2 className="font-bold text-lg">Importante:</h2>
-          <p className="text-sm text-gray-700 mt-2">
+    <div className="relative mb-4 bg-yellow-200 p-4 rounded-md shadow-lg">
+        <h2 className="font-bold text-lg">Importante:</h2>
+        <p className="text-sm text-gray-700 mt-2">
             Antes de proceder con el registro, es fundamental que leas y comprendas los requisitos necesarios para completar el proceso de manera efectiva. Por favor, asegúrate de tener los siguientes documentos listos:
-          </p>
-          <div className="flex space-x-2 justify-center mt-2">
-            <button
-              onClick={() => downloadFile(`${process.env.REACT_APP_API_BASE_URL}/documentos/requisitos-local.pdf`)} // Ruta que apunta a tu API
-              className="bg-blue-500 text-white py-2 px-4 rounded hover:bg-blue-700"
-            >
-              Descargar para habilitación de local
-            </button>
-            <button
-              onClick={() => downloadFile(`${process.env.REACT_APP_API_BASE_URL}/documentos/requisitos-eventos.pdf`)} // Ruta que apunta a tu API
-              className="bg-blue-500 text-white py-2 px-4 rounded hover:bg-blue-700"
-            >
-              Descargar para habilitación de eventos
-            </button>
-          </div>
+        </p>
+        <div className="flex space-x-2 justify-center mt-2">
+        <button
+    onClick={() => downloadFile('/documentos/requisitos-local.pdf')} // Ruta relativa
+    className="bg-blue-500 text-white py-2 px-4 rounded hover:bg-blue-700"
+>
+    Descargar para habilitación de local
+</button>
+<button
+    onClick={() => downloadFile('/documentos/requisitos-eventos.pdf')} // Ruta relativa
+    className="bg-blue-500 text-white py-2 px-4 rounded hover:bg-blue-700"
+>
+    Descargar para habilitación de eventos
+</button>
         </div>
-      )}
+    </div>
+)}
+
         <form onSubmit={handleSubmit(onSubmit)} className="mt-4">
           {/* Selección de Tipo de Evento */}
           <label

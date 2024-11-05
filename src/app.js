@@ -24,21 +24,21 @@ app.use(cors({
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
-// Define la ruta a tus documentos en producción
-const documentsPath = path.join(__dirname, 'documentos'); // Asegúrate de que esta ruta sea correcta
+// Define la ruta a tus documentos
+const documentsPath = path.join(__dirname, '../documentos'); // Ajusta según la estructura de directorios
+ // Ajusta según la estructura de directorios
+// Asegúrate de que esta ruta sea correcta
+
 // Sirve archivos estáticos desde la carpeta de documentos
-// Sirve archivos estáticos desde la carpeta 'documentos'
-app.use('/api/documentos', express.static(path.join(__dirname, '../documentos')));
+app.use('/documentos', express.static(documentsPath));
 
-
+// Middleware
 app.use(morgan('dev'));
 app.use(express.json());
 app.use(cookieParser());
 
-
+// Rutas de la API
 app.use('/api', authRoutes);
 app.use('/api', tasksRoutes);
-
-
 
 export default app;
