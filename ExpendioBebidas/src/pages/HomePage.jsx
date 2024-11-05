@@ -21,7 +21,7 @@ function HomePage() {
       >
         <div className="bg-dark-overlay absolute inset-0"></div> {/* Superposición de color oscuro */}
         <div className="container mx-auto relative z-10 text-center"> {/* Contenido del encabezado */}
-        <h1 className="text-5xl font-bold mb-4">Solicitud Provincial de expendio de bebidas</h1>
+        <h1 className="text-5xl font-bold mb-4">Solicitud Provincial de Expendio de Bebidas</h1>
           {/* <p className="text-md mb-8">
             “La Danza abarca todas las formas de expresión artística corporal
             en sus diversos géneros, estilos y formatos interpretativos”

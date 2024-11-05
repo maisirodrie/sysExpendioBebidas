@@ -19,8 +19,9 @@ function TaskViewPage() {
       try {
         const fetchedTask = await getTask(params.id);
         setTask(fetchedTask);
-
-        if (fetchedTask.file && fetchedTask.file.length > 0) {
+        
+        // Configurar la URL del primer archivo PDF si existe
+        if (fetchedTask.file?.length > 0) {
           setPdfUrl(`${apiUrl}/tasks/file/${fetchedTask.file[0].filename}`);
         }
       } catch (error) {
@@ -31,41 +32,74 @@ function TaskViewPage() {
   }, [getTask, params.id]);
 
   const formatDate = (dateString) => {
-    try {
-      const date = new Date(dateString);
-      if (isNaN(date)) {
-        return "Fecha no válida";
-      }
-      // Obtener la fecha local
-      const localDate = new Date(
-        date.getTime() + date.getTimezoneOffset() * 60000
-      );
-      // Formatear la fecha local
-      return format(localDate, "dd/MM/yyyy", { locale: esLocale });
-    } catch (error) {
-      console.error("Error formatting date:", error);
+    const date = new Date(dateString);
+    if (isNaN(date)) {
       return "Fecha no válida";
     }
+    return format(date, "dd/MM/yyyy", { locale: esLocale });
   };
 
-  const tipoExpendio = task?.expendio;
-  const tipoPersona = task?.persona;
+  const renderTaskDetails = () => {
+    if (!task) return null;
+
+    const { expendio, persona, dni, apellido, nombre, localidad, domicilio, lugar, dias, rubro, tipoevento, email, contacto, nroHabilitacion, domicilioLocalComercial, horarioAtencion } = task;
+
+    const isEventoParticular = expendio === "Evento Particular";
+    const isLocalComercial = expendio === "Local Comercial";
+    const isPersonaFisica = persona === "física";
+    const isPersonaJuridica = persona === "jurídica";
+
+    return (
+      <>
+        <p className="my-4"><strong>Datos del Registro</strong></p>
+        
+        {isEventoParticular && (
+          <>
+            <p className="my-4">Tipo de Persona: {persona}</p>
+            <p className="my-4">Tipo de Expendio: {expendio}</p>
+            <p className="my-4">DNI: {dni}</p>
+            <p className="my-4">Apellido: {apellido}</p>
+            <p className="my-4">Nombre: {nombre}</p>
+            <p className="my-4">Localidad: {localidad}</p>
+            <p className="my-4">Domicilio Particular: {domicilio}</p>
+            <p className="my-4">Lugar de Realización del evento: {lugar}</p>
+            <p className="my-4">Días del evento: {dias}</p>
+            <p className="my-4">Horarios del evento: {horarios}</p>
+            <p className="my-4">Tipo de Evento: {tipoevento}</p>
+            <p className="my-4">Email particular: {email}</p>
+            <p className="my-4">Nro de WhatsApp: {contacto}</p>
+            {isPersonaJuridica && (
+              <p className="my-4">Número de Habilitación Municipal: {nroHabilitacion}</p>
+            )}
+          </>
+        )}
+
+        {isLocalComercial && (
+          <>
+            <p className="my-4">Tipo de Persona: {persona}</p>
+            <p className="my-4">Tipo de Expendio: {expendio}</p>
+            <p className="my-4">DNI del Propietario: {dni}</p>
+            <p className="my-4">Apellido: {apellido}</p>
+            <p className="my-4">Nombre: {nombre}</p>
+            <p className="my-4">Localidad: {localidad}</p>
+            <p className="my-4">Domicilio Particular: {domicilio}</p>
+            <p className="my-4">Nro de Habilitación Municipal: {nroHabilitacion}</p>
+            <p className="my-4">Domicilio del Local Comercial: {domicilioLocalComercial}</p>
+            <p className="my-4">Horario de atención: {horarioAtencion}</p>
+            <p className="my-4">Rubro: {rubro}</p>
+            <p className="my-4">Email particular: {email}</p>
+            <p className="my-4">Nro de WhatsApp: {contacto}</p>
+          </>
+        )}
+      </>
+    );
+  };
 
   return (
-    <div
-      className="flex items-center justify-center overflow-y-auto"
-      style={{
-        marginTop: "20px",
-        marginBottom: "20px",
-        paddingRight: "20px",
-        paddingLeft: "20px",
-      }}
-    >
+    <div className="flex items-center justify-center overflow-y-auto" style={{ marginTop: "20px", marginBottom: "20px", paddingRight: "20px", paddingLeft: "20px" }}>
       <div className="bg-gray-300 max-w-screen-md w-full p-10 rounded-md">
         <div className="flex justify-between items-center mb-4">
-          <h1 className="text-2xl font-bold text-black">
-            Detalles del Registro
-          </h1>
+          <h1 className="text-2xl font-bold text-black">Detalles del Registro</h1>
           <Link to="/task" className="btn btn-success">
             <FontAwesomeIcon icon={faArrowLeft} />
           </Link>
@@ -73,137 +107,7 @@ function TaskViewPage() {
         <div className="text-black">
           {task ? (
             <>
-              <p className="my-4">
-                <strong>Datos del Registro</strong>
-              </p>
-
-              {tipoExpendio && tipoPersona && (
-                <>
-                  {/* Evento Particular */}
-                  {tipoExpendio === "Evento Particular" &&
-                    tipoPersona === "física" && (
-                      <>
-                        <p className="my-4">Tipo de Persona: {task.persona}</p>
-                        <p className="my-4">
-                          Tipo de Expendio: {task.expendio}
-                        </p>
-                        <p className="my-4">DNI: {task.dni}</p>
-                        <p className="my-4">Apellido: {task.apellido}</p>
-                        <p className="my-4">Nombre: {task.nombre}</p>
-                        <p className="my-4">Localidad: {task.localidad}</p>
-                        <p className="my-4">
-                          Domicilio Particular: {task.domicilio}
-                        </p>
-                        <p className="my-4">
-                          Lugar de Realización del evento: {task.lugar}
-                        </p>
-                        <p className="my-4">Días del evento: {task.dias}</p>
-                        <p className="my-4">
-                          Horarios del evento: {task.horarios}
-                        </p>
-                        <p className="my-4">
-                          Tipo de Evento: {task.tipoevento}
-                        </p>
-                        <p className="my-4">Email particular: {task.email}</p>
-                        <p className="my-4">Nro de WhatsApp: {task.contacto}</p>
-                      </>
-                    )}
-
-                  {tipoExpendio === "Evento Particular" &&
-                    tipoPersona === "jurídica" && (
-                      <>
-                        <p className="my-4">Tipo de Persona: {task.persona}</p>
-                        <p className="my-4">
-                          Tipo de Expendio: {task.expendio}
-                        </p>
-                        <p className="my-4">
-                          Número de Habilitación Municipal:{" "}
-                          {task.nroHabilitacion}
-                        </p>
-                        <p className="my-4">DNI del Propietario: {task.dni}</p>
-                        <p className="my-4">Apellido: {task.apellido}</p>
-                        <p className="my-4">Nombre: {task.nombre}</p>
-                        <p className="my-4">Localidad: {task.localidad}</p>
-                        <p className="my-4">
-                          Domicilio Particular: {task.domicilio}
-                        </p>
-                        <p className="my-4">
-                          Lugar de Realización del evento: {task.lugar}
-                        </p>
-                        <p className="my-4">Días del evento: {task.dias}</p>
-                        <p className="my-4">
-                          Horarios del evento: {task.horarios}
-                        </p>
-                        <p className="my-4">
-                          Tipo de Evento: {task.tipoevento}
-                        </p>
-                        <p className="my-4">Email particular: {task.email}</p>
-                        <p className="my-4">Nro de WhatsApp: {task.contacto}</p>
-                      </>
-                    )}
-
-                  {/* Local Comercial */}
-                  {tipoExpendio === "Local Comercial" &&
-                    tipoPersona === "física" && (
-                      <>
-                        <p className="my-4">Tipo de Persona: {task.persona}</p>
-                        <p className="my-4">
-                          Tipo de Expendio: {task.expendio}
-                        </p>
-                        <p className="my-4">DNI del Propietario: {task.dni}</p>
-                        <p className="my-4">Apellido: {task.apellido}</p>
-                        <p className="my-4">Nombre: {task.nombre}</p>
-                        <p className="my-4">Localidad: {task.localidad}</p>
-                        <p className="my-4">
-                          Domicilio Particular: {task.domicilio}
-                        </p>
-                        <p className="my-4">
-                          Nro de Habilitación Municipal: {task.nroHabilitacion}
-                        </p>
-                        <p className="my-4">
-                          Domicilio del Local Comercial:{" "}
-                          {task.domicilioLocalComercial}
-                        </p>
-                        <p className="my-4">
-                          Horario de atención: {task.horarioAtencion}
-                        </p>
-                        <p className="my-4">Rubro: {task.horarios}</p>
-                        <p className="my-4">Email particular: {task.email}</p>
-                        <p className="my-4">Nro de WhatsApp: {task.contacto}</p>
-                      </>
-                    )}
-
-                  {tipoExpendio === "Local Comercial" &&
-                    tipoPersona === "jurídica" && (
-                      <>
-                        <p className="my-4">Tipo de Persona: {task.persona}</p>
-                        <p className="my-4">
-                          Tipo de Expendio: {task.expendio}
-                        </p>
-                        <p className="my-4">DNI del Propietario: {task.dni}</p>
-                        <p className="my-4">Apellido: {task.apellido}</p>
-                        <p className="my-4">Nombre: {task.nombre}</p>
-                        <p className="my-4">Localidad: {task.localidad}</p>
-                        <p className="my-4">
-                          Domicilio Particular: {task.domicilio}
-                        </p>
-                        <p className="my-4">
-                          Nro de Habilitación Municipal: {task.nroHabilitacion}
-                        </p>
-                        <p className="my-4">
-                          Domicilio del Local Comercial:{" "}
-                          {task.domicilioLocalComercial}
-                        </p>
-                        <p className="my-4">
-                          Horario de atención: {task.horarioAtencion}
-                        </p>
-                        <p className="my-4">Rubro: {task.horarios}</p>
-                        <p className="my-4">Email particular: {task.email}</p>
-                        <p className="my-4">Nro de WhatsApp: {task.contacto}</p>
-                      </>
-                    )}
-                </>
-              )}
+              {renderTaskDetails()}
 
               {/* Mostrar todos los archivos asociados a la tarea */}
               {task.file && task.file.length > 0 && (
@@ -218,7 +122,7 @@ function TaskViewPage() {
                         rel="noopener noreferrer"
                         className="bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded transition duration-200"
                       >
-                        Descargar {fileInfo.filename}
+                         {fileInfo.filename}
                       </a>
                     ))}
                   </div>
