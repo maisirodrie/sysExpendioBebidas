@@ -117,8 +117,8 @@ if (user.role === "mesa") {
   }
   
   // Mesa siempre puede cambiar a "pendiente" desde cualquier estado
-  if (task.estado === "controlado" || task.estado === "pendiente") {
-    options.push("pendiente", "controlado");
+  if (task.estado === "controlado" || task.estado === "pendiente" || task.estado === "ingresado") {
+    options.push("pendiente", "controlado","ingresado");
   }
 }
 
