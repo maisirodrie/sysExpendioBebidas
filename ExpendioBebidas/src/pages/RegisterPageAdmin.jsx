@@ -186,6 +186,12 @@ function RegisterPageAdmin() {
               <option value="admin">Administrador</option>
               <option value="boss">Jefe</option>
               <option value="viewer">Observador</option>
+              <option value="mesa">Mesa de entrada</option>
+              
+              <option value="jurídicos">Jurídicos</option>
+              
+              
+              
             </select>
             {errors.role && <p className="text-red-500">El rol es requerido</p>}
           </div>

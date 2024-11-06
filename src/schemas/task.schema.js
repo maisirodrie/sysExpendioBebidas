@@ -35,5 +35,6 @@ export const creatTaskSchema = z.object({
   rubro: z.string().optional(), // Opcional si aplica
   horarioAtencion: z.string().optional(), // Opcional si aplica
   habilitacionComercial: z.string().optional(), // Opcional si aplica
+  estado: z.string().optional().default("Ingresado"),
   file: z.any().optional(), // Correcta utilización de optional
 });

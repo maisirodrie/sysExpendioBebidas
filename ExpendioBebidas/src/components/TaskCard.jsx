@@ -11,13 +11,14 @@ import {
   faSearch,
   faUserPlus,
   faRotate,
+  faCircle,
 } from "@fortawesome/free-solid-svg-icons";
 import "./Table.css";
 import Paginator from "./Paginator";
 import Swal from "sweetalert2";
 
 function Table() {
-  const { tasks, deleteTask, getTasks } = useTasks();
+  const { tasks, deleteTask, getTasks, updateTaskStatus } = useTasks();
   const { user } = useAuth(); // Suponiendo que 'user' contiene el rol del usuario
   const [search, setSearch] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
@@ -31,7 +32,7 @@ function Table() {
       showDenyButton: true,
     }).then(async (result) => {
       if (result.isConfirmed) {
-        await deleteTask(id); // Asegúrate de que `deleteTask` es la función correcta
+        await deleteTask(id);
         Swal.fire({
           title: "Éxito",
           text: "Archivo eliminado correctamente",
@@ -46,20 +47,18 @@ function Table() {
     setSearch(e.target.value);
   };
 
-  // Invertir el orden de las tareas al inicio
-  const reversedTasks = [...tasks].reverse(); // Crea una copia de tasks y la invierte
+  const reversedTasks = [...tasks].reverse();
 
   const filteredTasks = !search
-    ? reversedTasks // Usa las tareas invertidas directamente si no hay búsqueda
+    ? reversedTasks
     : reversedTasks.filter((task) => {
         const apellido = task.apellido ? task.apellido.toLowerCase() : "";
-        const nombre = task.nombre
-          ? task.nombre.toLowerCase()
-          : "";
+        const nombre = task.nombre ? task.nombre.toLowerCase() : "";
         const dni = task.dni ? task.dni.toLowerCase() : "";
         const localidad = task.localidad ? task.localidad.toLowerCase() : "";
         const persona = task.persona ? task.persona.toLowerCase() : "";
         const expendio = task.expendio ? task.expendio.toLowerCase() : "";
+        const estado = task.estado ? task.estado.toLowerCase() : "";
         const searchLowerCase = search.toLowerCase();
 
         return (
@@ -68,16 +67,13 @@ function Table() {
           dni.includes(searchLowerCase) ||
           localidad.includes(searchLowerCase) ||
           persona.includes(searchLowerCase) ||
-          expendio.includes(searchLowerCase)
-          
+          expendio.includes(searchLowerCase) ||
+          estado.includes(searchLowerCase)
         );
       });
 
-  // Calcular los índices para la paginación
   const indexOfLastTask = currentPage * tasksPerPage;
   const indexOfFirstTask = indexOfLastTask - tasksPerPage;
-
-  // Slicing para obtener las tareas actuales
   const currentTasks = filteredTasks.slice(indexOfFirstTask, indexOfLastTask);
 
   const onPageChange = (pageNumber) => {
@@ -101,11 +97,121 @@ function Table() {
   const canDelete = ["admin", "editor"].includes(user.role);
   const canAddUser = !["user", "viewer", "editor"].includes(user.role);
   const canAddTask = !["user", "viewer"].includes(user.role);
+  const canViewStatus = ["admin", "viewer", "juridicos", "mesa"].includes(
+    user.role
+  );
+  const canEditStatus = ["mesa", "juridicos"].includes(user.role);
 
   const handleRefresh = async () => {
-    await getTasks(); // Vuelve a obtener las tareas al hacer clic en "Refrescar Tabla"
+    await getTasks();
   };
 
+  const getStatusOptions = (task) => {
+    const options = [];
+
+    // Opciones para mesa
+if (user.role === "mesa") {
+  // Si está en "aprobado" o "rechazado", mesa puede cambiar a "finalizado"
+  if (task.estado === "aprobado" || task.estado === "rechazado" || task.estado === "finalizado") {
+    options.push("aprobado", "finalizado");
+  }
+  
+  // Mesa siempre puede cambiar a "pendiente" desde cualquier estado
+  if (task.estado === "controlado" || task.estado === "pendiente") {
+    options.push("pendiente", "controlado");
+  }
+}
+
+
+    // Opciones para jurídicos
+    if (user.role === "juridicos") {
+      // Juridicos puede cambiar de "controlado" a "aprobado" o "rechazado"
+      options.push("aprobado", "rechazado", "controlado");
+    }
+    
+
+    return options;
+  };
+
+  const handleStatusChange = async (taskId, newStatus) => {
+    await updateTaskStatus(taskId, newStatus); // Llamada a la API para actualizar el estado
+    Swal.fire({
+      title: "Estado actualizado",
+      text: "El estado de la tarea se ha modificado correctamente",
+      icon: "success",
+      timer: 2000,
+    });
+  };
+
+  // Función que asigna un color a cada estado
+  const getStatusColor = (status) => {
+    switch (status) {
+      case "ingresado":
+        return "black"; // Blanco para Ingresado
+      case "pendiente":
+        return "orange"; // Naranja para Pendiente
+      case "controlado":
+        return "blue"; // Azul para Controlado
+      case "aprobado":
+        return "green"; // Verde para Aprobado
+      case "rechazado":
+        return "red"; // Rojo para Rechazado
+      case "finalizado":
+        return "black"; // Negro para Finalizado
+      default:
+        return "gray"; // Color predeterminado en caso de no encontrar el estado
+    }
+  };
+
+  // Función que asigna un ícono a cada estado
+  const getStatusIcon = (status) => {
+    switch (status) {
+      case "ingresado":
+        return (
+          <FontAwesomeIcon
+            icon={faCircle}
+            style={{ color: "gray", fontSize: "10px" }}
+          />
+        );
+      case "pendiente":
+        return (
+          <FontAwesomeIcon
+            icon={faCircle}
+            style={{ color: "orange", fontSize: "10px" }}
+          />
+        );
+      case "controlado":
+        return (
+          <FontAwesomeIcon
+            icon={faCircle}
+            style={{ color: "blue", fontSize: "10px" }}
+          />
+        );
+      case "aprobado":
+        return (
+          <FontAwesomeIcon
+            icon={faCircle}
+            style={{ color: "green", fontSize: "10px" }}
+          />
+        );
+      case "rechazado":
+        return (
+          <FontAwesomeIcon
+            icon={faCircle}
+            style={{ color: "red", fontSize: "10px" }}
+          />
+        );
+      case "finalizado":
+        return (
+          <FontAwesomeIcon
+            icon={faCircle}
+            style={{ color: "black", fontSize: "10px" }}
+          />
+        );
+      default:
+        return null; // Sin ícono por defecto
+    }
+  };
   return (
     <div className="container-fluid bg-primary vh-100 vw-100 d-flex align-items-center justify-content-center">
       <div className="row">
@@ -131,8 +237,6 @@ function Table() {
 
             <ul className="button-container">
               <li className="d-flex gap-2">
-                {" "}
-                {/* Usamos d-flex y gap-2 para separar los botones */}
                 {canAddTask && (
                   <Link to="/add-task" className="btn btn-success">
                     <FontAwesomeIcon icon={faFileCirclePlus} />
@@ -154,7 +258,7 @@ function Table() {
               <table className="table" style={{ textTransform: "uppercase" }}>
                 <thead>
                   <tr>
-                    <th colSpan="9" className="table-title">
+                    <th colSpan="10" className="table-title">
                       Listado de Archivos
                     </th>
                   </tr>
@@ -165,6 +269,7 @@ function Table() {
                     <th>Localidad</th>
                     <th>Tipo de Persona</th>
                     <th>Tipo de Expendio</th>
+                    <th>Estado</th>
                     <th>Ver</th>
                     {canEdit && <th>Editar</th>}
                     {canDelete && <th>Borrar</th>}
@@ -188,9 +293,50 @@ function Table() {
                       <td data-label="Tipo de Persona">
                         {task.persona ? task.persona.toUpperCase() : ""}
                       </td>
-                      <td data-label="Tipo de Evento">
+                      <td data-label="Tipo de Expendio">
                         {task.expendio ? task.expendio.toUpperCase() : ""}
                       </td>
+                      {canViewStatus && (
+                        // Renderizando la tabla o el componente con los estados
+                        <td data-label="Estado">
+                          {canEditStatus ? (
+                            <select
+                              value={task.estado || "ingresado"}
+                              onChange={(e) =>
+                                handleStatusChange(task._id, e.target.value)
+                              }
+                              style={{
+                                color: getStatusColor(task.estado),
+                              }}
+                            >
+                              {getStatusOptions(task, user).map((state) => (
+                                <option
+                                  key={state}
+                                  value={state}
+                                  style={{
+                                    color: getStatusColor(state),
+                                  }}
+                                >
+                                  {state.charAt(0).toUpperCase() +
+                                    state.slice(1)}{" "}
+                                  {/* Capitaliza el estado */}
+                                </option>
+                              ))}
+                            </select>
+                          ) : (
+                            <>
+                              <span
+                                style={{ color: getStatusColor(task.estado) }}
+                              >
+                                {task.estado.charAt(0).toUpperCase() +
+                                  task.estado.slice(1)}{" "}
+                                {/* Capitaliza el estado */}
+                                {getStatusIcon(task.estado)}
+                              </span>
+                            </>
+                          )}
+                        </td>
+                      )}
                       <td data-label="Ver">
                         <div className="button-container">
                           <Link

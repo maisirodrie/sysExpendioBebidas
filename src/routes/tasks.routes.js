@@ -12,6 +12,7 @@ import {
   downloadFile,
   getUserProfileWithTask,
   getTaskWithUser,
+  taskEstados,
 } from "../controllers/tasks.controller.js";
 import { validateSchema } from "../middlewares/validator.middleware.js";
 import { creatTaskSchema } from "../schemas/task.schema.js";
@@ -30,12 +31,15 @@ import {
   deleteUser,
   adminChangeUserPassword,
   getAllUserActivities,
-  getUserActivities
+  getUserActivities,
+   
 } from "../controllers/auth.controller.js";
 
 const router = Router();
 
 // Registros
+// Ruta para cambiar el estado de la tarea (solo accesible por roles mesa y juridicos)
+router.put('/tasks', authRequired, taskEstados);
 router.get("/tasks", authRequired, getTasks);
 router.get("/tasks/:id", authRequired, getTask);
 // Ruta para tareas públicas

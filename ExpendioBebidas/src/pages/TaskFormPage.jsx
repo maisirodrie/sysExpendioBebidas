@@ -223,7 +223,7 @@ function TaskFormPage() {
                 type="text"
                 {...register("persona", { required: true })}
                 className="w-full bg-gray-100 text-black px-4 py-2 rounded-md my-2"
-                 Value="Física"
+                 value="Física"
                  readOnly
               />
 

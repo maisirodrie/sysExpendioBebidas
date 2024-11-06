@@ -26,11 +26,13 @@ const logActivity = async (userId, action, entity, entityId) => {
 export const getTasks = async (req, res) => {
   try {
     const tasks = await Task.find().populate("user");
+    console.log(tasks); // Verifica si hay tareas antes de responder
     res.json(tasks);
   } catch (error) {
     return res.status(500).json({ message: error.message });
   }
 };
+
 
 
 // Controlador para crear tareas públicas
@@ -53,6 +55,7 @@ export const createTasksPublic = async (req, res) => {
       nroHabilitacion,
       domicilioLocalComercial,
       rubro,
+      estado,
       horarioAtencion,
       habilitacionComercial,
     } = req.body;
@@ -89,6 +92,7 @@ export const createTasksPublic = async (req, res) => {
       nroHabilitacion,
       domicilioLocalComercial,
       rubro,
+      estado,
       horarioAtencion,
       habilitacionComercial,
       file: files,
@@ -125,6 +129,7 @@ export const createTasks = async (req, res) => {
       rubro,
       horarioAtencion,
       habilitacionComercial,
+      estado
     } = req.body;
 
     const existingTask = await Task.findOne({ dni });
@@ -163,6 +168,7 @@ export const createTasks = async (req, res) => {
       horarioAtencion,
       habilitacionComercial,
       file: files,
+      estado,
       user: req.user.id,
     });
 
@@ -207,6 +213,7 @@ export const updateTasks = async (req, res) => {
       nroHabilitacion,
       domicilioLocalComercial,
       rubro,
+      estado,
       horarioAtencion,
       habilitacionComercial,
     } = req.body;
@@ -260,6 +267,7 @@ export const updateTasks = async (req, res) => {
         nroHabilitacion,
         domicilioLocalComercial,
         rubro,
+        estado,
         horarioAtencion,
         habilitacionComercial,
         file: files, // Guardar los nuevos archivos o los existentes
@@ -274,6 +282,81 @@ export const updateTasks = async (req, res) => {
     return res.status(500).json({ message: error.message });
   }
 };
+
+export const taskEstados = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { newState } = req.body;
+    const userRole = req.user.role;
+
+    // Obtener la tarea de la base de datos
+    const task = await Task.findById(id);
+    if (!task) return res.status(404).json({ message: "Tarea no encontrada" });
+
+    // Verificar si el nuevo estado es válido
+    const validStates = ['pendiente', 'controlado', 'aprobado', 'rechazado', 'finalizado', 'ingresado'];
+    if (!validStates.includes(newState.toLowerCase())) {
+      return res.status(400).json({ message: "Estado inválido" });
+    }
+
+    // Verificación de roles permitidos para cambiar el estado
+    const canEditStatus = ["mesa", "juridicos", "admin"].includes(userRole);
+    if (!canEditStatus) {
+      return res.status(403).json({ message: "No tienes permiso para cambiar el estado" });
+    }
+
+    // Lógica de control de estado según el rol del usuario
+    if (userRole === 'mesa') {
+      // Mesa puede cambiar de "ingresado" a "pendiente" o "controlado"
+      if (task.estado === 'ingresado' && (newState === 'pendiente' || newState === 'controlado')) {
+        task.estado = newState;
+      }
+      // Mesa puede cambiar de "pendiente" a "controlado"
+      else if (task.estado === 'pendiente' && newState === 'controlado') {
+        task.estado = newState;
+      }
+      // Mesa puede cambiar de "aprobado" o "rechazado" a "finalizado"
+      else if ((task.estado === 'aprobado' || task.estado === 'rechazado') && newState === 'finalizado') {
+        task.estado = newState;
+      }
+      // Permitir que Mesa corrija errores cambiando de un estado anterior
+      else if ((task.estado === 'controlado' || task.estado === 'finalizado') && newState === 'pendiente') {
+        task.estado = newState; // Permitimos volver a "pendiente" si hubo un error
+      } else {
+        return res.status(403).json({ message: "No puedes cambiar el estado en este momento" });
+      }
+    }
+
+    if (userRole === 'juridicos') {
+      // Jurídicos puede cambiar de "controlado" a "aprobado" o "rechazado"
+      if (task.estado === 'controlado' && (newState === 'aprobado' || newState === 'rechazado')) {
+        task.estado = newState;
+      }
+      // Permitir que Jurídicos corrija errores cambiando de "aprobado" o "rechazado" a "controlado"
+      else if ((task.estado === 'aprobado' || task.estado === 'rechazado') && newState === 'controlado') {
+        task.estado = newState; // Permitir corregir si se hizo un cambio erróneo
+      } else {
+        return res.status(403).json({ message: "No puedes cambiar el estado en este momento" });
+      }
+    }
+
+    if (userRole === 'admin') {
+      // Admin puede cambiar cualquier estado
+      task.estado = newState;
+    }
+
+    // Guardar la tarea actualizada
+    const updatedTask = await task.save();
+
+    // Retornar la tarea actualizada
+    res.json(updatedTask);
+  } catch (error) {
+    return res.status(500).json({ message: error.message });
+  }
+};
+
+
+
 
 
 
