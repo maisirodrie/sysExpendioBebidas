@@ -121,8 +121,16 @@ function TaskFormPage() {
   };
 
   const handleTipoExpendioChange = (e) => {
-    setTipoExpendio(e.target.value);
-    setValue("tipoexpendio", e.target.value);
+    const selectedExpendio = e.target.value;
+    setTipoExpendio(selectedExpendio);
+    setValue("expendio", selectedExpendio); // Actualiza el valor en el formulario
+
+    // Si se selecciona "Evento Particular", establecer persona como "Física"
+    if (selectedExpendio === "Evento Particular") {
+      setValue("persona", "Física"); // Asegura que el valor en el formulario sea "Física"
+    } else {
+      setValue("persona", ""); // Limpia el campo de persona si es "Local Comercial"
+    }
   };
 
   const handleTipoPersonaChange = (e) => {
@@ -161,7 +169,7 @@ function TaskFormPage() {
             htmlFor="Evento"
             className="block text-sm font-medium text-black"
           >
-            Tipo de Expendio Expendio de Bebidas
+            Tipo de Expendio de Bebidas
           </label>
           <select
             id="expendio"
@@ -215,8 +223,8 @@ function TaskFormPage() {
                 type="text"
                 {...register("persona", { required: true })}
                 className="w-full bg-gray-100 text-black px-4 py-2 rounded-md my-2"
-                defaultValue="Física"
-                 disabled
+                 Value="Física"
+                 readOnly
               />
 
               <label

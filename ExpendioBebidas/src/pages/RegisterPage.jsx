@@ -234,7 +234,7 @@ function RegisterPage() {
             htmlFor="Evento"
             className="block text-sm font-medium text-black"
           >
-            Tipo de Expendio Expendio de Bebidas
+            Tipo de Expendio de Bebidas
           </label>
           <select
             id="expendio"

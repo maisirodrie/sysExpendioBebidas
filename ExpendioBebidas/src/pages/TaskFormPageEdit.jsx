@@ -57,8 +57,6 @@ function TaskFormPageEdit() {
     loadTask();
   }, [params.id, setValue, getTask]);
 
-
-
   const onSubmit = handleSubmit(async (data) => {
     try {
       Swal.fire({
@@ -69,28 +67,28 @@ function TaskFormPageEdit() {
           Swal.showLoading();
         },
       });
-  
+
       const formData = new FormData();
-        Object.keys(data).forEach((key) => {
-            if (key !== "file") {
-                formData.append(key, data[key]);
-            }
+      Object.keys(data).forEach((key) => {
+        if (key !== "file") {
+          formData.append(key, data[key]);
+        }
+      });
+
+      // Agregar archivos existentes primero (si hay)
+      if (selectedFiles && selectedFiles.length > 0) {
+        selectedFiles.forEach((file) => {
+          formData.append("files", file); // Asegúrate de usar el nombre correcto del campo
         });
+      }
 
-        // Agregar archivos existentes primero (si hay)
-        if (selectedFiles && selectedFiles.length > 0) {
-            selectedFiles.forEach((file) => {
-                formData.append("files", file); // Asegúrate de usar el nombre correcto del campo
-            });
-        }
+      // Luego agregar los nuevos archivos
+      if (files && files.length > 0) {
+        files.forEach((file) => {
+          formData.append("files", file);
+        });
+      }
 
-        // Luego agregar los nuevos archivos
-        if (files && files.length > 0) {
-            files.forEach((file) => {
-                formData.append("files", file);
-            });
-        }
-  
       if (params.id) {
         await updateTask(params.id, formData);
         Swal.close();
@@ -102,7 +100,7 @@ function TaskFormPageEdit() {
           showConfirmButton: false,
         });
       }
-  
+
       navigate("/task");
     } catch (error) {
       console.error("Error:", error);
@@ -117,7 +115,6 @@ function TaskFormPageEdit() {
     }
   });
 
-
   const handleFileChange = (e) => {
     const selectedFiles = Array.from(e.target.files); // Convertir el FileList a un array
     setFiles((prevFiles) => [...prevFiles, ...selectedFiles]); // Acumular archivos
@@ -129,8 +126,16 @@ function TaskFormPageEdit() {
   };
 
   const handleTipoExpendioChange = (e) => {
-    setTipoExpendio(e.target.value);
-    setValue("tipoexpendio", e.target.value);
+    const selectedExpendio = e.target.value;
+    setTipoExpendio(selectedExpendio);
+    setValue("expendio", selectedExpendio); // Actualiza el valor en el formulario
+
+    // Si se selecciona "Evento Particular", establecer persona como "Física"
+    if (selectedExpendio === "Evento Particular") {
+      setValue("persona", "Física"); // Asegura que el valor en el formulario sea "Física"
+    } else {
+      setValue("persona", ""); // Limpia el campo de persona si es "Local Comercial"
+    }
   };
 
   const handleTipoPersonaChange = (e) => {
@@ -168,7 +173,7 @@ function TaskFormPageEdit() {
             htmlFor="Evento"
             className="block text-sm font-medium text-black"
           >
-            Tipo de Expendio Expendio de Bebidas
+            Tipo de Expendio de Bebidas
           </label>
           <select
             id="expendio"
@@ -222,10 +227,10 @@ function TaskFormPageEdit() {
                 type="text"
                 {...register("persona", { required: true })}
                 className="w-full bg-gray-100 text-black px-4 py-2 rounded-md my-2"
-                defaultValue="Física"
-                 disabled
+                Value="Física"
+                readOnly
               />
-              
+
               <label
                 htmlFor="dni"
                 className="block text-sm font-medium text-black"
@@ -520,60 +525,62 @@ function TaskFormPageEdit() {
               />
             </>
           )}
-              
-              {/* Visualización de los archivos actuales */}
-              {pdfUrl.length > 0 && (
-  <div className="my-4">
-    <label className="block text-sm font-medium text-black mb-2">
-      Archivos actuales:
-    </label>
-    {pdfUrl.map((url, index) => (
-      <div key={index}>
-        <a
-          href={url}
-          target="_blank"
-          rel="noopener noreferrer"
-          className="bg-blue-500 text-white px-4 py-2 rounded-md mt-2 block"
-        >
-          Ver Archivo {index + 1}
-        </a>
-      </div>
-    ))}
-  </div>
-)}
 
-{/* Entrada para reemplazar archivo */}
-<label htmlFor="file" className="block text-sm font-medium text-black">
-  Archivos
-</label>
-<input
-  type="file"
-  name="file"
-  multiple
-  onChange={handleFileChange}
-  className="w-full bg-gray-100 text-black px-4 py-2 rounded-md my-2"
-/>
+          {/* Visualización de los archivos actuales */}
+          {pdfUrl.length > 0 && (
+            <div className="my-4">
+              <label className="block text-sm font-medium text-black mb-2">
+                Archivos actuales:
+              </label>
+              {pdfUrl.map((url, index) => (
+                <div key={index}>
+                  <a
+                    href={url}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="bg-blue-500 text-white px-4 py-2 rounded-md mt-2 block"
+                  >
+                    Ver Archivo {index + 1}
+                  </a>
+                </div>
+              ))}
+            </div>
+          )}
 
-{/* Mostrar archivos seleccionados */}
-<div className="mt-4">
-  <h3 className="text-lg font-semibold">Archivos seleccionados:</h3>
-  <ul className="list-disc list-inside">
-    {files.length > 0 && files.map((file, index) => (
-      <li key={`new-${index}`} className="flex justify-between">
-        {file.name}
-        <button
-          type="button"
-          onClick={() => removeNewFile(index)}
-          className="text-red-600 hover:underline"
-        >
-          Eliminar
-        </button>
-      </li>
-    ))}
-  </ul>
-</div>
-          
+          {/* Entrada para reemplazar archivo */}
+          <label
+            htmlFor="file"
+            className="block text-sm font-medium text-black"
+          >
+            Archivos
+          </label>
+          <input
+            type="file"
+            name="file"
+            multiple
+            onChange={handleFileChange}
+            className="w-full bg-gray-100 text-black px-4 py-2 rounded-md my-2"
+          />
 
+          {/* Mostrar archivos seleccionados */}
+          <div className="mt-4">
+            <h3 className="text-lg font-semibold">Archivos seleccionados:</h3>
+            <ul className="list-disc list-inside">
+              {files.length > 0 &&
+                files.map((file, index) => (
+                  <li key={`new-${index}`} className="flex justify-between">
+                    {file.name}
+                    <button
+                      type="button"
+                      onClick={() => removeNewFile(index)}
+                      className="text-red-600 hover:underline"
+                    >
+                      Eliminar
+                    </button>
+                  </li>
+                ))}
+            </ul>
+          </div>
 
           <button
             type="submit"
