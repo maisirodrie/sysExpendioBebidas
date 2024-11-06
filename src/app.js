@@ -15,13 +15,16 @@ app.use(cors({
     credentials: true,
 }));
 
-// Obtener el directorio actual
+
+
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
-// Servir archivos estáticos
-app.use('/documentos', express.static(path.join(__dirname, 'documentos')));
+// Definir la ruta de la carpeta "documentos"
+const documentosPath = path.join(__dirname, 'src', 'documentos');
 
+// Configurar Express para servir archivos estáticos desde esa carpeta en '/documentos'
+app.use('/documentos', express.static(documentosPath));
 // Middleware
 app.use(morgan('dev'));
 app.use(express.json());

@@ -151,14 +151,14 @@ function RegisterPage() {
   const downloadFile = async (filePath) => {
     try {
         const response = await axios.get(filePath, {
-            responseType: 'blob', // Asegúrate de especificar que es un blob
+            responseType: 'blob', // Indica que es un archivo binario
         });
 
-        // Crear un enlace para descargar el archivo
+        // Crear un enlace temporal para descargar el archivo
         const url = window.URL.createObjectURL(new Blob([response.data]));
         const link = document.createElement('a');
         link.href = url;
-        link.setAttribute('download', filePath.split('/').pop()); // Usa el nombre del archivo para descargar
+        link.setAttribute('download', filePath.split('/').pop()); // Nombre del archivo
         document.body.appendChild(link);
         link.click();
         link.parentNode.removeChild(link);
@@ -167,7 +167,6 @@ function RegisterPage() {
         alert('Se ha producido un error al cargar el documento PDF.');
     }
 };
-
   
 
   return (
@@ -203,13 +202,13 @@ function RegisterPage() {
         </p>
         <div className="flex space-x-2 justify-center mt-2">
             <button
-                onClick={() => downloadFile(`${import.meta.env.VITE_API_ARCHIVO}/documentos/requisitos-local.pdf`)} // Ruta absoluta
+                onClick={() => downloadFile(`${import.meta.env.VITE_DOCS_URL}/requisitos-local.pdf`)} // Ruta de documentos
                 className="bg-blue-500 text-white py-2 px-4 rounded hover:bg-blue-700"
             >
                 Descargar para habilitación de local
             </button>
             <button
-                onClick={() => downloadFile(`${import.meta.env.VITE_API_ARCHIVO}/documentos/requisitos-eventos.pdf`)} // Ruta absoluta
+                onClick={() => downloadFile(`${import.meta.env.VITE_DOCS_URL}/requisitos-eventos.pdf`)} // Ruta de documentos
                 className="bg-blue-500 text-white py-2 px-4 rounded hover:bg-blue-700"
             >
                 Descargar para habilitación de eventos
@@ -217,6 +216,7 @@ function RegisterPage() {
         </div>
     </div>
 )}
+
         <form onSubmit={handleSubmit(onSubmit)} className="mt-4">
           {/* Selección de Tipo de Evento */}
           <label
