@@ -212,13 +212,13 @@ function RegisterPage() {
     </p>
     <div className="flex space-x-2 justify-center mt-2">
       <button
-        onClick={() => downloadFile(`${import.meta.env.VITE_API_ARCHIVO}/requisitos-local.pdf`)}
+        onClick={() => downloadFile(`${import.meta.env.VITE_API_ARCHIVO}/documentos/requisitos-local.pdf`)}
         className="bg-blue-500 text-white py-2 px-4 rounded hover:bg-blue-700"
       >
         Descargar para habilitación de local
       </button>
       <button
-        onClick={() => downloadFile(`${import.meta.env.VITE_API_ARCHIVO}/requisitos-eventos.pdf`)}
+        onClick={() => downloadFile(`${import.meta.env.VITE_API_ARCHIVO}/documentos/requisitos-eventos.pdf`)}
         className="bg-blue-500 text-white py-2 px-4 rounded hover:bg-blue-700"
       >
         Descargar para habilitación de eventos
