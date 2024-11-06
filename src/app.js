@@ -16,15 +16,15 @@ app.use(cors({
 }));
 
 
-
+// Define la ruta de los documentos
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
-// Definir la ruta de la carpeta "documentos"
-const documentosPath = path.join(__dirname, 'src', 'documentos');
+// Carpeta de documentos
+const documentosPath = path.join(__dirname, 'documentos');
 
 // Configurar Express para servir archivos estáticos desde esa carpeta en '/documentos'
-app.use('/documentos', express.static(documentosPath));
+app.use('/api/documentos', express.static(documentosPath));
 // Middleware
 app.use(morgan('dev'));
 app.use(express.json());

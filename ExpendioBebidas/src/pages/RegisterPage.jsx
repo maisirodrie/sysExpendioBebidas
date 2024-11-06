@@ -150,23 +150,33 @@ function RegisterPage() {
 
   const downloadFile = async (filePath) => {
     try {
+        // Solicitar el archivo como blob
         const response = await axios.get(filePath, {
-            responseType: 'blob', // Indica que es un archivo binario
+            responseType: 'blob', // Asegura que el archivo se reciba como un blob
         });
 
-        // Crear un enlace temporal para descargar el archivo
+        // Crear una URL para el blob
         const url = window.URL.createObjectURL(new Blob([response.data]));
+
+        // Crear un enlace invisible para descargar el archivo
         const link = document.createElement('a');
         link.href = url;
-        link.setAttribute('download', filePath.split('/').pop()); // Nombre del archivo
+        link.setAttribute('download', filePath.split('/').pop()); // Extrae el nombre del archivo del path
         document.body.appendChild(link);
         link.click();
+        
+        // Eliminar el enlace después de la descarga
         link.parentNode.removeChild(link);
     } catch (error) {
         console.error('Error al descargar el archivo:', error);
-        alert('Se ha producido un error al cargar el documento PDF.');
+        Swal.fire({
+            icon: "error",
+            title: "Error",
+            text: "Se ha producido un error al cargar el documento PDF.",
+        });
     }
 };
+
   
 
   return (
@@ -195,27 +205,28 @@ function RegisterPage() {
         </div>
       {/* Sección de Requisitos con documentos descargables */}
       {showRequisitos && (
-    <div className="relative mb-4 bg-yellow-200 p-4 rounded-md shadow-lg">
-        <h2 className="font-bold text-lg">Importante:</h2>
-        <p className="text-sm text-gray-700 mt-2">
-            Antes de proceder con el registro, es fundamental que leas y comprendas los requisitos necesarios para completar el proceso de manera efectiva. Por favor, asegúrate de tener los siguientes documentos listos:
-        </p>
-        <div className="flex space-x-2 justify-center mt-2">
-            <button
-                onClick={() => downloadFile(`${import.meta.env.VITE_DOCS_URL}/requisitos-local.pdf`)} // Ruta de documentos
-                className="bg-blue-500 text-white py-2 px-4 rounded hover:bg-blue-700"
-            >
-                Descargar para habilitación de local
-            </button>
-            <button
-                onClick={() => downloadFile(`${import.meta.env.VITE_DOCS_URL}/requisitos-eventos.pdf`)} // Ruta de documentos
-                className="bg-blue-500 text-white py-2 px-4 rounded hover:bg-blue-700"
-            >
-                Descargar para habilitación de eventos
-            </button>
-        </div>
+  <div className="relative mb-4 bg-yellow-200 p-4 rounded-md shadow-lg">
+    <h2 className="font-bold text-lg">Importante:</h2>
+    <p className="text-sm text-gray-700 mt-2">
+      Antes de proceder con el registro, es fundamental que leas y comprendas los requisitos necesarios para completar el proceso de manera efectiva. Por favor, asegúrate de tener los siguientes documentos listos:
+    </p>
+    <div className="flex space-x-2 justify-center mt-2">
+      <button
+        onClick={() => downloadFile(`${import.meta.env.VITE_DOCS_URL}/requisitos-local.pdf`)}
+        className="bg-blue-500 text-white py-2 px-4 rounded hover:bg-blue-700"
+      >
+        Descargar para habilitación de local
+      </button>
+      <button
+        onClick={() => downloadFile(`${import.meta.env.VITE_DOCS_URL}/requisitos-eventos.pdf`)}
+        className="bg-blue-500 text-white py-2 px-4 rounded hover:bg-blue-700"
+      >
+        Descargar para habilitación de eventos
+      </button>
     </div>
+  </div>
 )}
+
 
         <form onSubmit={handleSubmit(onSubmit)} className="mt-4">
           {/* Selección de Tipo de Evento */}
