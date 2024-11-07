@@ -4,6 +4,7 @@ import { useTasks } from "../context/TasksContext";
 import { Link, useNavigate, useParams } from "react-router-dom";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faArrowLeft } from "@fortawesome/free-solid-svg-icons";
+import { Municipios } from "../api/municipios";
 import "./taskformpage.css";
 import Swal from "sweetalert2";
 
@@ -18,6 +19,7 @@ function TaskFormPageEdit() {
   const [selectedFiles, setSelectedFiles] = useState([]);
   const [pdfUrl, setPdfUrl] = useState([]); // URL del archivo actual
   const apiUrl = import.meta.env.VITE_API_ARCHIVO;
+  const [LocalidadValue, setSelectedLocalidadValue] = useState("");
 
   useEffect(() => {
     async function loadTask() {
@@ -114,6 +116,10 @@ function TaskFormPageEdit() {
       });
     }
   });
+
+  const handleLocalidadChange = (event) => {
+    setSelectedLocalidadValue(event.target.value);
+  };
 
   const handleFileChange = (e) => {
     const selectedFiles = Array.from(e.target.files); // Convertir el FileList a un array
@@ -270,18 +276,25 @@ function TaskFormPageEdit() {
                 placeholder="Nombre"
               />
 
-              <label
+<label
                 htmlFor="localidad"
                 className="block text-sm font-medium text-black"
               >
                 Localidad
               </label>
-              <input
-                type="text"
-                {...register("localidad", { required: true })}
+              <select
+                {...register("localidad")}
+                value={LocalidadValue}
                 className="w-full bg-gray-100 text-black px-4 py-2 rounded-md my-2"
-                placeholder="Localidad"
-              />
+                onChange={handleLocalidadChange}
+              >
+                <option value="">Selecciona una localidad</option>
+                {Municipios.map((municipio) => (
+                  <option key={municipio.id} value={municipio.nombre}>
+                    {municipio.nombre}
+                  </option>
+                ))}
+              </select>
 
               <label
                 htmlFor="domicilio"
@@ -418,18 +431,25 @@ function TaskFormPageEdit() {
                 placeholder="Nombre del Propietario"
               />
 
-              <label
+<label
                 htmlFor="localidad"
                 className="block text-sm font-medium text-black"
               >
                 Localidad
               </label>
-              <input
-                type="text"
-                {...register("localidad", { required: true })}
+              <select
+                {...register("localidad")}
+                value={LocalidadValue}
                 className="w-full bg-gray-100 text-black px-4 py-2 rounded-md my-2"
-                placeholder="Localidad"
-              />
+                onChange={handleLocalidadChange}
+              >
+                <option value="">Selecciona una localidad</option>
+                {Municipios.map((municipio) => (
+                  <option key={municipio.id} value={municipio.nombre}>
+                    {municipio.nombre}
+                  </option>
+                ))}
+              </select>
 
               <label
                 htmlFor="domicilio"
