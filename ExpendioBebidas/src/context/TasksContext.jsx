@@ -60,19 +60,23 @@ export function TaskProvider({ children }) {
     }
 
     // Dentro del TaskProvider, agrega esta función:
-const updateTaskStatus = async (taskId, newStatus) => {
-    try {
-        // Aquí llamarías a la API para actualizar el estado de la tarea
-        await updateTasksRequest(taskId, { estado: newStatus });
-
-        // Si la tarea se actualiza correctamente, puedes actualizar el estado en el cliente:
-        setTasks(tasks.map((task) => 
-            task._id === taskId ? { ...task, estado: newStatus } : task
-        ));
-    } catch (error) {
-        console.error("Error al actualizar el estado de la tarea:", error);
-    }
-};
+    const updateTaskStatus = async (taskId, newStatus) => {
+        try {
+            // Llamada a la API para actualizar el estado de la tarea en el backend
+            const res = await updateTasksRequest(taskId, { estado: newStatus });
+            
+            // Verificar si la actualización fue exitosa antes de actualizar el estado localmente
+            if (res.status === 200) {
+                setTasks((prevTasks) => 
+                    prevTasks.map((task) => 
+                        task._id === taskId ? { ...task, estado: newStatus } : task
+                    )
+                );
+            }
+        } catch (error) {
+            console.error("Error al actualizar el estado de la tarea:", error);
+        }
+    };
 
 
 

@@ -293,62 +293,41 @@ export const taskEstados = async (req, res) => {
     const task = await Task.findById(id);
     if (!task) return res.status(404).json({ message: "Tarea no encontrada" });
 
-    // Verificar si el nuevo estado es válido
+    // Definir los estados válidos y normalizar el nuevo estado
     const validStates = ['pendiente', 'controlado', 'aprobado', 'rechazado', 'finalizado', 'ingresado'];
-    if (!validStates.includes(newState.toLowerCase())) {
+    const newStateLower = newState.toLowerCase();
+    if (!validStates.includes(newStateLower)) {
       return res.status(400).json({ message: "Estado inválido" });
     }
 
-    // Verificación de roles permitidos para cambiar el estado
-    const canEditStatus = ["mesa", "juridicos", "admin"].includes(userRole);
-    if (!canEditStatus) {
-      return res.status(403).json({ message: "No tienes permiso para cambiar el estado" });
+    // Funciones auxiliares para verificar las transiciones válidas por rol
+    const canMesaChangeState = () => {
+      return (
+        (task.estado === 'ingresado' && (newStateLower === 'pendiente' || newStateLower === 'controlado')) ||
+        (task.estado === 'pendiente' && newStateLower === 'controlado') ||
+        ((task.estado === 'aprobado' || task.estado === 'rechazado') && newStateLower === 'finalizado')
+      );
+    };
+
+    const canJuridicosChangeState = () => {
+      return task.estado === 'controlado' && (newStateLower === 'aprobado' || newStateLower === 'rechazado');
+    };
+
+    const canAdminChangeState = () => true;  // Admin puede cambiar a cualquier estado
+
+    // Verificar permisos y actualizar estado según el rol
+    if (userRole === 'mesa' && canMesaChangeState()) {
+      task.estado = newStateLower;
+    } else if (userRole === 'juridicos' && canJuridicosChangeState()) {
+      task.estado = newStateLower;
+    } else if (userRole === 'admin' && canAdminChangeState()) {
+      task.estado = newStateLower; // Admin puede cambiar el estado a cualquiera
+    } else {
+      return res.status(403).json({ message: "No tienes permiso para cambiar el estado en este momento" });
     }
 
-    // Lógica de control de estado según el rol del usuario
-    if (userRole === 'mesa') {
-      // Mesa puede cambiar de "ingresado" a "pendiente" o "controlado"
-      if (task.estado === 'ingresado' && (newState === 'pendiente' || newState === 'controlado')) {
-        task.estado = newState;
-      }
-      // Mesa puede cambiar de "pendiente" a "controlado"
-      else if (task.estado === 'pendiente' && newState === 'controlado') {
-        task.estado = newState;
-      }
-      // Mesa puede cambiar de "aprobado" o "rechazado" a "finalizado"
-      else if ((task.estado === 'aprobado' || task.estado === 'rechazado') && newState === 'finalizado') {
-        task.estado = newState;
-      }
-      // Permitir que Mesa corrija errores cambiando de un estado anterior
-      else if ((task.estado === 'controlado' || task.estado === 'finalizado') && newState === 'pendiente') {
-        task.estado = newState; // Permitimos volver a "pendiente" si hubo un error
-      } else {
-        return res.status(403).json({ message: "No puedes cambiar el estado en este momento" });
-      }
-    }
-
-    if (userRole === 'juridicos') {
-      // Jurídicos puede cambiar de "controlado" a "aprobado" o "rechazado"
-      if (task.estado === 'controlado' && (newState === 'aprobado' || newState === 'rechazado')) {
-        task.estado = newState;
-      }
-      // Permitir que Jurídicos corrija errores cambiando de "aprobado" o "rechazado" a "controlado"
-      else if ((task.estado === 'aprobado' || task.estado === 'rechazado') && newState === 'controlado') {
-        task.estado = newState; // Permitir corregir si se hizo un cambio erróneo
-      } else {
-        return res.status(403).json({ message: "No puedes cambiar el estado en este momento" });
-      }
-    }
-
-    if (userRole === 'admin') {
-      // Admin puede cambiar cualquier estado
-      task.estado = newState;
-    }
-
-    // Guardar la tarea actualizada
+    // Guardar la tarea actualizada y responder
     const updatedTask = await task.save();
-
-    // Retornar la tarea actualizada
     res.json(updatedTask);
   } catch (error) {
     return res.status(500).json({ message: error.message });

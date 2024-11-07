@@ -93,125 +93,62 @@ function Table() {
     return `${day}/${month}/${year}`;
   };
 
-  const canEdit = ["admin", "editor"].includes(user.role);
-  const canDelete = ["admin", "editor"].includes(user.role);
-  const canAddUser = !["user", "viewer", "editor"].includes(user.role);
-  const canAddTask = !["user", "viewer"].includes(user.role);
-  const canViewStatus = ["admin", "viewer", "juridicos", "mesa"].includes(
-    user.role
-  );
-  const canEditStatus = ["mesa", "juridicos"].includes(user.role);
-
-  const handleRefresh = async () => {
-    await getTasks();
+  const permissions = {
+    canEdit: ["admin", "editor"].includes(user.role),
+    canDelete: ["admin", "editor"].includes(user.role),
+    canAddUser: ["admin"].includes(user.role),
+    canAddTask: ["admin", "editor"].includes(user.role),
+    canViewStatus: ["admin", "viewer", "juridicos", "mesa"].includes(user.role),
+    canEditStatus: ["mesa", "juridicos","admin"].includes(user.role),
   };
 
-  const getStatusOptions = (task) => {
-    const options = [];
+  const handleRefresh = async () => await getTasks();
 
-    // Opciones para mesa
-if (user.role === "mesa") {
-  // Si está en "aprobado" o "rechazado", mesa puede cambiar a "finalizado"
-  if (task.estado === "aprobado" || task.estado === "rechazado" || task.estado === "finalizado") {
-    options.push("aprobado", "finalizado");
-  }
-  
-  // Mesa siempre puede cambiar a "pendiente" desde cualquier estado
-  if (task.estado === "controlado" || task.estado === "pendiente" || task.estado === "ingresado") {
-    options.push("pendiente", "controlado","ingresado");
-  }
-}
-
-
-    // Opciones para jurídicos
-    if (user.role === "juridicos") {
-      // Juridicos puede cambiar de "controlado" a "aprobado" o "rechazado"
-      options.push("aprobado", "rechazado", "controlado");
+  const statusOptions = {
+    mesa: {
+      ingresado: ["ingresado", "pendiente", "controlado"],
+      pendiente: ["pendiente", "controlado"],
+      aprobado: ["aprobado", "finalizado"],
+      rechazado: ["rechazado", "finalizado"]
+    },
+    juridicos: {
+      controlado: ["controlado", "aprobado", "rechazado"]
+    },
+    admin: {
+      any: ["pendiente", "controlado", "aprobado", "rechazado", "finalizado", "ingresado"] // Admin puede cambiar cualquier estado
     }
-    
-
-    return options;
+  };
+  
+  const getStatusOptions = (task) => {
+    const roleOptions = statusOptions[user.role] || {}; // Obtener opciones según el rol
+    const availableOptions = roleOptions[task.estado] || roleOptions.any || []; // Si no tiene opciones específicas, tomar "any"
+    return availableOptions.length ? availableOptions : [];
   };
 
   const handleStatusChange = async (taskId, newStatus) => {
-    await updateTaskStatus(taskId, newStatus); // Llamada a la API para actualizar el estado
-    Swal.fire({
-      title: "Estado actualizado",
-      text: "El estado de la tarea se ha modificado correctamente",
-      icon: "success",
-      timer: 2000,
-    });
+    await updateTaskStatus(taskId, newStatus);
+    Swal.fire("Estado actualizado", "El estado se ha modificado correctamente", "success");
   };
 
-  // Función que asigna un color a cada estado
   const getStatusColor = (status) => {
-    switch (status) {
-      case "ingresado":
-        return "black"; // Blanco para Ingresado
-      case "pendiente":
-        return "orange"; // Naranja para Pendiente
-      case "controlado":
-        return "blue"; // Azul para Controlado
-      case "aprobado":
-        return "green"; // Verde para Aprobado
-      case "rechazado":
-        return "red"; // Rojo para Rechazado
-      case "finalizado":
-        return "black"; // Negro para Finalizado
-      default:
-        return "gray"; // Color predeterminado en caso de no encontrar el estado
-    }
+    return {
+      ingresado: "gray",
+      pendiente: "orange",
+      controlado: "blue",
+      aprobado: "green",
+      rechazado: "red",
+      finalizado: "black",
+    }[status] || "gray";
   };
 
-  // Función que asigna un ícono a cada estado
-  const getStatusIcon = (status) => {
-    switch (status) {
-      case "ingresado":
-        return (
-          <FontAwesomeIcon
-            icon={faCircle}
-            style={{ color: "gray", fontSize: "10px" }}
-          />
-        );
-      case "pendiente":
-        return (
-          <FontAwesomeIcon
-            icon={faCircle}
-            style={{ color: "orange", fontSize: "10px" }}
-          />
-        );
-      case "controlado":
-        return (
-          <FontAwesomeIcon
-            icon={faCircle}
-            style={{ color: "blue", fontSize: "10px" }}
-          />
-        );
-      case "aprobado":
-        return (
-          <FontAwesomeIcon
-            icon={faCircle}
-            style={{ color: "green", fontSize: "10px" }}
-          />
-        );
-      case "rechazado":
-        return (
-          <FontAwesomeIcon
-            icon={faCircle}
-            style={{ color: "red", fontSize: "10px" }}
-          />
-        );
-      case "finalizado":
-        return (
-          <FontAwesomeIcon
-            icon={faCircle}
-            style={{ color: "black", fontSize: "10px" }}
-          />
-        );
-      default:
-        return null; // Sin ícono por defecto
-    }
-  };
+  const getStatusIcon = (status) => (
+    <FontAwesomeIcon
+      icon={faCircle}
+      style={{ color: getStatusColor(status), fontSize: "10px" }}
+    />
+  );
+
+
   return (
     <div className="container-fluid bg-primary vh-100 vw-100 d-flex align-items-center justify-content-center">
       <div className="row">
@@ -237,19 +174,19 @@ if (user.role === "mesa") {
 
             <ul className="button-container">
               <li className="d-flex gap-2">
-                {canAddTask && (
+                {permissions.canAddTask && (
                   <Link to="/add-task" className="btn btn-success">
                     <FontAwesomeIcon icon={faFileCirclePlus} />
                   </Link>
                 )}
-                {canAddUser && (
+                {permissions.canAddUser && (
                   <Link to="/registeradmin" className="btn btn-success">
                     <FontAwesomeIcon icon={faUserPlus} />
                   </Link>
                 )}
-                <Link onClick={handleRefresh} className="btn btn-success">
+                <button onClick={handleRefresh} className="btn btn-success">
                   <FontAwesomeIcon icon={faRotate} />
-                </Link>
+                </button>
               </li>
             </ul>
 
@@ -258,9 +195,7 @@ if (user.role === "mesa") {
               <table className="table" style={{ textTransform: "uppercase" }}>
                 <thead>
                   <tr>
-                    <th colSpan="10" className="table-title">
-                      Listado de Archivos
-                    </th>
+                    <th colSpan="10" className="table-title">Listado de Archivos</th>
                   </tr>
                   <tr>
                     <th>Apellido</th>
@@ -271,104 +206,57 @@ if (user.role === "mesa") {
                     <th>Tipo de Expendio</th>
                     <th>Estado</th>
                     <th>Ver</th>
-                    {canEdit && <th>Editar</th>}
-                    {canDelete && <th>Borrar</th>}
+                    {permissions.canEdit && <th>Editar</th>}
+                    {permissions.canDelete && <th>Borrar</th>}
                   </tr>
                 </thead>
                 <tbody>
                   {currentTasks.map((task) => (
                     <tr key={task._id}>
-                      <td data-label="Apellido">
-                        {task.apellido ? task.apellido.toUpperCase() : ""}
-                      </td>
-                      <td data-label="Nombre">
-                        {task.nombre ? task.nombre.toUpperCase() : ""}
-                      </td>
-                      <td data-label="DNI">
-                        {task.dni ? task.dni.toUpperCase() : ""}
-                      </td>
-                      <td data-label="Localidad">
-                        {task.localidad ? task.localidad.toUpperCase() : ""}
-                      </td>
-                      <td data-label="Tipo de Persona">
-                        {task.persona ? task.persona.toUpperCase() : ""}
-                      </td>
-                      <td data-label="Tipo de Expendio">
-                        {task.expendio ? task.expendio.toUpperCase() : ""}
-                      </td>
-                      {canViewStatus && (
-                        // Renderizando la tabla o el componente con los estados
-                        <td data-label="Estado">
-                          {canEditStatus ? (
+                      <td>{task.apellido?.toUpperCase()}</td>
+                      <td>{task.nombre?.toUpperCase()}</td>
+                      <td>{task.dni?.toUpperCase()}</td>
+                      <td>{task.localidad?.toUpperCase()}</td>
+                      <td>{task.persona?.toUpperCase()}</td>
+                      <td>{task.expendio?.toUpperCase()}</td>
+                      {permissions.canViewStatus && (
+                        <td>
+                           {permissions.canEditStatus && getStatusOptions(task).length > 0 ? (
                             <select
                               value={task.estado || "ingresado"}
-                              onChange={(e) =>
-                                handleStatusChange(task._id, e.target.value)
-                              }
-                              style={{
-                                color: getStatusColor(task.estado),
-                              }}
+                              onChange={(e) => handleStatusChange(task._id, e.target.value)}
+                              style={{ color: getStatusColor(task.estado) }}
                             >
-                              {getStatusOptions(task, user).map((state) => (
-                                <option
-                                  key={state}
-                                  value={state}
-                                  style={{
-                                    color: getStatusColor(state),
-                                  }}
-                                >
-                                  {state.charAt(0).toUpperCase() +
-                                    state.slice(1)}{" "}
-                                  {/* Capitaliza el estado */}
+                              {getStatusOptions(task).map((state) => (
+                                <option key={state} value={state} style={{ color: getStatusColor(state) }}>
+                                  {state.charAt(0).toUpperCase() + state.slice(1)}
                                 </option>
                               ))}
                             </select>
                           ) : (
-                            <>
-                              <span
-                                style={{ color: getStatusColor(task.estado) }}
-                              >
-                                {task.estado.charAt(0).toUpperCase() +
-                                  task.estado.slice(1)}{" "}
-                                {/* Capitaliza el estado */}
-                                {getStatusIcon(task.estado)}
-                              </span>
-                            </>
+                            <span style={{ color: getStatusColor(task.estado) }}>
+                              {task.estado?.charAt(0).toUpperCase() + task.estado?.slice(1)} {getStatusIcon(task.estado)}
+                            </span>
                           )}
                         </td>
                       )}
-                      <td data-label="Ver">
-                        <div className="button-container">
-                          <Link
-                            className="btn btn-success"
-                            to={`/view/task/${task._id}`}
-                          >
-                            <FontAwesomeIcon icon={faEye} />
-                          </Link>
-                        </div>
+                      <td>
+                        <Link className="btn btn-success" to={`/view/task/${task._id}`}>
+                          <FontAwesomeIcon icon={faEye} />
+                        </Link>
                       </td>
-                      {canEdit && (
-                        <td data-label="Editar">
-                          <div className="button-container">
-                            <Link
-                              className="btn btn-primary"
-                              to={`/edit-task/${task._id}`}
-                            >
-                              <FontAwesomeIcon icon={faEdit} />
-                            </Link>
-                          </div>
+                      {permissions.canEdit && (
+                        <td>
+                          <Link className="btn btn-primary" to={`/edit-task/${task._id}`}>
+                            <FontAwesomeIcon icon={faEdit} />
+                          </Link>
                         </td>
                       )}
-                      {canDelete && (
-                        <td data-label="Borrar">
-                          <div className="button-container">
-                            <button
-                              className="btn btn-danger"
-                              onClick={() => handleDelete(task._id)}
-                            >
-                              <FontAwesomeIcon icon={faTrashAlt} />
-                            </button>
-                          </div>
+                      {permissions.canDelete && (
+                        <td>
+                          <button className="btn btn-danger" onClick={() => handleDelete(task._id)}>
+                            <FontAwesomeIcon icon={faTrashAlt} />
+                          </button>
                         </td>
                       )}
                     </tr>
