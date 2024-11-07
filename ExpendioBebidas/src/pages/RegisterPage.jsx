@@ -3,7 +3,8 @@ import { useForm } from "react-hook-form";
 import { useTasks } from "../context/TasksContext";
 import { Link, useNavigate, useParams } from "react-router-dom";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import axios from 'axios';
+import axios from "axios";
+import { Municipios } from "../api/municipios";
 
 import { faArrowLeft, faTimes } from "@fortawesome/free-solid-svg-icons";
 import Swal from "sweetalert2";
@@ -19,6 +20,7 @@ function RegisterPage() {
   const [tipoPersona, setTipoPersona] = useState("");
   const [showRequisitos, setShowRequisitos] = useState(true);
   const [horarios, setHorarios] = useState([""]); // Estado para los horarios
+  const [LocalidadValue, setSelectedLocalidadValue] = useState("");
 
   useEffect(() => {
     async function loadTask() {
@@ -120,6 +122,12 @@ function RegisterPage() {
     }
   });
 
+
+
+  const handleLocalidadChange = (event) => {
+    setSelectedLocalidadValue(event.target.value);
+  };
+
   const handleFileChange = (e) => {
     const selectedFiles = Array.from(e.target.files); // Convertir el FileList a un array
     setFiles((prevFiles) => [...prevFiles, ...selectedFiles]); // Acumular archivos
@@ -150,34 +158,32 @@ function RegisterPage() {
 
   const downloadFile = async (filePath) => {
     try {
-        // Solicitar el archivo como blob
-        const response = await axios.get(filePath, {
-            responseType: 'blob', // Asegura que el archivo se reciba como un blob
-        });
+      // Solicitar el archivo como blob
+      const response = await axios.get(filePath, {
+        responseType: "blob", // Asegura que el archivo se reciba como un blob
+      });
 
-        // Crear una URL para el blob
-        const url = window.URL.createObjectURL(new Blob([response.data]));
+      // Crear una URL para el blob
+      const url = window.URL.createObjectURL(new Blob([response.data]));
 
-        // Crear un enlace invisible para descargar el archivo
-        const link = document.createElement('a');
-        link.href = url;
-        link.setAttribute('download', filePath.split('/').pop()); // Extrae el nombre del archivo del path
-        document.body.appendChild(link);
-        link.click();
-        
-        // Eliminar el enlace después de la descarga
-        link.parentNode.removeChild(link);
+      // Crear un enlace invisible para descargar el archivo
+      const link = document.createElement("a");
+      link.href = url;
+      link.setAttribute("download", filePath.split("/").pop()); // Extrae el nombre del archivo del path
+      document.body.appendChild(link);
+      link.click();
+
+      // Eliminar el enlace después de la descarga
+      link.parentNode.removeChild(link);
     } catch (error) {
-        console.error('Error al descargar el archivo:', error);
-        Swal.fire({
-            icon: "error",
-            title: "Error",
-            text: "Se ha producido un error al cargar el documento PDF.",
-        });
+      console.error("Error al descargar el archivo:", error);
+      Swal.fire({
+        icon: "error",
+        title: "Error",
+        text: "Se ha producido un error al cargar el documento PDF.",
+      });
     }
-};
-
-  
+  };
 
   return (
     <div
@@ -203,30 +209,44 @@ function RegisterPage() {
             {/* Ícono de flecha hacia la izquierda */}
           </Link>
         </div>
-      {/* Sección de Requisitos con documentos descargables */}
-      {showRequisitos && (
-  <div className="relative mb-4 bg-yellow-200 p-4 rounded-md shadow-lg">
-    <h2 className="font-bold text-lg">Importante:</h2>
-    <p className="text-sm text-gray-700 mt-2">
-      Antes de proceder con el registro, es fundamental que leas y comprendas los requisitos necesarios para completar el proceso de manera efectiva. Por favor, asegúrate de tener los siguientes documentos listos:
-    </p>
-    <div className="flex space-x-2 justify-center mt-2">
-      <button
-        onClick={() => downloadFile(`${import.meta.env.VITE_API_ARCHIVO}/documentos/requisitos-local.pdf`)}
-        className="bg-blue-500 text-white py-2 px-4 rounded hover:bg-blue-700"
-      >
-        Descargar para habilitación de local
-      </button>
-      <button
-        onClick={() => downloadFile(`${import.meta.env.VITE_API_ARCHIVO}/documentos/requisitos-eventos.pdf`)}
-        className="bg-blue-500 text-white py-2 px-4 rounded hover:bg-blue-700"
-      >
-        Descargar para habilitación de eventos
-      </button>
-    </div>
-  </div>
-)}
-
+        {/* Sección de Requisitos con documentos descargables */}
+        {showRequisitos && (
+          <div className="relative mb-4 bg-yellow-200 p-4 rounded-md shadow-lg">
+            <h2 className="font-bold text-lg">Importante:</h2>
+            <p className="text-sm text-gray-700 mt-2">
+              Antes de proceder con el registro, es fundamental que leas y
+              comprendas los requisitos necesarios para completar el proceso de
+              manera efectiva. Por favor, asegúrate de tener los siguientes
+              documentos listos:
+            </p>
+            <div className="flex space-x-2 justify-center mt-2">
+              <button
+                onClick={() =>
+                  downloadFile(
+                    `${
+                      import.meta.env.VITE_API_ARCHIVO
+                    }/documentos/requisitos-local.pdf`
+                  )
+                }
+                className="bg-blue-500 text-white py-2 px-4 rounded hover:bg-blue-700"
+              >
+                Descargar para habilitación de local
+              </button>
+              <button
+                onClick={() =>
+                  downloadFile(
+                    `${
+                      import.meta.env.VITE_API_ARCHIVO
+                    }/documentos/requisitos-eventos.pdf`
+                  )
+                }
+                className="bg-blue-500 text-white py-2 px-4 rounded hover:bg-blue-700"
+              >
+                Descargar para habilitación de eventos
+              </button>
+            </div>
+          </div>
+        )}
 
         <form onSubmit={handleSubmit(onSubmit)} className="mt-4">
           {/* Selección de Tipo de Evento */}
@@ -288,8 +308,8 @@ function RegisterPage() {
                 type="text"
                 {...register("persona", { required: true })}
                 className="w-full bg-gray-100 text-black px-4 py-2 rounded-md my-2"
-                 value="Física"
-                 readOnly
+                value="Física"
+                readOnly
               />
 
               <label
@@ -330,19 +350,25 @@ function RegisterPage() {
                 className="w-full bg-gray-100 text-black px-4 py-2 rounded-md my-2"
                 placeholder="Nombre"
               />
-
               <label
                 htmlFor="localidad"
                 className="block text-sm font-medium text-black"
               >
                 Localidad
               </label>
-              <input
-                type="text"
-                {...register("localidad", { required: true })}
+              <select
+                {...register("localidad")}
+                value={LocalidadValue}
                 className="w-full bg-gray-100 text-black px-4 py-2 rounded-md my-2"
-                placeholder="Localidad"
-              />
+                onChange={handleLocalidadChange}
+              >
+                <option value="">Selecciona una localidad</option>
+                {Municipios.map((municipio) => (
+                  <option key={municipio.id} value={municipio.nombre}>
+                    {municipio.nombre}
+                  </option>
+                ))}
+              </select>
 
               <label
                 htmlFor="domicilio"
@@ -485,12 +511,19 @@ function RegisterPage() {
               >
                 Localidad
               </label>
-              <input
-                type="text"
-                {...register("localidad", { required: true })}
+              <select
+                {...register("localidad")}
+                value={LocalidadValue}
                 className="w-full bg-gray-100 text-black px-4 py-2 rounded-md my-2"
-                placeholder="Localidad"
-              />
+                onChange={handleLocalidadChange}
+              >
+                <option value="">Selecciona una localidad</option>
+                {Municipios.map((municipio) => (
+                  <option key={municipio.id} value={municipio.nombre}>
+                    {municipio.nombre}
+                  </option>
+                ))}
+              </select>
 
               <label
                 htmlFor="domicilio"

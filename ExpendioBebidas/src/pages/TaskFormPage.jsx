@@ -4,6 +4,7 @@ import { useTasks } from "../context/TasksContext";
 import { Link, useNavigate, useParams } from "react-router-dom";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faArrowLeft } from "@fortawesome/free-solid-svg-icons";
+import { Municipios } from "../api/municipios";
 import "./taskformpage.css";
 import Swal from "sweetalert2";
 
@@ -17,6 +18,7 @@ function TaskFormPage() {
   const [tipoPersona, setTipoPersona] = useState("");
   const [showRequisitos, setShowRequisitos] = useState(true);
   const [horarios, setHorarios] = useState([""]); // Estado para los horarios
+  const [LocalidadValue, setSelectedLocalidadValue] = useState("");
 
   useEffect(() => {
     async function loadTask() {
@@ -109,6 +111,10 @@ function TaskFormPage() {
       });
     }
   });
+
+  const handleLocalidadChange = (event) => {
+    setSelectedLocalidadValue(event.target.value);
+  };
 
   const handleFileChange = (e) => {
     const selectedFiles = Array.from(e.target.files); // Convertir el FileList a un array
@@ -223,8 +229,8 @@ function TaskFormPage() {
                 type="text"
                 {...register("persona", { required: true })}
                 className="w-full bg-gray-100 text-black px-4 py-2 rounded-md my-2"
-                 value="Física"
-                 readOnly
+                value="Física"
+                readOnly
               />
 
               <label
@@ -272,12 +278,19 @@ function TaskFormPage() {
               >
                 Localidad
               </label>
-              <input
-                type="text"
-                {...register("localidad", { required: true })}
+              <select
+                {...register("localidad")}
+                value={LocalidadValue}
                 className="w-full bg-gray-100 text-black px-4 py-2 rounded-md my-2"
-                placeholder="Localidad"
-              />
+                onChange={handleLocalidadChange}
+              >
+                <option value="">Selecciona una localidad</option>
+                {Municipios.map((municipio) => (
+                  <option key={municipio.id} value={municipio.nombre}>
+                    {municipio.nombre}
+                  </option>
+                ))}
+              </select>
 
               <label
                 htmlFor="domicilio"
@@ -420,12 +433,19 @@ function TaskFormPage() {
               >
                 Localidad
               </label>
-              <input
-                type="text"
-                {...register("localidad", { required: true })}
+              <select
+                {...register("localidad")}
+                value={LocalidadValue}
                 className="w-full bg-gray-100 text-black px-4 py-2 rounded-md my-2"
-                placeholder="Localidad"
-              />
+                onChange={handleLocalidadChange}
+              >
+                <option value="">Selecciona una localidad</option>
+                {Municipios.map((municipio) => (
+                  <option key={municipio.id} value={municipio.nombre}>
+                    {municipio.nombre}
+                  </option>
+                ))}
+              </select>
 
               <label
                 htmlFor="domicilio"
