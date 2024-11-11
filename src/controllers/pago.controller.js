@@ -16,12 +16,20 @@ export const getPago = async (req, res) => {
 export const updatePago = async (req, res) => {
   try {
     const { value } = req.body;
-    const pago = await Pago.findOneAndUpdate({}, { value }, { new: true });
+
+    // Busca y actualiza el documento de Pago. Si no existe, lo crea.
+    const pago = await Pago.findOneAndUpdate(
+      {},
+      { value },
+      { new: true, upsert: true } // 'upsert: true' crea el documento si no existe
+    );
+
     res.json(pago);
   } catch (error) {
     res.status(500).json({ message: "Error al actualizar el valor de Pago" });
   }
 };
+
 
 
 
