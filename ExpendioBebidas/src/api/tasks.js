@@ -17,3 +17,9 @@ export const deleteTasksRequest = (id) => axios.delete(`/tasks/${id}`);
 // En src/api/tasks.js
 export const createTasksPublicRequest = (task) => axios.post("/taskspublico", task);
 
+// src/api/taskApi.js
+export const getPagoRequest = () => axios.get("/admin/pago");
+
+export const updatePagoRequest = (newPagoValue) => {
+    return axios.put('/admin/pago', { value: newPagoValue });
+};

@@ -12,6 +12,8 @@ import {
   faUserPlus,
   faRotate,
   faCircle,
+  faCoins,
+  faDollar,
 } from "@fortawesome/free-solid-svg-icons";
 import "./Table.css";
 import Paginator from "./Paginator";
@@ -94,12 +96,13 @@ function Table() {
   };
 
   const permissions = {
-    canEdit: ["admin", "editor"].includes(user.role),
+    canEdit: ["admin", "editor", "mesa"].includes(user.role),
     canDelete: ["admin", "editor"].includes(user.role),
     canAddUser: ["admin"].includes(user.role),
     canAddTask: ["admin", "editor"].includes(user.role),
     canViewStatus: ["admin", "viewer", "juridicos", "mesa"].includes(user.role),
     canEditStatus: ["mesa", "juridicos","admin"].includes(user.role),
+    canPagoEditStatus: ["admin"].includes(user.role),
   };
 
   const handleRefresh = async () => await getTasks();
@@ -187,6 +190,11 @@ function Table() {
                 <button onClick={handleRefresh} className="btn btn-success">
                   <FontAwesomeIcon icon={faRotate} />
                 </button>
+                {permissions.canPagoEditStatus && (
+                <Link to="/pago" className="btn btn-success">
+                    <FontAwesomeIcon icon={faDollar} />
+                  </Link>
+               )}
               </li>
             </ul>
 

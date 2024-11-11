@@ -15,6 +15,7 @@ import TaskViewPage from "./pages/TaskViewPage"
 import Footer from "./components/Footer"
 import TaskFormPageEdit from "./pages/TaskFormPageEdit"
 import RegisterPageAdmin from "./pages/RegisterPageAdmin"
+import Pago from "./pages/Pago"
 
 function App() {
   return(
@@ -39,6 +40,7 @@ function App() {
           <Route path='/view/task/:id/' element={<TaskViewPage/>} /> {/* Ruta para ver */}
           <Route path="/edit-task/:id" element={<TaskFormPageEdit />} />
           <Route path='/profile' element={<Profilepage/>} />
+          <Route path='/pago' element={<Pago/>} />
           </Route>
       </Routes>
       <Footer/>

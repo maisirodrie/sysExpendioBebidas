@@ -5,13 +5,19 @@ import { Link, useNavigate, useParams } from "react-router-dom";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import axios from "axios";
 import { Municipios } from "../api/municipios";
-
 import { faArrowLeft, faTimes } from "@fortawesome/free-solid-svg-icons";
 import Swal from "sweetalert2";
+import Vistapago from "./Vistapago"
 import "./taskformpage.css";
 
+
 function RegisterPage() {
-  const { register, handleSubmit, setValue } = useForm();
+  const {
+    register,
+    handleSubmit,
+    setValue,clearErrors,
+    formState: { errors },
+  } = useForm();
   const { createTasksPublic, getTask, updateTask } = useTasks();
   const navigate = useNavigate();
   const params = useParams();
@@ -122,12 +128,13 @@ function RegisterPage() {
     }
   });
 
-
-
   const handleLocalidadChange = (event) => {
-    setSelectedLocalidadValue(event.target.value);
+    const selectedValue = event.target.value;
+    setValue("localidad", selectedValue);
+    if (selectedValue) {
+      clearErrors("localidad"); // Elimina el mensaje de error si el campo tiene un valor
+    }
   };
-
   const handleFileChange = (e) => {
     const selectedFiles = Array.from(e.target.files); // Convertir el FileList a un array
     setFiles((prevFiles) => [...prevFiles, ...selectedFiles]); // Acumular archivos
@@ -211,6 +218,7 @@ function RegisterPage() {
         </div>
         {/* Sección de Requisitos con documentos descargables */}
         {showRequisitos && (
+          
           <div className="relative mb-4 bg-yellow-200 p-4 rounded-md shadow-lg">
             <h2 className="font-bold text-lg">Importante:</h2>
             <p className="text-sm text-gray-700 mt-2">
@@ -219,6 +227,7 @@ function RegisterPage() {
               manera efectiva. Por favor, asegúrate de tener los siguientes
               documentos listos:
             </p>
+           
             <div className="flex space-x-2 justify-center mt-2">
               <button
                 onClick={() =>
@@ -245,8 +254,12 @@ function RegisterPage() {
                 Descargar para habilitación de eventos
               </button>
             </div>
+            
           </div>
+          
         )}
+        <div><h1 className="text-2xl font-bold text-black text-center"><Vistapago /></h1>
+        </div>
 
         <form onSubmit={handleSubmit(onSubmit)} className="mt-4">
           {/* Selección de Tipo de Evento */}
@@ -318,9 +331,14 @@ function RegisterPage() {
               >
                 DNI
               </label>
+              {errors.dni && (
+                <p className="text-red-500 text-sm mt-1">
+                  {errors.dni.message}
+                </p>
+              )}
               <input
                 type="text"
-                {...register("dni", { required: true })}
+                {...register("dni", { required: "El DNI es requerido" })}
                 className="w-full bg-gray-100 text-black px-4 py-2 rounded-md my-2"
                 placeholder="DNI"
               />
@@ -331,9 +349,16 @@ function RegisterPage() {
               >
                 Apellido
               </label>
+              {errors.apellido && (
+                <p className="text-red-500 text-sm mt-1">
+                  {errors.apellido.message}
+                </p>
+              )}
               <input
                 type="text"
-                {...register("apellido", { required: true })}
+                {...register("apellido", {
+                  required: "El Apellido es requerido",
+                })}
                 className="w-full bg-gray-100 text-black px-4 py-2 rounded-md my-2"
                 placeholder="Apellido"
               />
@@ -344,21 +369,33 @@ function RegisterPage() {
               >
                 Nombre
               </label>
+              {errors.nombre && (
+                <p className="text-red-500 text-sm mt-1">
+                  {errors.nombre.message}
+                </p>
+              )}
               <input
                 type="text"
-                {...register("nombre", { required: true })}
+                {...register("nombre", { required: "El Nombre es requerido" })}
                 className="w-full bg-gray-100 text-black px-4 py-2 rounded-md my-2"
                 placeholder="Nombre"
               />
+
               <label
                 htmlFor="localidad"
                 className="block text-sm font-medium text-black"
               >
                 Localidad
               </label>
+              {errors.localidad && (
+                <p className="text-red-500 text-sm mt-1">
+                  {errors.localidad.message}
+                </p>
+              )}
               <select
-                {...register("localidad")}
-                value={LocalidadValue}
+                {...register("localidad", {
+                  required: "La Localidad es requerida",
+                })}
                 className="w-full bg-gray-100 text-black px-4 py-2 rounded-md my-2"
                 onChange={handleLocalidadChange}
               >
@@ -376,9 +413,16 @@ function RegisterPage() {
               >
                 Domicilio Particular
               </label>
+              {errors.domicilio && (
+                <p className="text-red-500 text-sm mt-1">
+                  {errors.domicilio.message}
+                </p>
+              )}
               <input
                 type="text"
-                {...register("domicilio", { required: true })}
+                {...register("domicilio", {
+                  required: "El Domicilio es requerido",
+                })}
                 className="w-full bg-gray-100 text-black px-4 py-2 rounded-md my-2"
                 placeholder="Domicilio"
               />
@@ -389,9 +433,14 @@ function RegisterPage() {
               >
                 Lugar de Realización del evento
               </label>
+              {errors.lugar && (
+                <p className="text-red-500 text-sm mt-1">
+                  {errors.lugar.message}
+                </p>
+              )}
               <input
                 type="text"
-                {...register("lugar", { required: true })}
+                {...register("lugar", { required: "El Lugar es requerido" })}
                 className="w-full bg-gray-100 text-black px-4 py-2 rounded-md my-2"
                 placeholder="Lugar de Realización del evento"
               />
@@ -402,9 +451,16 @@ function RegisterPage() {
               >
                 Días del evento
               </label>
+              {errors.dias && (
+                <p className="text-red-500 text-sm mt-1">
+                  {errors.dias.message}
+                </p>
+              )}
               <textarea
                 type="text"
-                {...register("dias", { required: true })}
+                {...register("dias", {
+                  required: "Los Días del evento es requerido",
+                })}
                 className="w-full bg-gray-100 text-black px-4 py-2 rounded-md my-2"
                 placeholder="Días"
               />
@@ -415,9 +471,16 @@ function RegisterPage() {
               >
                 Horarios del evento
               </label>
+              {errors.horarios && (
+                <p className="text-red-500 text-sm mt-1">
+                  {errors.horarios.message}
+                </p>
+              )}
               <textarea
                 type="text"
-                {...register("horarios", { required: true })}
+                {...register("horarios", {
+                  required: "Los Horarios son requeridos",
+                })}
                 className="w-full bg-gray-100 text-black px-4 py-2 rounded-md my-2"
                 placeholder="Horarios"
               />
@@ -428,9 +491,16 @@ function RegisterPage() {
               >
                 Tipo de Evento
               </label>
+              {errors.tipoevento && (
+                <p className="text-red-500 text-sm mt-1">
+                  {errors.tipoevento.message}
+                </p>
+              )}
               <input
                 type="text"
-                {...register("tipoevento", { required: true })}
+                {...register("tipoevento", {
+                  required: "El Tipo de Evento es requerido",
+                })}
                 className="w-full bg-gray-100 text-black px-4 py-2 rounded-md my-2"
                 placeholder="Tipo de Evento"
               />
@@ -441,9 +511,14 @@ function RegisterPage() {
               >
                 Email particular
               </label>
+              {errors.email && (
+                <p className="text-red-500 text-sm mt-1">
+                  {errors.email.message}
+                </p>
+              )}
               <input
                 type="text"
-                {...register("email", { required: true })}
+                {...register("email", { required: "El Email es requerido" })}
                 className="w-full bg-gray-100 text-black px-4 py-2 rounded-md my-2"
                 placeholder="Email"
               />
@@ -454,9 +529,17 @@ function RegisterPage() {
               >
                 Nro de WhatsApp
               </label>
+
+              {errors.contacto && (
+                <p className="text-red-500 text-sm mt-1">
+                  {errors.contacto.message}
+                </p>
+              )}
               <input
                 type="text"
-                {...register("contacto", { required: true })}
+                {...register("contacto", {
+                  required: "El Nro de WhatsApp es requerido",
+                })}
                 className="w-full bg-gray-100 text-black px-4 py-2 rounded-md my-2"
                 placeholder="Teléfono de Contacto"
               />
@@ -472,9 +555,14 @@ function RegisterPage() {
               >
                 DNI del Propietario
               </label>
+              {errors.dni && (
+                <p className="text-red-500 text-sm mt-1">
+                  {errors.dni.message}
+                </p>
+              )}
               <input
                 type="text"
-                {...register("dni", { required: true })}
+                {...register("dni", { required: "El DNI es requerido" })}
                 className="w-full bg-gray-100 text-black px-4 py-2 rounded-md my-2"
                 placeholder="DNI del Propietario"
               />
@@ -485,9 +573,16 @@ function RegisterPage() {
               >
                 Apellido
               </label>
+              {errors.apellido && (
+                <p className="text-red-500 text-sm mt-1">
+                  {errors.apellido.message}
+                </p>
+              )}
               <input
                 type="text"
-                {...register("apellido", { required: true })}
+                {...register("apellido", {
+                  required: "El Apellido es requerido",
+                })}
                 className="w-full bg-gray-100 text-black px-4 py-2 rounded-md my-2"
                 placeholder="Apellido del Propietario"
               />
@@ -498,9 +593,14 @@ function RegisterPage() {
               >
                 Nombre
               </label>
+              {errors.nombre && (
+                <p className="text-red-500 text-sm mt-1">
+                  {errors.nombre.message}
+                </p>
+              )}
               <input
                 type="text"
-                {...register("nombre", { required: true })}
+                {...register("nombre", { required: "El Nombre es requerido" })}
                 className="w-full bg-gray-100 text-black px-4 py-2 rounded-md my-2"
                 placeholder="Nombre del Propietario"
               />
@@ -511,9 +611,15 @@ function RegisterPage() {
               >
                 Localidad
               </label>
+              {errors.localidad && (
+                <p className="text-red-500 text-sm mt-1">
+                  {errors.localidad.message}
+                </p>
+              )}
               <select
-                {...register("localidad")}
-                value={LocalidadValue}
+                {...register("localidad", {
+                  required: "La Localidad es requerida",
+                })}
                 className="w-full bg-gray-100 text-black px-4 py-2 rounded-md my-2"
                 onChange={handleLocalidadChange}
               >
@@ -524,16 +630,22 @@ function RegisterPage() {
                   </option>
                 ))}
               </select>
-
               <label
                 htmlFor="domicilio"
                 className="block text-sm font-medium text-black"
               >
                 Domicilio particular
               </label>
+              {errors.domicilio && (
+                <p className="text-red-500 text-sm mt-1">
+                  {errors.domicilio.message}
+                </p>
+              )}
               <input
                 type="text"
-                {...register("domicilio", { required: true })}
+                {...register("domicilio", {
+                  required: "El Domicilio es requerido",
+                })}
                 className="w-full bg-gray-100 text-black px-4 py-2 rounded-md my-2"
                 placeholder="Domicilio"
               />
@@ -544,9 +656,16 @@ function RegisterPage() {
               >
                 Nro de Habilitación Municipal
               </label>
+              {errors.nroHabilitacion && (
+                <p className="text-red-500 text-sm mt-1">
+                  {errors.nroHabilitacion.message}
+                </p>
+              )}
               <input
                 type="text"
-                {...register("nroHabilitacion", { required: true })}
+                {...register("nroHabilitacion", {
+                  required: "El Nro de Habilitación es requerido",
+                })}
                 className="w-full bg-gray-100 text-black px-4 py-2 rounded-md my-2"
                 placeholder="Nro de Habilitación Municipal"
               />
@@ -557,10 +676,15 @@ function RegisterPage() {
               >
                 Domicilio del Local Comercial
               </label>
+              {errors.domicilioLocalComercial && (
+                <p className="text-red-500 text-sm mt-1">
+                  {errors.domicilioLocalComercial.message}
+                </p>
+              )}
               <input
                 type="text"
                 {...register("domicilioLocalComercial", {
-                  required: true,
+                  required: "El Domicilio del Local es requerido",
                 })}
                 className="w-full bg-gray-100 text-black px-4 py-2 rounded-md my-2"
                 placeholder="Domicilio del Local Comercial"
@@ -572,9 +696,16 @@ function RegisterPage() {
               >
                 Horario de atención
               </label>
+              {errors.horarioAtencion && (
+                <p className="text-red-500 text-sm mt-1">
+                  {errors.horarioAtencion.message}
+                </p>
+              )}
               <textarea
                 type="text"
-                {...register("horarioAtencion", { required: true })}
+                {...register("horarioAtencion", {
+                  required: "El Horario es requerido",
+                })}
                 className="w-full bg-gray-100 text-black px-4 py-2 rounded-md my-2"
                 placeholder="Horario de atención"
               />
@@ -585,9 +716,14 @@ function RegisterPage() {
               >
                 Rubro
               </label>
+              {errors.rubro && (
+                <p className="text-red-500 text-sm mt-1">
+                  {errors.rubro.message}
+                </p>
+              )}
               <textarea
                 type="text"
-                {...register("rubro", { required: true })}
+                {...register("rubro", { required: "El Rubro es requerido" })}
                 className="w-full bg-gray-100 text-black px-4 py-2 rounded-md my-2"
                 placeholder="Rubro"
               />
@@ -598,9 +734,14 @@ function RegisterPage() {
               >
                 Email
               </label>
+              {errors.email && (
+                <p className="text-red-500 text-sm mt-1">
+                  {errors.email.message}
+                </p>
+              )}
               <input
                 type="text"
-                {...register("email", { required: true })}
+                {...register("email", { required: "El Email es requerido" })}
                 className="w-full bg-gray-100 text-black px-4 py-2 rounded-md my-2"
                 placeholder="Email"
               />
@@ -611,9 +752,16 @@ function RegisterPage() {
               >
                 Nro de Whatsapp
               </label>
+              {errors.contacto && (
+                <p className="text-red-500 text-sm mt-1">
+                  {errors.contacto.message}
+                </p>
+              )}
               <input
                 type="text"
-                {...register("contacto", { required: true })}
+                {...register("contacto", {
+                  required: "El contacto es requerido",
+                })}
                 className="w-full bg-gray-100 text-black px-4 py-2 rounded-md my-2"
                 placeholder="Teléfono de Contacto"
               />
@@ -628,11 +776,21 @@ function RegisterPage() {
           </label>
           <input
             type="file"
-            name="file"
+            {...register("file", {
+              required: "Por favor selecciona al menos un archivo",
+              validate: {
+                maxLength: (value) =>
+                  value.length <= 15 ||
+                  "No puedes seleccionar más de 15 archivos",
+              },
+            })}
             multiple
             onChange={handleFileChange}
             className="w-full bg-gray-100 text-black px-4 py-2 rounded-md my-2"
           />
+          {errors.file && (
+            <p className="text-red-500 text-sm mt-1">{errors.file.message}</p>
+          )}
 
           {/* Mostrar archivos seleccionados */}
           <div className="mt-4">

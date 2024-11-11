@@ -197,6 +197,7 @@ export const updateTasks = async (req, res) => {
   try {
     const { id } = req.params;
     const {
+      filesToRemove, // Array de archivos a eliminar
       expendio,
       persona,
       dni,
@@ -215,39 +216,50 @@ export const updateTasks = async (req, res) => {
       rubro,
       estado,
       horarioAtencion,
-      habilitacionComercial,
+      habilitacionComercial
     } = req.body;
 
-    // Obtener los archivos enviados (manejo de múltiples archivos)
-    const files = req.files ? req.files.map(file => ({
-      filename: file.filename,
-      bucketName: file.bucketName,
-      mimetype: file.mimetype,
-      encoding: file.encoding,
-      id: file.id, // Asegúrate de que se esté configurando correctamente en la carga
-    })) : [];
+    // Obtener los archivos nuevos subidos
+    const newFiles = req.files
+      ? req.files.map((file) => ({
+          filename: file.filename,
+          bucketName: file.bucketName,
+          mimetype: file.mimetype,
+          encoding: file.encoding,
+          id: file.id
+        }))
+      : [];
 
+    // Verificar si la tarea existe
     const task = await Task.findById(id);
     if (!task) return res.status(404).json({ message: "Tarea no encontrada" });
 
-    // Solo eliminar archivos si se han subido nuevos archivos
-    if (files.length > 0) {
-      // Eliminar archivos existentes
-      for (const fileInfo of task.file) {
-        if (fileInfo.id) {
-          try {
-            await gfs.delete(new mongoose.Types.ObjectId(fileInfo.id));
-          } catch (error) {
-            return res.status(500).json({ message: "Error al eliminar el archivo anterior." });
-          }
+    // Eliminar los archivos que se hayan especificado en filesToRemove
+    if (filesToRemove && filesToRemove.length > 0) {
+      console.log("Eliminando archivos: ", filesToRemove); // Log para verificar los archivos a eliminar
+
+      // Iterar sobre los archivos a eliminar
+      for (const fileId of filesToRemove) {
+        // Verificar y convertir el ID a ObjectId
+        if (mongoose.Types.ObjectId.isValid(fileId)) {
+          const objectId = new mongoose.Types.ObjectId(fileId);
+
+          // Remover archivo de la tarea
+          await Task.updateOne({ _id: id }, { $pull: { file: { id: objectId } } });
+
+          // Eliminar archivo de GridFS
+          await gridfsBucket.delete(objectId);
+          console.log(`Archivo con ID ${fileId} eliminado.`);
+        } else {
+          console.warn(`ID inválido en filesToRemove: ${fileId}`);
         }
       }
-    } else {
-      // Si no se están subiendo nuevos archivos, mantenemos los archivos existentes
-      files.push(...task.file); // Conservar archivos existentes
     }
 
-    // Actualizar la tarea con los nuevos datos y archivos
+    // Combinar archivos existentes con los nuevos
+    const updatedFiles = [...task.file, ...newFiles];
+
+    // Actualizar la tarea con los nuevos datos y archivos combinados
     const updatedTask = await Task.findByIdAndUpdate(
       id,
       {
@@ -270,18 +282,23 @@ export const updateTasks = async (req, res) => {
         estado,
         horarioAtencion,
         habilitacionComercial,
-        file: files, // Guardar los nuevos archivos o los existentes
+        file: updatedFiles // Guardar los archivos combinados
       },
       { new: true }
     );
 
+    // Registrar la actividad del usuario
     await logActivity(req.user.id, "actualizó tarea", "tarea", updatedTask._id);
 
     res.json(updatedTask);
   } catch (error) {
+    console.error("Error al guardar la tarea:", error);
     return res.status(500).json({ message: error.message });
   }
 };
+
+
+
 
 export const taskEstados = async (req, res) => {
   try {

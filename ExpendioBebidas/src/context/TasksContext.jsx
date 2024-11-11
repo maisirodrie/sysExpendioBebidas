@@ -1,6 +1,7 @@
 import { createContext, useContext, useState } from "react";
-import { createTasksRequest,createTasksPublicRequest, deleteTasksRequest, getTaskRequest, getTasksRequest, updateTasksRequest } from "../api/tasks";
+import { createTasksRequest,createTasksPublicRequest, deleteTasksRequest, getTaskRequest, getTasksRequest, updateTasksRequest, getPagoRequest,updatePagoRequest } from "../api/tasks";
 import { trusted } from "mongoose";
+import React, { useEffect } from "react";
 
 const TaskContext = createContext()
 
@@ -17,6 +18,7 @@ export const useTasks = () => {
 export function TaskProvider({ children }) {
 
     const [tasks, setTasks] = useState([]);
+    const [pago, setPago] = useState(0); // Estado para almacenar el valor de Pago
 
     const getTasks = async () => {
         try {
@@ -78,12 +80,46 @@ export function TaskProvider({ children }) {
         }
     };
 
+    
+    const getPago = async () => {
+        try {
+            const res = await getPagoRequest()
+            setPago(res.data.value)
+        } catch (error) {
+            console.error(error)
+        }
+
+    }
+    
+
+    const updatePago = async (newPagoValue) => {
+        try {
+            const res = await updatePagoRequest(newPagoValue); // Actualiza el valor de pago en el backend
+            setPago(res.data.value);
+        } catch (error) {
+            console.error("Error al actualizar el valor de Pago:", error);
+        }
+    };
+
+    useEffect(() => {
+        getPago(); // Obtiene el valor de Pago cuando el componente se monta
+    }, []); // Solo se ejecuta una vez cuando el componente se monta
 
 
 
 
 return (
-    <TaskContext.Provider value={{ tasks, createTask, createTasksPublic, getTasks, deleteTask, getTask, updateTask, updateTaskStatus }}>
+    <TaskContext.Provider value={{   tasks,
+        createTask,
+        createTasksPublic,
+        getTasks,
+        deleteTask,
+        getTask,
+        updateTask,
+        updateTaskStatus,
+        pago,
+        getPago,
+        updatePago }}>
         {children}
     </TaskContext.Provider>
 )

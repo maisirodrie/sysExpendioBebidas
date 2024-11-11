@@ -14,6 +14,8 @@ import {
   getTaskWithUser,
   taskEstados,
 } from "../controllers/tasks.controller.js";
+import { getPago, updatePago } from "../controllers/pago.controller.js";
+import { updatePagoSchema } from "../schemas/pago.schema.js";
 import { validateSchema } from "../middlewares/validator.middleware.js";
 import { creatTaskSchema } from "../schemas/task.schema.js";
 import { upload, streamUpload } from "../multerConfig.js"; // Asegúrate de que esta ruta es correcta
@@ -74,6 +76,11 @@ router.get("/profile", authRequired, profile); // Ver perfil de usuario
 router.put("/profile", authRequired, updateProfile); // Editar perfil de usuario
 router.put('/users/change-password', authRequired, changeUserPassword); // Ruta para que un usuario cambie su propia contraseña
 router.get("/verify-token", verifyToken); // Verificar token de autenticación
+
+// Rutas de Pago para el administrador
+router.get("/admin/pago", getPago); // Obtener valor de Pago
+router.put("/admin/pago",validateSchema(updatePagoSchema), updatePago); // Actualizar valor de Pago
+
 
 // Administrador
 router.put('/admin/users/blanquear-password/:userId', authRequired, adminChangeUserPassword); // Ruta para que un administrador blanquee la contraseña de un usuario

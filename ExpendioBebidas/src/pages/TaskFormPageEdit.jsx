@@ -18,6 +18,9 @@ function TaskFormPageEdit() {
   const [tipoPersona, setTipoPersona] = useState("");
   const [selectedFiles, setSelectedFiles] = useState([]);
   const [pdfUrl, setPdfUrl] = useState([]); // URL del archivo actual
+  // Estado para almacenar archivos seleccionados para eliminar
+const [filesToRemove, setFilesToRemove] = useState([]);
+
   const apiUrl = import.meta.env.VITE_API_ARCHIVO;
   const [LocalidadValue, setSelectedLocalidadValue] = useState("");
 
@@ -69,28 +72,33 @@ function TaskFormPageEdit() {
           Swal.showLoading();
         },
       });
-
+  
       const formData = new FormData();
       Object.keys(data).forEach((key) => {
         if (key !== "file") {
           formData.append(key, data[key]);
         }
       });
-
-      // Agregar archivos existentes primero (si hay)
+  
+      // Agregar archivos actuales al FormData
       if (selectedFiles && selectedFiles.length > 0) {
         selectedFiles.forEach((file) => {
-          formData.append("files", file); // Asegúrate de usar el nombre correcto del campo
+          formData.append("files", file);
         });
       }
-
-      // Luego agregar los nuevos archivos
+  
+      // Agregar nuevos archivos al FormData
       if (files && files.length > 0) {
         files.forEach((file) => {
           formData.append("files", file);
         });
       }
-
+  
+      // Agregar archivos a eliminar en FormData
+      filesToRemove.forEach((files) => {
+        formData.append("files", files);
+      });
+  
       if (params.id) {
         await updateTask(params.id, formData);
         Swal.close();
@@ -102,10 +110,12 @@ function TaskFormPageEdit() {
           showConfirmButton: false,
         });
       }
-
+  
+      // Navegar y limpiar el estado de archivos para eliminar
+      setFilesToRemove([]);
       navigate("/task");
     } catch (error) {
-      console.error("Error:", error);
+      console.error("Error al guardar la tarea:", error.response?.data || error.message);
       Swal.close();
       Swal.fire({
         title: "Error",
@@ -126,10 +136,71 @@ function TaskFormPageEdit() {
     setFiles((prevFiles) => [...prevFiles, ...selectedFiles]); // Acumular archivos
   };
 
-  // Función para eliminar un archivo específico del acumulador
-  const removeFile = (index) => {
-    setFiles((prevFiles) => prevFiles.filter((_, i) => i !== index));
-  };
+// Función para marcar un archivo actual para eliminar
+const removeCurrentFile = (index) => {
+  const fileIdToRemove = selectedFiles[index].id;
+
+  // Agregar el archivo a la lista de archivos a eliminar
+  setFilesToRemove((prev) => [...prev, fileIdToRemove]);
+
+  // Eliminarlo de la vista
+  setPdfUrl((prevFiles) => prevFiles.filter((_, i) => i !== index));
+  setSelectedFiles((prevFiles) => prevFiles.filter((_, i) => i !== index));
+};
+
+
+// Función para alternar la selección de archivos a eliminar
+const toggleFileSelection = (index) => {
+  setFilesToRemove((prev) => {
+    if (prev.includes(index)) {
+      // Si el archivo ya está seleccionado, desmarcarlo
+      return prev.filter((i) => i !== index);
+    } else {
+      // Si no está seleccionado, marcarlo
+      return [...prev, index];
+    }
+  });
+};
+
+// Función para eliminar los archivos seleccionados
+const removeSelectedFiles = () => {
+  setPdfUrl((prevFiles) => prevFiles.filter((_, i) => !filesToRemove.includes(i)));
+  setSelectedFiles((prevFiles) => prevFiles.filter((_, i) => !filesToRemove.includes(i)));
+  setFilesToRemove([]); // Limpiar la lista de archivos seleccionados
+};
+
+
+
+// Función para eliminar archivos seleccionados que aún no se han subido
+const removeFile = (index) => {
+  setFiles((prevFiles) => prevFiles.filter((_, i) => i !== index));
+  resetFileInput(); // Restablecer el campo después de eliminar
+};
+
+
+
+// Función para restablecer el campo de entrada de archivos
+const resetFileInput = () => {
+  document.querySelector('input[type="file"]').value = files;
+};
+
+const handleSave = async () => {
+  try {
+    // Enviar la solicitud de actualización, incluyendo los archivos a eliminar
+    await updateTask(params.id, {
+      filesToRemove, // archivos marcados para eliminar
+      // otros datos de la tarea, incluyendo nuevos archivos y campos actualizados
+    });
+
+    // Limpiar la lista de archivos a eliminar después de la solicitud
+    setFilesToRemove([]);
+  } catch (error) {
+    console.error("Error al guardar la tarea:", error);
+  }
+};
+
+
+
 
   const handleTipoExpendioChange = (e) => {
     const selectedExpendio = e.target.value;
@@ -276,7 +347,7 @@ function TaskFormPageEdit() {
                 placeholder="Nombre"
               />
 
-<label
+              <label
                 htmlFor="localidad"
                 className="block text-sm font-medium text-black"
               >
@@ -431,7 +502,7 @@ function TaskFormPageEdit() {
                 placeholder="Nombre del Propietario"
               />
 
-<label
+              <label
                 htmlFor="localidad"
                 className="block text-sm font-medium text-black"
               >
@@ -547,13 +618,14 @@ function TaskFormPageEdit() {
           )}
 
           {/* Visualización de los archivos actuales */}
+          {/* Visualización de los archivos actuales */}
           {pdfUrl.length > 0 && (
             <div className="my-4">
               <label className="block text-sm font-medium text-black mb-2">
                 Archivos actuales:
               </label>
               {pdfUrl.map((url, index) => (
-                <div key={index}>
+                <div key={index} className="flex justify-between items-center">
                   <a
                     href={url}
                     target="_blank"
@@ -562,6 +634,13 @@ function TaskFormPageEdit() {
                   >
                     Ver Archivo {index + 1}
                   </a>
+                  <button
+                    type="button"
+                    onClick={() => removeCurrentFile(index)} // Llamada a la función de eliminación
+                    className="text-red-600 hover:underline"
+                  >
+                    Eliminar
+                  </button>
                 </div>
               ))}
             </div>
@@ -578,7 +657,10 @@ function TaskFormPageEdit() {
             type="file"
             name="file"
             multiple
-            onChange={handleFileChange}
+            onChange={(e) => {
+              handleFileChange(e);
+              resetFileInput(); // Restablece el campo de archivos después de agregar
+            }}
             className="w-full bg-gray-100 text-black px-4 py-2 rounded-md my-2"
           />
 
@@ -586,23 +668,22 @@ function TaskFormPageEdit() {
           <div className="mt-4">
             <h3 className="text-lg font-semibold">Archivos seleccionados:</h3>
             <ul className="list-disc list-inside">
-              {files.length > 0 &&
-                files.map((file, index) => (
-                  <li key={`new-${index}`} className="flex justify-between">
-                    {file.name}
-                    <button
-                      type="button"
-                      onClick={() => removeNewFile(index)}
-                      className="text-red-600 hover:underline"
-                    >
-                      Eliminar
-                    </button>
-                  </li>
-                ))}
+              {files.map((file, index) => (
+                <li key={index} className="flex justify-between">
+                  {file.name}
+                  <button
+                    type="button"
+                    onClick={() => removeFile(index)}
+                    className="text-red-600 hover:underline"
+                  >
+                    Eliminar
+                  </button>
+                </li>
+              ))}
             </ul>
           </div>
 
-          <button
+          <button  onClick={handleSave}
             type="submit"
             className="w-full bg-blue-500 text-white px-4 py-2 rounded-md mt-4"
           >
