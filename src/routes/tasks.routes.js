@@ -79,7 +79,7 @@ router.get("/verify-token", verifyToken); // Verificar token de autenticación
 
 // Rutas de Pago para el administrador
 router.get("/admin/pago", getPago); // Obtener valor de Pago
-router.put("/admin/pago",validateSchema(updatePagoSchema), updatePago); // Actualizar valor de Pago
+router.put("/admin/pago",authRequired,validateSchema(updatePagoSchema), updatePago); // Actualizar valor de Pago
 
 
 // Administrador
