@@ -21,5 +21,10 @@ export const createTasksPublicRequest = (task) => axios.post("/taskspublico", ta
 export const getPagoRequest = () => axios.get("/admin/pago");
 
 export const updatePagoRequest = (newPagoValue) => {
-    return axios.put('/admin/pago', { value: newPagoValue });
-};
+    return axios.put('/admin/pago', {
+      unidaduf: newPagoValue.unidaduf, 
+      valoruf: newPagoValue.valoruf, 
+      valortotal: newPagoValue.valortotal // Incluir este campo
+    });
+  };
+  

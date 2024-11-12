@@ -1,9 +1,18 @@
-// src/models/pago.model.js
-import mongoose from "mongoose";
-
+import mongoose from 'mongoose';
 
 const pagoSchema = new mongoose.Schema({
-    value: { type: Number, required: true }, // El valor del pago
-  }, { timestamps: true });
+  unidaduf: {
+    type: Number,
+    required: true,
+  },
+  valoruf: {
+    type: Number,
+    required: true,
+  },
+  valortotal: {
+    type: Number,
+    required: true,
+  },
+});
 
 export default mongoose.model("Pago", pagoSchema);

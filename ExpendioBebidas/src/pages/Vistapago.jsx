@@ -4,9 +4,9 @@ const Vistapago = () => {
   const { pago } = useTasks(); // Usamos el hook para obtener el valor de pago
 
   return (
-      <div>
-          <p>Valor del registro U.F : ${pago}</p> {/* Aquí mostramos el valor de pago */}
-      </div>
+      <div className="bg-gray-100 p-4 rounded-md shadow-md max-w-md mx-auto mt-4">
+      <p>Valor del registro : ${pago?.valortotal || 0}</p>
+    </div>
   );
 };
 

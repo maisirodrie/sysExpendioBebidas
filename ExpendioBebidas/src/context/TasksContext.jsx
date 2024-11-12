@@ -18,7 +18,11 @@ export const useTasks = () => {
 export function TaskProvider({ children }) {
 
     const [tasks, setTasks] = useState([]);
-    const [pago, setPago] = useState(0); // Estado para almacenar el valor de Pago
+    const [pago, setPago] = useState({
+  unidaduf: 0,
+  valoruf: 0,
+  valortotal: 0,  // Aquí también debería estar valortotal
+});
 
     const getTasks = async () => {
         try {
@@ -83,23 +87,38 @@ export function TaskProvider({ children }) {
     
     const getPago = async () => {
         try {
-            const res = await getPagoRequest()
-            setPago(res.data.value)
+          const res = await getPagoRequest(); // Suponiendo que la respuesta es la que muestras
+          setPago({
+            unidaduf: res.data.unidaduf, // Asigna todos los valores necesarios
+            valoruf: res.data.valoruf,
+            valortotal: res.data.valortotal,
+          });
         } catch (error) {
-            console.error(error)
+          console.error("Error al obtener el pago:", error);
         }
-
-    }
-    
-
-    const updatePago = async (newPagoValue) => {
+      };
+      
+      const updatePago = async (newPagoValue) => {
         try {
-            const res = await updatePagoRequest(newPagoValue); // Actualiza el valor de pago en el backend
-            setPago(res.data.value);
+          console.log("Datos a enviar:", newPagoValue);
+          const res = await updatePagoRequest(newPagoValue);
+          setPago({
+            unidaduf: res.data.unidaduf,
+            valoruf: res.data.valoruf,
+            valortotal: res.data.valortotal,
+          });
         } catch (error) {
-            console.error("Error al actualizar el valor de Pago:", error);
+          if (error.response) {
+            console.error("Error al actualizar el valor de Pago:", error.response.data); // Muestra detalles del error de la respuesta
+            console.error("Código de estado:", error.response.status); // Código de estado
+          } else {
+            console.error("Error al actualizar el valor de Pago:", error.message); // Muestra el mensaje de error
+          }
         }
-    };
+      };
+      
+      
+    
 
     useEffect(() => {
         getPago(); // Obtiene el valor de Pago cuando el componente se monta

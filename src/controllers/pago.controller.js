@@ -11,24 +11,29 @@ export const getPago = async (req, res) => {
   }
 };
 
-
-
 export const updatePago = async (req, res) => {
   try {
-    const { value } = req.body;
+    const { unidaduf, valoruf } = req.body;
+    console.log('Unidad UF:', unidaduf, 'Valor UF:', valoruf); // Log para depuración
 
-    // Busca y actualiza el documento de Pago. Si no existe, lo crea.
+    const valortotal = unidaduf * valoruf; // Cálculo del valor total
+    console.log('Valor Total Calculado:', valortotal); // Verifica el cálculo
+
+    // Busca y actualiza el documento de Pago, o lo crea si no existe
     const pago = await Pago.findOneAndUpdate(
-      {},
-      { value },
-      { new: true, upsert: true } // 'upsert: true' crea el documento si no existe
+      {}, // Busca el primer documento
+      { unidaduf, valoruf, valortotal }, // Actualiza los valores
+      { new: true, upsert: true } // Crea el documento si no existe
     );
 
+    console.log('Pago actualizado:', pago); // Verifica el pago actualizado
     res.json(pago);
   } catch (error) {
+    console.error(error);
     res.status(500).json({ message: "Error al actualizar el valor de Pago" });
   }
 };
+
 
 
 
