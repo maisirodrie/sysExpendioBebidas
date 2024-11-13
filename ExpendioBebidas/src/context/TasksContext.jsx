@@ -38,13 +38,14 @@ export function TaskProvider({ children }) {
     const createTask = async (task) => {
         const res = await createTasksRequest(task)
         console.log(task)
+        return res.data
     }
 
-    const createTasksPublic  = async (task) => {
-        const res = await createTasksPublicRequest(task)
-        console.log(task)
+    const createTasksPublic = async (task) => {
+        const res = await createTasksPublicRequest(task);
+        console.log("Respuesta del servidor:", res); // Verifica que la respuesta contenga lo que esperas
+        return res.data;  // Devuelve la respuesta correcta
     }
-
     
     const deleteTask = async (id) => {
         try {

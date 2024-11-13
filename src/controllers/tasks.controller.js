@@ -35,7 +35,6 @@ export const getTasks = async (req, res) => {
 
 
 
-// Controlador para crear tareas públicas
 export const createTasksPublic = async (req, res) => {
   try {
     const {
@@ -60,22 +59,36 @@ export const createTasksPublic = async (req, res) => {
       habilitacionComercial,
     } = req.body;
 
+    // Verificar si ya existe una tarea con el mismo DNI
     const existingTask = await Task.findOne({ dni });
     if (existingTask) {
       return res.status(400).json({ message: "El expediente ya ha sido cargado." });
     }
 
-   // Si se subió un archivo combinado
-   const files = req.files ? req.files.map(file => ({
-    filename: file.filename,
-    bucketName: file.bucketName,
-    mimetype: file.mimetype,
-    encoding: file.encoding,
-    id: file.id,
-  })) : [];
+    // Si se subió un archivo
+    const files = req.files ? req.files.map(file => ({
+      filename: file.filename,
+      bucketName: file.bucketName,
+      mimetype: file.mimetype,
+      encoding: file.encoding,
+      id: file.id,
+    })) : [];
+
+    // Definir el código del organismo
+    const codigoOrganismo = "2000";
+
+    // Buscar la última tarea con el mismo código de organismo
+    const lastTask = await Task.findOne({ nroexpediente: new RegExp(`/${codigoOrganismo}$`) })
+    .sort({ createdAt: -1 });
+  const nextNumber = lastTask ? parseInt(lastTask.nroexpediente.split("/")[0]) + 1 : 1;
+  const nroexpediente = `${nextNumber}/${codigoOrganismo}`;
+  console.log("Número de expediente generado:", nroexpediente);
+
+  
 
     // Crear la nueva tarea sin usuario asociado
     const newTask = new Task({
+      nroexpediente,
       expendio,
       persona,
       dni,
@@ -96,16 +109,24 @@ export const createTasksPublic = async (req, res) => {
       horarioAtencion,
       habilitacionComercial,
       file: files,
-      // Sin campo user
     });
 
+    // Guardar la nueva tarea en la base de datos
     await newTask.save();
-    res.status(201).json(newTask);
+
+    // Enviar la respuesta con el nroexpediente
+    res.json({
+      success: true,
+      nroexpediente: nroexpediente, // Esto se asegura de que el número de expediente se envíe al frontend
+      mensaje: 'Tarea creada/actualizada exitosamente'
+    });
+    
   } catch (error) {
     console.error(error);
     return res.status(500).json({ message: error.message });
   }
 };
+
 
 
 export const createTasks = async (req, res) => {

@@ -2,6 +2,7 @@ import mongoose from "mongoose";
 
 const taskSchema = new mongoose.Schema(
   {
+    nroexpediente: { type: String, required: true, trim: true  },
     expendio: { type: String, trim: true },
     persona: { type: String, trim: true },
     dni: { type: String, trim: true },

@@ -75,58 +75,69 @@ function RegisterPage() {
 
   const onSubmit = handleSubmit(async (data) => {
     try {
-      Swal.fire({
-        title: "Cargando...",
-        text: "Por favor, espere mientras se guarda el registro.",
-        allowOutsideClick: false,
-        didOpen: () => {
-          Swal.showLoading();
-        },
-      });
+        Swal.fire({
+            title: "Cargando...",
+            text: "Por favor, espere mientras se guarda el registro.",
+            allowOutsideClick: false,
+            didOpen: () => {
+                Swal.showLoading();
+            },
+        });
 
-      const formData = new FormData();
-      Object.keys(data).forEach((key) => {
-        formData.append(key, data[key]);
-      });
+        const formData = new FormData();
+        Object.keys(data).forEach((key) => {
+            formData.append(key, data[key]);
+        });
 
-      // Agregar los horarios al formData
-      horarios.forEach((horario) => {
-        if (horario) formData.append("horarios[]", horario); // Usar un arreglo
-      });
+        // Agregar los horarios al formData
+        horarios.forEach((horario) => {
+            if (horario) formData.append("horarios[]", horario);
+        });
 
-      files.forEach((file) => {
-        formData.append("files", file);
-      });
+        files.forEach((file) => {
+            formData.append("files", file);
+        });
 
-      if (params.id) {
-        await updateTask(params.id, formData);
+        let res;  // Aquí usamos 'res' en lugar de 'response'
+        if (params.id) {
+            res = await updateTask(params.id, formData);  // Si es una actualización
+        } else {
+            res = await createTasksPublic(formData);  // Si es una creación
+        }
+
+        if (res && res.nroexpediente) {
+          const nroexpediente = res.nroexpediente;
+          console.log("Número de expediente:", nroexpediente);  // Verifica que se recibe el nroexpediente correctamente
+          Swal.fire({
+              icon: "success",
+              title: "¡Éxito!",
+              html: `
+                  <p>Su registro se ha generado con éxito con el número de trámite: <strong>${nroexpediente}</strong>.</p>
+                  <p>Para cualquier consulta, llame al: <strong>0376-448963</strong>.</p>
+              `,
+              confirmButtonText: "OK",
+              allowOutsideClick: false,
+              showCloseButton: false,
+          });
+          navigate("/");  // Redirigir después de la creación/actualización
       } else {
-        await createTasksPublic(formData);
+          console.error("Número de expediente no encontrado:", res);
+          throw new Error("El número de expediente no se recibió correctamente");
       }
+      
 
-      Swal.fire({
-        icon: "success",
-        title: "¡Éxito!",
-        html: `
-          <p>Su registro se ha generado con éxito con el número de trámite: <strong></strong>.</p>
-          <p>Para cualquier consulta, llame al: <strong>0376-4447752</strong>.</p>
-        `,
-        confirmButtonText: "OK",
-        allowOutsideClick: false, // Evita que se cierre al hacer clic fuera
-        showCloseButton: false, // Evita el botón de cierre en la esquina
-      });
-
-      navigate("/");
     } catch (error) {
-      console.error("Error:", error);
-      Swal.close();
-      Swal.fire({
-        icon: "error",
-        title: "Error",
-        text: "Ocurrió un error al guardar el registro.",
-      });
+        console.error("Error:", error);
+        Swal.close();
+        Swal.fire({
+            icon: "error",
+            title: "Error",
+            text: error.message || "Ocurrió un error al guardar el registro.",
+        });
     }
-  });
+});
+  
+  
 
   const handleLocalidadChange = (event) => {
     const selectedValue = event.target.value;

@@ -1,6 +1,7 @@
 import { z } from "zod";
 
 export const creatTaskSchema = z.object({
+  nroexpediente:z.string().optional(),
   expendio: z.string({
     required_error: "El expendio es requerido",
   }),
@@ -37,4 +38,5 @@ export const creatTaskSchema = z.object({
   habilitacionComercial: z.string().optional(), // Opcional si aplica
   estado: z.string().optional().default("Ingresado"),
   file: z.any().optional(), // Correcta utilización de optional
+  user: z.string().optional(),
 });
