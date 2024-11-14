@@ -12,7 +12,6 @@ import {
   faUserPlus,
   faRotate,
   faCircle,
-  faCoins,
   faDollar,
 } from "@fortawesome/free-solid-svg-icons";
 import "./Table.css";
@@ -20,7 +19,7 @@ import Paginator from "./Paginator";
 import Swal from "sweetalert2";
 
 function Table() {
-  const { tasks, deleteTask, getTasks, updateTaskStatus } = useTasks();
+  const { tasks, deleteTask, getTasks, updateTaskStatus, updateTask } = useTasks();
   const { user } = useAuth(); // Suponiendo que 'user' contiene el rol del usuario
   const [search, setSearch] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
@@ -45,6 +44,14 @@ function Table() {
     });
   }
 
+    // Función para cambiar el estado de "Pagado/No Pagado"
+    const handlePaidToggle = async (task) => {
+      const updatedStatus = !task.pago; // Cambia entre pagado y no pagado
+      // Supongamos que `updateTaskStatus` puede actualizar el estado de pago
+      await updateTask(task._id, { pago: updatedStatus });
+      await getTasks(); // Refresca la lista después de actualizar
+    };
+
   const searcher = (e) => {
     setSearch(e.target.value);
   };
@@ -54,6 +61,7 @@ function Table() {
   const filteredTasks = !search
     ? reversedTasks
     : reversedTasks.filter((task) => {
+      const nroexpediente = task.nroexpediente ? task.nroexpediente.toLowerCase() : "";
         const apellido = task.apellido ? task.apellido.toLowerCase() : "";
         const nombre = task.nombre ? task.nombre.toLowerCase() : "";
         const dni = task.dni ? task.dni.toLowerCase() : "";
@@ -64,6 +72,7 @@ function Table() {
         const searchLowerCase = search.toLowerCase();
 
         return (
+          nroexpediente.includes(searchLowerCase) ||
           apellido.includes(searchLowerCase) ||
           nombre.includes(searchLowerCase) ||
           dni.includes(searchLowerCase) ||
@@ -203,9 +212,10 @@ function Table() {
               <table className="table" style={{ textTransform: "uppercase" }}>
                 <thead>
                   <tr>
-                    <th colSpan="10" className="table-title">Listado de Archivos</th>
+                    <th colSpan="12" className="table-title">Listado de Archivos</th>
                   </tr>
                   <tr>
+                    <th>N° Expediente</th>
                     <th>Apellido</th>
                     <th>Nombre</th>
                     <th>DNI</th>
@@ -213,6 +223,7 @@ function Table() {
                     <th>Tipo de Persona</th>
                     <th>Tipo de Expendio</th>
                     <th>Estado</th>
+                    <th>Pagado</th>
                     <th>Ver</th>
                     {permissions.canEdit && <th>Editar</th>}
                     {permissions.canDelete && <th>Borrar</th>}
@@ -221,6 +232,7 @@ function Table() {
                 <tbody>
                   {currentTasks.map((task) => (
                     <tr key={task._id}>
+                      <td>{task.nroexpediente?.toUpperCase()}</td>
                       <td>{task.apellido?.toUpperCase()}</td>
                       <td>{task.nombre?.toUpperCase()}</td>
                       <td>{task.dni?.toUpperCase()}</td>
@@ -248,6 +260,16 @@ function Table() {
                           )}
                         </td>
                       )}
+                      <td>
+                        <label className="switch">
+                          <input
+                            type="checkbox"
+                            checked={task.pago || false}
+                            onChange={() => handlePaidToggle(task)}
+                          />
+                          <span className="slider"></span>
+                        </label>
+                      </td>
                       <td>
                         <Link className="btn btn-success" to={`/view/task/${task._id}`}>
                           <FontAwesomeIcon icon={faEye} />

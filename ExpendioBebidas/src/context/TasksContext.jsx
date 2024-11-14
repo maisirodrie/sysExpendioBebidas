@@ -85,6 +85,25 @@ export function TaskProvider({ children }) {
         }
     };
 
+    const updatePagoStatus = async (id, pagoStatus) => {
+        try {
+            // Realiza la solicitud al backend para actualizar el estado del pago
+            const res = await updatePagoRequest(id, { pago: pagoStatus });
+            if (res.status === 200) {
+                // Si la respuesta es exitosa, actualiza el estado de pago en el frontend
+                setTasks((prevTasks) =>
+                    prevTasks.map((task) =>
+                        task._id === id ? { ...task, pago: pagoStatus } : task
+                    )
+                );
+            }
+        } catch (error) {
+            console.error("Error al actualizar el estado de pago:", error);
+        }
+    };
+    
+
+
     
     const getPago = async () => {
         try {

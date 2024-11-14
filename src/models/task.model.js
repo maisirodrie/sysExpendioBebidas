@@ -35,6 +35,7 @@ const taskSchema = new mongoose.Schema(
       enum: ["pendiente", "controlado", "aprobado", "rechazado", "finalizado", "ingresado"],
       default: "ingresado",
     },
+    pago: { type: Boolean, default: false }, // Campo de pago con valor por defecto false
     user: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "User",

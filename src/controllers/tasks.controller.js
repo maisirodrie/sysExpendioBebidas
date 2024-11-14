@@ -109,6 +109,7 @@ export const createTasksPublic = async (req, res) => {
       horarioAtencion,
       habilitacionComercial,
       file: files,
+      pago: false, // Campo de pago, inicialmente "no pagado"
     });
 
     // Guardar la nueva tarea en la base de datos
@@ -237,7 +238,8 @@ export const updateTasks = async (req, res) => {
       rubro,
       estado,
       horarioAtencion,
-      habilitacionComercial
+      habilitacionComercial,
+      pago
     } = req.body;
 
     // Obtener los archivos nuevos subidos
@@ -303,6 +305,7 @@ export const updateTasks = async (req, res) => {
         estado,
         horarioAtencion,
         habilitacionComercial,
+        pago,
         file: updatedFiles // Guardar los archivos combinados
       },
       { new: true }
@@ -372,6 +375,9 @@ export const taskEstados = async (req, res) => {
   }
 };
 
+
+export const taskPagos = async (req, res) => {
+}
 
 
 
