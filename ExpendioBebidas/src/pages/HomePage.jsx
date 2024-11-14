@@ -5,12 +5,6 @@ import "./login.css";
 function HomePage() {
   return (
     <section>
-      {/* <div className="bg-yellow-200 rounded-lg p-4 text-center">
-            <h2 className="text-lg font-bold mb-2">¡Próximamente!</h2>
-            <p className="text-sm text-gray-700">Esta página se habilitará</p>
-          </div> */}
-      
-      
       <header
         className="bg-cover bg-no-repeat py-10 text-white relative flex flex-col justify-center items-center"
         style={{
@@ -21,19 +15,17 @@ function HomePage() {
       >
         <div className="bg-dark-overlay absolute inset-0"></div> {/* Superposición de color oscuro */}
         <div className="container mx-auto relative z-10 text-center"> {/* Contenido del encabezado */}
-        <h1 className="text-5xl font-bold mb-4">Solicitud Provincial de Expendio de Bebidas</h1>
-          {/* <p className="text-md mb-8">
-            “La Danza abarca todas las formas de expresión artística corporal
-            en sus diversos géneros, estilos y formatos interpretativos”
-          </p> */}
+          <h1 className="text-5xl font-bold mb-4">Solicitud Provincial de Expendio de Bebidas</h1>
+          
+         
+          
+          {/* Agregar la clase personalizada al Link */}
           <Link
-  className="hover:bg-blue-600 hover:border-blue-600 hover:text-white bg-blue-500 text-white border-blue-500 border-2 px-4 py-2 rounded-md inline-block"
-  to="/register"
->
-  Bienvenido
-</Link>  
-
-
+            className="custom-button hover:bg-blue-600 hover:border-blue-600 hover:text-white border-blue-500 border-2 px-4 py-2 rounded-md inline-block mt-4"
+            to="/register"
+          >
+            Bienvenido
+          </Link>
         </div>
       </header>
     </section>
@@ -41,4 +33,3 @@ function HomePage() {
 }
 
 export default HomePage;
-

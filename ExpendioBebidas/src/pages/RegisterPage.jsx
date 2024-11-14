@@ -73,6 +73,17 @@ function RegisterPage() {
     loadTask();
   }, [params.id, setValue, getTask]);
 
+  useEffect(() => {
+    // Mostrar el aviso con SweetAlert
+    Swal.fire({
+      icon: "info",
+      title: "Aviso Importante",
+      text: "Se solicita que el trámite se realice con 72hs de antelación.",
+      confirmButtonText: "OK",
+    });
+  }, []);
+  
+
   const onSubmit = handleSubmit(async (data) => {
     try {
         Swal.fire({
@@ -218,6 +229,7 @@ function RegisterPage() {
           <h1 className="text-2xl font-bold text-black">
             Registro de Expendio
           </h1>
+          
           <Link
             to="/"
             className="btn btn-success"
@@ -231,6 +243,7 @@ function RegisterPage() {
         {showRequisitos && (
           
           <div className="relative mb-4 bg-yellow-200 p-4 rounded-md shadow-lg">
+            
             <h2 className="font-bold text-lg">Importante:</h2>
             <p className="text-sm text-gray-700 mt-2">
               Antes de proceder con el registro, es fundamental que leas y

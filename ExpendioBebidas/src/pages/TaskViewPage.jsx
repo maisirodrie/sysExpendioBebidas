@@ -51,44 +51,44 @@ function TaskViewPage() {
 
     return (
       <>
-        <p className="my-4"><strong>Datos del Registro</strong></p>
+        
         
         {isEventoParticular && (
           <>
-            <p className="my-4">Tipo de Persona: {persona}</p>
-            <p className="my-4">Tipo de Expendio: {expendio}</p>
-            <p className="my-4">DNI: {dni}</p>
-            <p className="my-4">Apellido: {apellido}</p>
-            <p className="my-4">Nombre: {nombre}</p>
-            <p className="my-4">Localidad: {localidad}</p>
-            <p className="my-4">Domicilio Particular: {domicilio}</p>
-            <p className="my-4">Lugar de Realización del evento: {lugar}</p>
-            <p className="my-4">Días del evento: {dias}</p>
-            <p className="my-4">Horarios del evento: {horarios}</p>
-            <p className="my-4">Tipo de Evento: {tipoevento}</p>
-            <p className="my-4">Email particular: {email}</p>
-            <p className="my-4">Nro de WhatsApp: {contacto}</p>
+            <p className="my-4"><strong>Tipo de Persona:</strong> {persona}</p>
+            <p className="my-4"><strong>Tipo de Expendio:</strong> {expendio}</p>
+            <p className="my-4"><strong>DNI:</strong> {dni}</p>
+            <p className="my-4"><strong>Apellido:</strong> {apellido}</p>
+            <p className="my-4"><strong>Nombre:</strong> {nombre}</p>
+            <p className="my-4"><strong>Localidad:</strong> {localidad}</p>
+            <p className="my-4"><strong>Domicilio Particular:</strong> {domicilio}</p>
+            <p className="my-4"><strong>Lugar de Realización del evento:</strong> {lugar}</p>
+            <p className="my-4"><strong>Días del evento:</strong> {dias}</p>
+            <p className="my-4"><strong>Horarios del evento:</strong> {horarios}</p>
+            <p className="my-4"><strong>Tipo de Evento:</strong> {tipoevento}</p>
+            <p className="my-4"><strong>Email particular:</strong> {email}</p>
+            <p className="my-4"><strong>Nro de WhatsApp:</strong> {contacto}</p>
             {isPersonaJuridica && (
-              <p className="my-4">Número de Habilitación Municipal: {nroHabilitacion}</p>
+              <p className="my-4"><strong>Número de Habilitación Municipal:</strong> {nroHabilitacion}</p>
             )}
           </>
         )}
 
         {isLocalComercial && (
           <>
-            <p className="my-4">Tipo de Persona: {persona}</p>
-            <p className="my-4">Tipo de Expendio: {expendio}</p>
-            <p className="my-4">DNI del Propietario: {dni}</p>
-            <p className="my-4">Apellido: {apellido}</p>
-            <p className="my-4">Nombre: {nombre}</p>
-            <p className="my-4">Localidad: {localidad}</p>
-            <p className="my-4">Domicilio Particular: {domicilio}</p>
-            <p className="my-4">Nro de Habilitación Municipal: {nroHabilitacion}</p>
-            <p className="my-4">Domicilio del Local Comercial: {domicilioLocalComercial}</p>
-            <p className="my-4">Horario de atención: {horarioAtencion}</p>
-            <p className="my-4">Rubro: {rubro}</p>
-            <p className="my-4">Email particular: {email}</p>
-            <p className="my-4">Nro de WhatsApp: {contacto}</p>
+            <p className="my-4"><strong>Tipo de Persona:</strong> {persona}</p>
+            <p className="my-4"><strong>Tipo de Expendio:</strong> {expendio}</p>
+            <p className="my-4"><strong>DNI del Propietario:</strong> {dni}</p>
+            <p className="my-4"><strong>Apellido:</strong> {apellido}</p>
+            <p className="my-4"><strong>Nombre:</strong> {nombre}</p>
+            <p className="my-4"><strong>Localidad:</strong> {localidad}</p>
+            <p className="my-4"><strong>Domicilio Particular:</strong> {domicilio}</p>
+            <p className="my-4"><strong>Nro de Habilitación Municipal:</strong> {nroHabilitacion}</p>
+            <p className="my-4"><strong>Domicilio del Local Comercial:</strong> {domicilioLocalComercial}</p>
+            <p className="my-4"><strong>Horario de atención:</strong> {horarioAtencion}</p>
+            <p className="my-4"><strong>Rubro:</strong> {rubro}</p>
+            <p className="my-4"><strong>Email particular:</strong> {email}</p>
+            <p className="my-4"><strong>Nro de WhatsApp:</strong> {contacto}</p>
           </>
         )}
       </>

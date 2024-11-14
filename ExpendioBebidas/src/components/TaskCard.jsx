@@ -112,6 +112,7 @@ function Table() {
     canViewStatus: ["admin", "viewer", "juridicos", "mesa"].includes(user.role),
     canEditStatus: ["mesa", "juridicos","admin"].includes(user.role),
     canPagoEditStatus: ["admin"].includes(user.role),
+    canPagado: ["admin","mesa"].includes(user.role),
   };
 
   const handleRefresh = async () => await getTasks();
@@ -223,7 +224,7 @@ function Table() {
                     <th>Tipo de Persona</th>
                     <th>Tipo de Expendio</th>
                     <th>Estado</th>
-                    <th>Pagado</th>
+                    {permissions.canPagado && <th>Pagado</th>}
                     <th>Ver</th>
                     {permissions.canEdit && <th>Editar</th>}
                     {permissions.canDelete && <th>Borrar</th>}
@@ -260,6 +261,7 @@ function Table() {
                           )}
                         </td>
                       )}
+                      {permissions.canPagado && (
                       <td>
                         <label className="switch">
                           <input
@@ -270,6 +272,7 @@ function Table() {
                           <span className="slider"></span>
                         </label>
                       </td>
+                       )}
                       <td>
                         <Link className="btn btn-success" to={`/view/task/${task._id}`}>
                           <FontAwesomeIcon icon={faEye} />
