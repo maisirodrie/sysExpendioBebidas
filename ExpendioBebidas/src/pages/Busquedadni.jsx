@@ -82,8 +82,11 @@ function Busquedadni() {
         <div className="bg-dark-overlay absolute inset-0"></div>
         <div className="container mx-auto relative z-10 text-center">
           <h1 className="text-5xl font-bold mb-4">
-            Solicitud Provincial de Expendio de Bebidas
+          Solicitud Provincial de Expendio de Bebidas
           </h1>
+          <p>Introduce tu DNI para consultar el estado de tu trámite.</p>
+          
+
 
           {/* Campo de búsqueda */}
           <div className="flex flex-col items-center mt-8">
@@ -91,7 +94,7 @@ function Busquedadni() {
               type="text"
               value={dni}
               onChange={(e) => setDni(e.target.value)}
-              placeholder="Ingresa el DNI"
+              placeholder="Ingresa tu DNI"
               className="border px-2 py-2 rounded-md text-black w-34 text-center"
             />
             <button
