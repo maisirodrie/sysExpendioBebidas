@@ -15,6 +15,7 @@ import TaskViewPage from "./pages/TaskViewPage"
 import Footer from "./components/Footer"
 import TaskFormPageEdit from "./pages/TaskFormPageEdit"
 import RegisterPageAdmin from "./pages/RegisterPageAdmin"
+import Busquedadni from "./pages/Busquedadni"
 import Pago from "./pages/Pago"
 
 function App() {
@@ -28,6 +29,7 @@ function App() {
           <Route path='/' element={<HomePage/>} />
           <Route path='/login' element={<LoginPage/>} />
           <Route path='/register' element={<RegisterPage/>} />
+          <Route path='/consulta-estado' element={<Busquedadni/>} />
           
           
           
