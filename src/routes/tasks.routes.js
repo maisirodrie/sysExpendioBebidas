@@ -13,6 +13,7 @@ import {
   getUserProfileWithTask,
   getTaskWithUser,
   taskEstados,
+  getTaskByDni
 } from "../controllers/tasks.controller.js";
 import { getPago, updatePago } from "../controllers/pago.controller.js";
 import { updatePagoSchema } from "../schemas/pago.schema.js";
@@ -34,6 +35,7 @@ import {
   adminChangeUserPassword,
   getAllUserActivities,
   getUserActivities,
+
    
 } from "../controllers/auth.controller.js";
 
@@ -80,6 +82,11 @@ router.get("/verify-token", verifyToken); // Verificar token de autenticación
 // Rutas de Pago para el administrador
 router.get("/admin/pago", getPago); // Obtener valor de Pago
 router.put("/admin/pago",authRequired,validateSchema(updatePagoSchema), updatePago); // Actualizar valor de Pago
+
+
+//Busqueda de estado por DNI
+router.get("/tasks/search/:dni", getTaskByDni);
+
 
 
 // Administrador

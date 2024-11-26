@@ -1,5 +1,5 @@
 import { createContext, useContext, useState } from "react";
-import { createTasksRequest,createTasksPublicRequest, deleteTasksRequest, getTaskRequest, getTasksRequest, updateTasksRequest, getPagoRequest,updatePagoRequest } from "../api/tasks";
+import { createTasksRequest,createTasksPublicRequest, deleteTasksRequest, getTaskRequest, getTasksRequest, updateTasksRequest, getPagoRequest,updatePagoRequest, getEstadoDniRequest } from "../api/tasks";
 import { trusted } from "mongoose";
 import React, { useEffect } from "react";
 
@@ -55,6 +55,13 @@ export function TaskProvider({ children }) {
             console.log(error);
         }
     };
+
+    const getDni = async (dni) => {
+        const res = await getEstadoDniRequest(dni);
+        return res.data;
+      };
+      
+    
 
     const getTask = async (id) =>{
         const res = await getTaskRequest(id)
@@ -158,6 +165,8 @@ return (
         updateTaskStatus,
         pago,
         getPago,
+        getDni,
+        updatePagoStatus,
         updatePago }}>
         {children}
     </TaskContext.Provider>

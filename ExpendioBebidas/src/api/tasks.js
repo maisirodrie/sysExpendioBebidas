@@ -27,4 +27,5 @@ export const updatePagoRequest = (newPagoValue) => {
       valortotal: newPagoValue.valortotal // Incluir este campo
     });
   };
-  
+
+  export const getEstadoDniRequest = (dni) => axios.get(`/tasks/search/${dni}`);

@@ -6,6 +6,33 @@ import { gfs } from "../multerConfig.js"; // Importa gfs desde multerConfig.js
 import Activity from "../models/activity.model.js"; // Asegúrate de que esta ruta es correcta
 import { PDFDocument } from 'pdf-lib';
 
+
+export const getTaskByDni = async (req, res) => {
+  const { dni } = req.params;
+
+  try {
+    // Busca la tarea asociada al DNI proporcionado
+    const task = await Task.findOne({ dni }).select("estado dni nroexpediente nombre apellido");
+    if (!task) {
+      return res.status(404).json({ message: "No se encontraron datos para este DNI." });
+    }
+
+    // Devuelve el estado y otros detalles de la tarea
+    res.json({
+      success: true,
+      dni: task.dni,
+      nombre: task.nombre,
+      apellido: task.apellido,
+      nroexpediente: task.nroexpediente,
+      estado: task.estado,
+    });
+  } catch (error) {
+    console.error("Error al buscar el estado de la tarea:", error);
+    return res.status(500).json({ message: "Error al buscar el estado de la tarea.", error });
+  }
+};
+
+
 // Función para registrar la actividad del usuario
 const logActivity = async (userId, action, entity, entityId) => {
   try {
