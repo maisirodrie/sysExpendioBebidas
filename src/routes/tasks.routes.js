@@ -13,7 +13,8 @@ import {
   getUserProfileWithTask,
   getTaskWithUser,
   taskEstados,
-  getTaskByDni
+  getTaskByDni,
+  generateTasksPDF
 } from "../controllers/tasks.controller.js";
 import { getPago, updatePago } from "../controllers/pago.controller.js";
 import { updatePagoSchema } from "../schemas/pago.schema.js";
@@ -86,6 +87,10 @@ router.put("/admin/pago",authRequired,validateSchema(updatePagoSchema), updatePa
 
 //Busqueda de estado por DNI
 router.get("/tasks/search/:dni", getTaskByDni);
+
+//Reporte
+
+router.get("tasks/reporte", authRequired,generateTasksPDF)
 
 
 

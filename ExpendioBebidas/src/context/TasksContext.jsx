@@ -1,5 +1,5 @@
 import { createContext, useContext, useState } from "react";
-import { createTasksRequest,createTasksPublicRequest, deleteTasksRequest, getTaskRequest, getTasksRequest, updateTasksRequest, getPagoRequest,updatePagoRequest, getEstadoDniRequest } from "../api/tasks";
+import { createTasksRequest,createTasksPublicRequest, deleteTasksRequest, getTaskRequest, getTasksRequest, updateTasksRequest, getPagoRequest,updatePagoRequest, getEstadoDniRequest, reportePDFRequest } from "../api/tasks";
 import { trusted } from "mongoose";
 import React, { useEffect } from "react";
 
@@ -34,6 +34,15 @@ export function TaskProvider({ children }) {
 
     }
 
+    const generateReport = async (filters, selectedColumns) => {
+        try {
+          await reportePDFRequest(filters, selectedColumns);
+        } catch (error) {
+          console.error("Error al generar el reporte:", error);
+        }
+      };
+    
+    
 
     const createTask = async (task) => {
         const res = await createTasksRequest(task)
@@ -167,7 +176,8 @@ return (
         getPago,
         getDni,
         updatePagoStatus,
-        updatePago }}>
+        updatePago,
+        generateReport }}>
         {children}
     </TaskContext.Provider>
 )

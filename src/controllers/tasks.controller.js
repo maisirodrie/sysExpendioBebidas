@@ -1,10 +1,73 @@
 import mongoose from "mongoose";
 import fs from 'fs';
+import jsPDF from "jspdf";
+import autoTable from "jspdf-autotable";
 import Task from "../models/task.model.js";
 import User from "../models/user.model.js";
 import { gfs } from "../multerConfig.js"; // Importa gfs desde multerConfig.js
 import Activity from "../models/activity.model.js"; // Asegúrate de que esta ruta es correcta
 import { PDFDocument } from 'pdf-lib';
+
+
+export const generateTasksPDF = async (req, res) => {
+  try {
+    const { filters, selectedColumns } = req.body;
+
+    // Construir la consulta basada en los filtros
+    const query = {};
+    if (filters) {
+      if (filters.dni) query.dni = filters.dni;
+      if (filters.nroexpediente) query.nroexpediente = filters.nroexpediente;
+      if (filters.persona) query.persona = filters.persona;
+      if (filters.localidad) query.localidad = filters.localidad;
+    }
+
+    const tasks = await Task.find(query);
+
+    if (!tasks.length) {
+      return res.status(404).json({ message: "No hay datos que coincidan con los filtros." });
+    }
+
+    const allColumns = {
+      nroexpediente: "N° Expediente",
+      apellido: "Apellido",
+      nombre: "Nombre",
+      dni: "DNI",
+      localidad: "Localidad",
+      persona: "Tipo de Persona",
+      expendio: "Tipo de Expendio",
+    };
+
+    const tableColumn = selectedColumns.map((col) => allColumns[col]);
+    const tableRows = tasks.map((task) =>
+      selectedColumns.map((col) => task[col] || "N/A")
+    );
+
+    const doc = new jsPDF();
+
+    doc.setFontSize(18);
+    doc.text("Reporte Filtrado de Tareas", 14, 20);
+    doc.setFontSize(12);
+    doc.text(`Fecha: ${new Date().toLocaleDateString()}`, 14, 30);
+
+    doc.autoTable({
+      head: [tableColumn],
+      body: tableRows,
+      startY: 40,
+      theme: "grid",
+      headStyles: { fillColor: [22, 160, 133] },
+      styles: { fontSize: 10 },
+    });
+
+    const pdfBuffer = doc.output("arraybuffer");
+    res.setHeader("Content-Type", "application/pdf");
+    res.setHeader("Content-Disposition", `attachment; filename="reporte_tareas_filtrado.pdf"`);
+    res.send(Buffer.from(pdfBuffer));
+  } catch (error) {
+    console.error("Error al generar el PDF:", error);
+    res.status(500).json({ message: "Error al generar el PDF.", error });
+  }
+};
 
 
 export const getTaskByDni = async (req, res) => {

@@ -1,5 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
+import { jsPDF } from 'jspdf';
+import 'jspdf-autotable'; // Esta línea importa el complemento para `autoTable`
 import { useTasks } from "../context/TasksContext";
 import { useAuth } from "../context/AuthContext";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
@@ -13,6 +15,7 @@ import {
   faRotate,
   faCircle,
   faDollar,
+  faFilePdf
 } from "@fortawesome/free-solid-svg-icons";
 import "./Table.css";
 import Paginator from "./Paginator";
@@ -162,6 +165,55 @@ function Table() {
   );
 
 
+  const handleGenerateReport = () => {
+    Swal.fire({
+      title: "¿Desea generar un reporte en PDF?",
+      text: "El reporte incluirá todos los detalles de las tareas actuales.",
+      icon: "warning",
+      showCancelButton: true,
+      confirmButtonText: "Generar Reporte",
+      cancelButtonText: "Cancelar"
+    }).then((result) => {
+      if (result.isConfirmed) {
+        // Crear una nueva instancia de jsPDF
+        const doc = new jsPDF();
+        doc.setFontSize(12);
+  
+        // Título del reporte
+        doc.text("Reporte de Expendio", 10, 10);
+  
+        // Crear el contenido de la tabla
+        const tableData = filteredTasks.map((task) => [
+          task.nroexpediente || "",
+          task.apellido || "",
+          task.nombre || "",
+          task.dni || "",
+          task.localidad || "",
+          task.persona || "",
+          task.expendio || "",
+          task.estado || "",
+        ]);
+  
+        // Usar autoTable para crear la tabla en el PDF
+        doc.autoTable({
+          startY: 20,
+          head: [
+            ["N° Expediente", "Apellido", "Nombre", "DNI", "Localidad", "Tipo de Persona", "Tipo de Expendio", "Estado"]
+          ],
+          body: tableData,
+          margin: { top: 10 },
+          styles: { fontSize: 10 }
+        });
+  
+        // Guardar el PDF
+        doc.save("Reporte_expendio.pdf");
+  
+        Swal.fire("Reporte Generado", "El reporte se ha generado exitosamente.", "success");
+      }
+    });
+  };
+
+
   return (
     <div className="container-fluid bg-primary vh-100 vw-100 d-flex align-items-center justify-content-center">
       <div className="row">
@@ -205,6 +257,11 @@ function Table() {
                     <FontAwesomeIcon icon={faDollar} />
                   </Link>
                )}
+                {/* Botón para generar el reporte PDF */}
+                <button onClick={handleGenerateReport} className="btn btn-danger">
+                  <FontAwesomeIcon icon={faFilePdf} className="mr-2" />
+                  Generar Reporte
+                </button>
               </li>
             </ul>
 

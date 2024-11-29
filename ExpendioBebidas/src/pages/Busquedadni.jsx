@@ -83,6 +83,7 @@ function Busquedadni() {
         <div className="container mx-auto relative z-10 text-center">
           <h1 className="text-5xl font-bold mb-4">
           Solicitud Provincial de Expendio de Bebidas
+          
           </h1>
           <p>Introduce tu DNI para consultar el estado de tu trámite.</p>
           
