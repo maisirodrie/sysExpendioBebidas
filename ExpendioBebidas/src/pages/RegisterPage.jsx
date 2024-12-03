@@ -7,15 +7,15 @@ import axios from "axios";
 import { Municipios } from "../api/municipios";
 import { faArrowLeft, faTimes } from "@fortawesome/free-solid-svg-icons";
 import Swal from "sweetalert2";
-import Vistapago from "./Vistapago"
+import Vistapago from "./Vistapago";
 import "./taskformpage.css";
-
 
 function RegisterPage() {
   const {
     register,
     handleSubmit,
-    setValue,clearErrors,
+    setValue,
+    clearErrors,
     formState: { errors },
   } = useForm();
   const { createTasksPublic, getTask, updateTask } = useTasks();
@@ -82,73 +82,68 @@ function RegisterPage() {
       confirmButtonText: "OK",
     });
   }, []);
-  
 
   const onSubmit = handleSubmit(async (data) => {
     try {
+      Swal.fire({
+        title: "Cargando...",
+        text: "Por favor, espere mientras se guarda el registro.",
+        allowOutsideClick: false,
+        didOpen: () => {
+          Swal.showLoading();
+        },
+      });
+
+      const formData = new FormData();
+      Object.keys(data).forEach((key) => {
+        formData.append(key, data[key]);
+      });
+
+      // Agregar los horarios al formData
+      horarios.forEach((horario) => {
+        if (horario) formData.append("horarios[]", horario);
+      });
+
+      files.forEach((file) => {
+        formData.append("files", file);
+      });
+
+      let res; // Aquí usamos 'res' en lugar de 'response'
+      if (params.id) {
+        res = await updateTask(params.id, formData); // Si es una actualización
+      } else {
+        res = await createTasksPublic(formData); // Si es una creación
+      }
+
+      if (res && res.nroexpediente) {
+        const nroexpediente = res.nroexpediente;
+        console.log("Número de expediente:", nroexpediente); // Verifica que se recibe el nroexpediente correctamente
         Swal.fire({
-            title: "Cargando...",
-            text: "Por favor, espere mientras se guarda el registro.",
-            allowOutsideClick: false,
-            didOpen: () => {
-                Swal.showLoading();
-            },
-        });
-
-        const formData = new FormData();
-        Object.keys(data).forEach((key) => {
-            formData.append(key, data[key]);
-        });
-
-        // Agregar los horarios al formData
-        horarios.forEach((horario) => {
-            if (horario) formData.append("horarios[]", horario);
-        });
-
-        files.forEach((file) => {
-            formData.append("files", file);
-        });
-
-        let res;  // Aquí usamos 'res' en lugar de 'response'
-        if (params.id) {
-            res = await updateTask(params.id, formData);  // Si es una actualización
-        } else {
-            res = await createTasksPublic(formData);  // Si es una creación
-        }
-
-        if (res && res.nroexpediente) {
-          const nroexpediente = res.nroexpediente;
-          console.log("Número de expediente:", nroexpediente);  // Verifica que se recibe el nroexpediente correctamente
-          Swal.fire({
-              icon: "success",
-              title: "¡Éxito!",
-              html: `
+          icon: "success",
+          title: "¡Éxito!",
+          html: `
                   <p>Su registro se ha generado con éxito con el número de trámite: <strong>${nroexpediente}</strong>.</p>
                   <p>Para cualquier consulta, llame al: <strong>0376-448963</strong>.</p>
               `,
-              confirmButtonText: "OK",
-              allowOutsideClick: false,
-              showCloseButton: false,
-          });
-          navigate("/");  // Redirigir después de la creación/actualización
-      } else {
-          console.error("Número de expediente no encontrado:", res);
-          throw new Error("El número de expediente no se recibió correctamente");
-      }
-      
-
-    } catch (error) {
-        console.error("Error:", error);
-        Swal.close();
-        Swal.fire({
-            icon: "error",
-            title: "Error",
-            text: error.message || "Ocurrió un error al guardar el registro.",
+          confirmButtonText: "OK",
+          allowOutsideClick: false,
+          showCloseButton: false,
         });
+        navigate("/"); // Redirigir después de la creación/actualización
+      } else {
+        console.error("Número de expediente no encontrado:", res);
+        throw new Error("El número de expediente no se recibió correctamente");
+      }
+    } catch (error) {
+      console.error("Error:", error);
+      Swal.close();
+      Swal.fire({
+        icon: "error",
+        title: "Error",
+        text: error.message || "Ocurrió un error al guardar el registro.",
+      });
     }
-});
-  
-  
+  });
 
   const handleLocalidadChange = (event) => {
     const selectedValue = event.target.value;
@@ -229,7 +224,7 @@ function RegisterPage() {
           <h1 className="text-2xl font-bold text-black">
             Registro de Expendio
           </h1>
-          
+
           <Link
             to="/"
             className="btn btn-success"
@@ -241,9 +236,7 @@ function RegisterPage() {
         </div>
         {/* Sección de Requisitos con documentos descargables */}
         {showRequisitos && (
-          
           <div className="relative mb-4 bg-yellow-200 p-4 rounded-md shadow-lg">
-            
             <h2 className="font-bold text-lg">Importante:</h2>
             <p className="text-sm text-gray-700 mt-2">
               Antes de proceder con el registro, es fundamental que leas y
@@ -251,7 +244,7 @@ function RegisterPage() {
               manera efectiva. Por favor, asegúrate de tener los siguientes
               documentos listos:
             </p>
-           
+
             <div className="flex space-x-2 justify-center mt-2">
               <button
                 onClick={() =>
@@ -278,11 +271,17 @@ function RegisterPage() {
                 Descargar para habilitación de eventos
               </button>
             </div>
-            
+
+            <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', textAlign: 'center', marginTop: '20px' }}>
+  <p>Para cualquier consulta, llame al: <strong>0376-448963</strong>.</p>
+</div>
+
           </div>
-          
         )}
-        <div><h1 className="text-2xl font-bold text-black text-center"><Vistapago /></h1>
+        <div>
+          <h1 className="text-2xl font-bold text-black text-center">
+            <Vistapago />
+          </h1>
         </div>
 
         <form onSubmit={handleSubmit(onSubmit)} className="mt-4">

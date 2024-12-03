@@ -14,7 +14,8 @@ import {
   getTaskWithUser,
   taskEstados,
   getTaskByDni,
-  generateTasksPDF
+  generateTasksPDF,
+  generateTasksExcel
 } from "../controllers/tasks.controller.js";
 import { getPago, updatePago } from "../controllers/pago.controller.js";
 import { updatePagoSchema } from "../schemas/pago.schema.js";
@@ -91,6 +92,8 @@ router.get("/tasks/search/:dni", getTaskByDni);
 //Reporte
 
 router.get("tasks/reporte", authRequired,generateTasksPDF)
+router.post("/tasks/reporte", authRequired, generateTasksExcel);
+
 
 
 

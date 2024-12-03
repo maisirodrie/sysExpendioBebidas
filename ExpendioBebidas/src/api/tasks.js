@@ -47,3 +47,24 @@ export const updatePagoRequest = (newPagoValue) => {
     link.click();
     document.body.removeChild(link);
   };
+
+
+  export const reporteExcelRequest = async (filters, selectedColumns) => {
+    const response = await axios.post(
+      "/tasks/reporte",
+      { filters, selectedColumns },
+      { responseType: "blob" } // Necesario para manejar archivos
+    );
+  
+    // Descarga automática del Excel
+    const url = window.URL.createObjectURL(new Blob([response.data]));
+    const link = document.createElement("a");
+    link.href = url;
+    link.setAttribute("download", "reporte_tareas_filtrado.xlsx");
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+  };
+  
+
+  

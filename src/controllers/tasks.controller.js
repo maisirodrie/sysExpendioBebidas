@@ -1,6 +1,7 @@
 import mongoose from "mongoose";
 import fs from 'fs';
 import jsPDF from "jspdf";
+import * as XLSX from 'xlsx';
 import autoTable from "jspdf-autotable";
 import Task from "../models/task.model.js";
 import User from "../models/user.model.js";
@@ -66,6 +67,59 @@ export const generateTasksPDF = async (req, res) => {
   } catch (error) {
     console.error("Error al generar el PDF:", error);
     res.status(500).json({ message: "Error al generar el PDF.", error });
+  }
+};
+
+export const generateTasksExcel = async (req, res) => {
+  try {
+    const { filters, selectedColumns } = req.body;
+
+    // Construir la consulta basada en los filtros
+    const query = {};
+    if (filters) {
+      if (filters.dni) query.dni = filters.dni;
+      if (filters.nroexpediente) query.nroexpediente = filters.nroexpediente;
+      if (filters.persona) query.persona = filters.persona;
+      if (filters.localidad) query.localidad = filters.localidad;
+    }
+
+    const tasks = await Task.find(query);
+
+    if (!tasks.length) {
+      return res.status(404).json({ message: "No hay datos que coincidan con los filtros." });
+    }
+
+    const allColumns = {
+      nroexpediente: "N° Expediente",
+      apellido: "Apellido",
+      nombre: "Nombre",
+      dni: "DNI",
+      localidad: "Localidad",
+      persona: "Tipo de Persona",
+      expendio: "Tipo de Expendio",
+    };
+
+    const tableData = tasks.map((task) => {
+      const row = {};
+      selectedColumns.forEach((col) => {
+        row[allColumns[col]] = task[col] || "N/A";
+      });
+      return row;
+    });
+
+    // Crear la hoja de Excel
+    const worksheet = XLSX.utils.json_to_sheet(tableData);
+    const workbook = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(workbook, worksheet, "Reporte");
+
+    // Convertir a buffer y enviar al cliente
+    const excelBuffer = XLSX.write(workbook, { bookType: "xlsx", type: "buffer" });
+    res.setHeader("Content-Type", "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet");
+    res.setHeader("Content-Disposition", `attachment; filename="reporte_tareas_filtrado.xlsx"`);
+    res.send(excelBuffer);
+  } catch (error) {
+    console.error("Error al generar el Excel:", error);
+    res.status(500).json({ message: "Error al generar el Excel.", error });
   }
 };
 

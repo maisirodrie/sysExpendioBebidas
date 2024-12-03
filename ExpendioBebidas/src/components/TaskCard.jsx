@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import { jsPDF } from 'jspdf';
+import * as XLSX from "xlsx"; // Importa SheetJS
 import 'jspdf-autotable'; // Esta línea importa el complemento para `autoTable`
 import { useTasks } from "../context/TasksContext";
 import { useAuth } from "../context/AuthContext";
@@ -15,7 +16,8 @@ import {
   faRotate,
   faCircle,
   faDollar,
-  faFilePdf
+  faFilePdf,
+  faFileExcel 
 } from "@fortawesome/free-solid-svg-icons";
 import "./Table.css";
 import Paginator from "./Paginator";
@@ -168,7 +170,7 @@ function Table() {
   const handleGenerateReport = () => {
     Swal.fire({
       title: "¿Desea generar un reporte en PDF?",
-      text: "El reporte incluirá todos los detalles de las tareas actuales.",
+      text: "El reporte incluirá todos los detalles de los registros actuales.",
       icon: "warning",
       showCancelButton: true,
       confirmButtonText: "Generar Reporte",
@@ -208,6 +210,39 @@ function Table() {
         // Guardar el PDF
         doc.save("Reporte_expendio.pdf");
   
+        Swal.fire("Reporte Generado", "El reporte se ha generado exitosamente.", "success");
+      }
+    });
+  };
+
+  const handleGenerateExcel = () => {
+    Swal.fire({
+      title: "¿Desea generar un reporte en Excel?",
+      text: "El reporte incluirá todos los detalles de los registros actuales.",
+      icon: "warning",
+      showCancelButton: true,
+      confirmButtonText: "Generar Reporte",
+      cancelButtonText: "Cancelar"
+    }).then((result) => {
+      if (result.isConfirmed) {
+        // Crear una hoja de cálculo
+        const worksheet = XLSX.utils.json_to_sheet(filteredTasks.map(task => ({
+          "N° Expediente": task.nroexpediente || "",
+          "Apellido": task.apellido || "",
+          "Nombre": task.nombre || "",
+          "DNI": task.dni || "",
+          "Localidad": task.localidad || "",
+          "Tipo de Persona": task.persona || "",
+          "Tipo de Expendio": task.expendio || "",
+          "Estado": task.estado || "",
+        })));
+
+        // Crear un libro de Excel y agregar la hoja
+        const workbook = XLSX.utils.book_new();
+        XLSX.utils.book_append_sheet(workbook, worksheet, "Reporte");
+
+        // Generar y descargar el archivo
+        XLSX.writeFile(workbook, "Reporte_Expendio.xlsx");
         Swal.fire("Reporte Generado", "El reporte se ha generado exitosamente.", "success");
       }
     });
@@ -258,9 +293,12 @@ function Table() {
                   </Link>
                )}
                 {/* Botón para generar el reporte PDF */}
-                <button onClick={handleGenerateReport} className="btn btn-danger">
-                  <FontAwesomeIcon icon={faFilePdf} className="mr-2" />
-                  Generar Reporte
+                {/* <button onClick={handleGenerateReport} className="btn btn-danger">
+                  <FontAwesomeIcon icon={faFilePdf} />
+                </button> */}
+                 {/* Botón para generar el reporte en Excel */}
+                 <button onClick={handleGenerateExcel} className="btn btn-success">
+                  <FontAwesomeIcon icon={faFileExcel} />
                 </button>
               </li>
             </ul>
