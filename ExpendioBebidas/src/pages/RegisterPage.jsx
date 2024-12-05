@@ -9,6 +9,8 @@ import { faArrowLeft, faTimes } from "@fortawesome/free-solid-svg-icons";
 import Swal from "sweetalert2";
 import Vistapago from "./Vistapago";
 import "./taskformpage.css";
+import "./RegisterPage.css"
+
 
 function RegisterPage() {
   const {
@@ -279,9 +281,51 @@ function RegisterPage() {
           </div>
         )}
         <div>
-          <h1 className="text-2xl font-bold text-black text-center">
+              {/* Tabla con fondo blanco */}
+    <div className="text-center mt-4">
+    <div className="flex justify-center items-center 
+     bg-gray-100">
+  <table className="table" style={{ textTransform: "uppercase" }}>
+    <thead className="bg-blue-500 text-white">
+      <tr>
+        <th className="border border-gray-400 px-4 py-2">Categoría</th>
+        <th className="border border-gray-400 px-4 py-2">Arancel</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td data-label="Categoría" className="border border-gray-400 px-4 py-2">Eventos Temporarios</td>
+        <td data-label="Arancel" className="border border-gray-400 px-4 py-2">$7.140</td>
+      </tr>
+      <tr>
+        <td data-label="Categoría" className="border border-gray-400 px-4 py-2">Kioskos</td>
+        <td data-label="Arancel" className="border border-gray-400 px-4 py-2">$7.140</td>
+      </tr>
+      <tr>
+        <td data-label="Categoría" className="border border-gray-400 px-4 py-2">Mini Mercados</td>
+        <td data-label="Arancel" className="border border-gray-400 px-4 py-2">$11.494</td>
+      </tr>
+      <tr>
+        <td data-label="Categoría" className="border border-gray-400 px-4 py-2">Supermercados</td>
+        <td data-label="Arancel" className="border border-gray-400 px-4 py-2">$17.136</td>
+      </tr>
+      <tr>
+        <td data-label="Categoría" className="border border-gray-400 px-4 py-2">Locales Bailables, Bares, Pub</td>
+        <td data-label="Arancel" className="border border-gray-400 px-4 py-2">$21.420</td>
+      </tr>
+    </tbody>
+  </table>
+</div>
+
+      <p className="text-sm mt-4">
+        El monto deberá ser depositado en la cuenta corriente Nº{" "}
+        <strong>xxxxxxxxxx</strong> una vez terminado el procedimiento de
+        verificación de documentación presentada.
+      </p>
+    </div>
+          {/* <h1 className="text-2xl font-bold text-black text-center">
             <Vistapago />
-          </h1>
+          </h1> */}
         </div>
 
         <form onSubmit={handleSubmit(onSubmit)} className="mt-4">

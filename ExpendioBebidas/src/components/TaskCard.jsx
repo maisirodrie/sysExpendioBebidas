@@ -328,15 +328,15 @@ function Table() {
                 <tbody>
                   {currentTasks.map((task) => (
                     <tr key={task._id}>
-                      <td>{task.nroexpediente?.toUpperCase()}</td>
-                      <td>{task.apellido?.toUpperCase()}</td>
-                      <td>{task.nombre?.toUpperCase()}</td>
-                      <td>{task.dni?.toUpperCase()}</td>
-                      <td>{task.localidad?.toUpperCase()}</td>
-                      <td>{task.persona?.toUpperCase()}</td>
-                      <td>{task.expendio?.toUpperCase()}</td>
+                      <td data-label="N° Expediente">{task.nroexpediente?.toUpperCase()}</td>
+                      <td data-label="Apellido">{task.apellido?.toUpperCase()}</td>
+                      <td data-label="Nombre">{task.nombre?.toUpperCase()}</td>
+                      <td data-label="DNI">{task.dni?.toUpperCase()}</td>
+                      <td data-label="Localidad">{task.localidad?.toUpperCase()}</td>
+                      <td data-label="Tipo de Persona">{task.persona?.toUpperCase()}</td>
+                      <td data-label="Tipo de expendio">{task.expendio?.toUpperCase()}</td>
                       {permissions.canViewStatus && (
-                        <td>
+                        <td data-label="Estado">
                            {permissions.canEditStatus && getStatusOptions(task).length > 0 ? (
                             <select
                               value={task.estado || "ingresado"}
@@ -357,7 +357,7 @@ function Table() {
                         </td>
                       )}
                       {permissions.canPagado && (
-                      <td>
+                      <td data-label="Pagado">
                         <label className="switch">
                           <input
                             type="checkbox"
@@ -368,20 +368,20 @@ function Table() {
                         </label>
                       </td>
                        )}
-                      <td>
+                      <td data-label="Ver">
                         <Link className="btn btn-success" to={`/view/task/${task._id}`}>
                           <FontAwesomeIcon icon={faEye} />
                         </Link>
                       </td>
                       {permissions.canEdit && (
-                        <td>
+                        <td data-label="Editar">
                           <Link className="btn btn-primary" to={`/edit-task/${task._id}`}>
                             <FontAwesomeIcon icon={faEdit} />
                           </Link>
                         </td>
                       )}
                       {permissions.canDelete && (
-                        <td>
+                        <td data-label="Borrar">
                           <button className="btn btn-danger" onClick={() => handleDelete(task._id)}>
                             <FontAwesomeIcon icon={faTrashAlt} />
                           </button>
