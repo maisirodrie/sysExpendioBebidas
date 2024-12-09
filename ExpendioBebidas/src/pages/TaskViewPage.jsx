@@ -36,13 +36,14 @@ function TaskViewPage() {
     if (isNaN(date)) {
       return "Fecha no válida";
     }
-    return format(date, "dd/MM/yyyy", { locale: esLocale });
+    return `${format(date, "dd/MM/yyyy", { locale: esLocale })} a las ${format(date, "HH:mm:ss")}`;
   };
+  
 
   const renderTaskDetails = () => {
     if (!task) return null;
 
-    const { expendio, persona, dni, apellido, nombre, localidad, domicilio,horarios, lugar, dias, rubro, tipoevento, email, contacto, nroHabilitacion, domicilioLocalComercial, horarioAtencion } = task;
+    const { expendio, persona, dni, apellido, nombre, localidad, domicilio,horarios, lugar, dias, rubro, tipoevento, email, contacto, nroHabilitacion, domicilioLocalComercial, horarioAtencion, createdAt } = task;
 
     const isEventoParticular = expendio === "Evento Particular";
     const isLocalComercial = expendio === "Local Comercial";
@@ -52,9 +53,12 @@ function TaskViewPage() {
     return (
       <>
         
-        
+        <p className="my-4">
+          <strong>Fecha de Creación:</strong> {formatDate(createdAt)}
+        </p>
         {isEventoParticular && (
           <>
+          
             <p className="my-4"><strong>Tipo de Persona:</strong> {persona}</p>
             <p className="my-4"><strong>Tipo de Expendio:</strong> {expendio}</p>
             <p className="my-4"><strong>DNI:</strong> {dni}</p>

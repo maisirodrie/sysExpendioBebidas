@@ -22,6 +22,8 @@ import {
 import "./Table.css";
 import Paginator from "./Paginator";
 import Swal from "sweetalert2";
+import { DateTime } from "luxon";
+
 
 function Table() {
   const { tasks, deleteTask, getTasks, updateTaskStatus, updateTask } = useTasks();
@@ -248,6 +250,10 @@ function Table() {
     });
   };
 
+  function formatFechaCreacion(fecha) {
+    return DateTime.fromISO(fecha).setZone("America/Argentina/Buenos_Aires").toFormat("dd/MM/yyyy HH:mm");
+  }
+
 
   return (
     <div className="container-fluid bg-primary vh-100 vw-100 d-flex align-items-center justify-content-center">
@@ -308,16 +314,19 @@ function Table() {
               <table className="table" style={{ textTransform: "uppercase" }}>
                 <thead>
                   <tr>
-                    <th colSpan="12" className="table-title">Listado de Archivos</th>
+                    <th colSpan="13" className="table-title">Listado de Archivos</th>
                   </tr>
                   <tr>
                     <th>N° Expediente</th>
                     <th>Apellido</th>
                     <th>Nombre</th>
                     <th>DNI</th>
+                     <th className="border border-gray-400 px-4 py-2">Fecha de Creación</th>
+          
                     <th>Localidad</th>
                     <th>Tipo de Persona</th>
                     <th>Tipo de Expendio</th>
+                    
                     <th>Estado</th>
                     {permissions.canPagado && <th>Pagado</th>}
                     <th>Ver</th>
@@ -332,6 +341,9 @@ function Table() {
                       <td data-label="Apellido">{task.apellido?.toUpperCase()}</td>
                       <td data-label="Nombre">{task.nombre?.toUpperCase()}</td>
                       <td data-label="DNI">{task.dni?.toUpperCase()}</td>
+                      <td data-label="Fecha de Creación" className="border border-gray-400 px-4 py-2">
+                {formatFechaCreacion(task.createdAt)}
+              </td>
                       <td data-label="Localidad">{task.localidad?.toUpperCase()}</td>
                       <td data-label="Tipo de Persona">{task.persona?.toUpperCase()}</td>
                       <td data-label="Tipo de expendio">{task.expendio?.toUpperCase()}</td>
