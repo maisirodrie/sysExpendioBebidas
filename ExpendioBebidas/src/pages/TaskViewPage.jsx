@@ -115,22 +115,20 @@ function TaskViewPage() {
 
               {/* Mostrar todos los archivos asociados a la tarea */}
               {task.file && task.file.length > 0 && (
-                <div className="my-4">
-                  <h2 className="font-bold">Archivos Asociados</h2>
-                  <div className="grid grid-cols-2 gap-4 mt-2">
-                    {task.file.map((fileInfo, index) => (
-                      <a
-                        key={index}
-                        href={`${apiUrl}/tasks/file/${fileInfo.filename}`}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded transition duration-200"
-                      >
-                         {fileInfo.filename}
-                      </a>
-                    ))}
-                  </div>
-                </div>
+                <div className="grid grid-cols-1 sm:grid-cols-1 md:grid-cols-2 gap-4 mt-2">
+                {task.file.map((fileInfo, index) => (
+                  <a
+                    key={index}
+                    href={`${apiUrl}/tasks/file/${fileInfo.filename}`}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 text-center rounded transition duration-200 break-words w-full"
+                  >
+                    {fileInfo.filename}
+                  </a>
+                ))}
+              </div>
+              
               )}
             </>
           ) : (
