@@ -1,26 +1,18 @@
+import jwt from "jsonwebtoken";
 import { TOKEN_SECRET } from "../config.js";
-import jwt from 'jsonwebtoken'
 
-export function createAccessToke(payload){
-
+export function createAccessToke(payload) {
     return new Promise((resolve, reject) => {
         jwt.sign(
-
-            payload,
+            payload, // Usa el objeto completo como payload
             TOKEN_SECRET,
-        
-        {
-            expiresIn : "1d"
-        },
-        (err, token) => {
-            if (err) reject(err)
-            resolve(token)
-            
-        
-        } 
+            {
+                expiresIn: "1d",
+            },
+            (err, token) => {
+                if (err) reject(err);
+                resolve(token);
+            }
         );
-        
-    })
-
-
+    });
 }

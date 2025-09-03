@@ -19,7 +19,12 @@ function TaskFormPageEdit() {
   const [selectedFiles, setSelectedFiles] = useState([]);
   const [pdfUrl, setPdfUrl] = useState([]); // URL del archivo actual
   // Estado para almacenar archivos seleccionados para eliminar
-const [filesToRemove, setFilesToRemove] = useState([]);
+  const [filesToRemove, setFilesToRemove] = useState([]);
+  const [nroExpediente, setNroExpediente] = useState({
+    correlativo: "",
+    codigoOrganismo: "",
+    anio: "",
+  });
 
   const apiUrl = import.meta.env.VITE_API_ARCHIVO;
   const [LocalidadValue, setSelectedLocalidadValue] = useState("");
@@ -28,6 +33,21 @@ const [filesToRemove, setFilesToRemove] = useState([]);
     async function loadTask() {
       if (params.id) {
         const task = await getTask(params.id);
+        if (task.nroexpediente) {
+          const [correlativo, resto] = task.nroexpediente.split("/");
+          const [codigoOrganismo, anio] = resto.split("-");
+
+          setNroExpediente({
+            correlativo,
+            codigoOrganismo,
+            anio,
+          });
+
+          // Asignar los valores a los campos del formulario
+          setValue("correlativo", correlativo);
+          setValue("codigoOrganismo", codigoOrganismo);
+          setValue("anio", anio);
+        }
         // Rellenar los valores del formulario con la tarea existente
         setValue("expendio", task.expendio);
         setValue("persona", task.persona);
@@ -62,70 +82,78 @@ const [filesToRemove, setFilesToRemove] = useState([]);
     loadTask();
   }, [params.id, setValue, getTask]);
 
-  const onSubmit = handleSubmit(async (data) => {
-    try {
-      Swal.fire({
-        title: "Cargando...",
-        text: "Por favor, espere mientras se carga el registro.",
-        allowOutsideClick: false,
-        didOpen: () => {
-          Swal.showLoading();
-        },
-      });
-  
-      const formData = new FormData();
-      Object.keys(data).forEach((key) => {
-        if (key !== "file") {
-          formData.append(key, data[key]);
-        }
-      });
-  
-      // Agregar archivos actuales al FormData
-      if (selectedFiles && selectedFiles.length > 0) {
-        selectedFiles.forEach((file) => {
-          formData.append("files", file);
-        });
+const onSubmit = handleSubmit(async (data) => {
+  try {
+    Swal.fire({
+      title: "Cargando...",
+      text: "Por favor, espere mientras se carga el registro.",
+      allowOutsideClick: false,
+      didOpen: () => {
+        Swal.showLoading();
+      },
+    });
+
+    const formData = new FormData();
+
+    // Reconstruir el número de expediente
+    if (data.correlativo && data.codigoOrganismo && data.anio) {
+      const fullNroExpediente = `${data.correlativo}-${data.codigoOrganismo}/${data.anio}`;
+      formData.append("nroexpediente", fullNroExpediente);
+    }
+
+    // Agregar todos los campos de datos (excepto los de nroExpediente)
+    Object.keys(data).forEach((key) => {
+      if (key !== "correlativo" && key !== "codigoOrganismo" && key !== "anio") {
+        formData.append(key, data[key]);
       }
-  
-      // Agregar nuevos archivos al FormData
-      if (files && files.length > 0) {
-        files.forEach((file) => {
-          formData.append("files", file);
-        });
-      }
-  
-      // Agregar archivos a eliminar en FormData
-      filesToRemove.forEach((files) => {
-        formData.append("files", files);
+    });
+
+    // Agregar archivos a subir
+    if (files && files.length > 0) {
+      files.forEach((file) => {
+        formData.append("files", file);
       });
-  
-      if (params.id) {
-        await updateTask(params.id, formData);
-        Swal.close();
-        Swal.fire({
-          title: "¡Éxito!",
-          text: "Registro actualizado correctamente.",
-          icon: "success",
-          timer: 2000,
-          showConfirmButton: false,
-        });
-      }
-  
-      // Navegar y limpiar el estado de archivos para eliminar
-      setFilesToRemove([]);
-      navigate("/task");
-    } catch (error) {
-      console.error("Error al guardar la tarea:", error.response?.data || error.message);
+    }
+
+    // AQUI ES EL CAMBIO PRINCIPAL
+    // Agregar IDs de archivos a eliminar
+    if (filesToRemove && filesToRemove.length > 0) {
+      // El backend debe esperar una clave específica, como "filesToRemove"
+      // Enviar el array como una cadena JSON para asegurar que el backend lo interprete como un array.
+      formData.append("filesToRemove", JSON.stringify(filesToRemove));
+    }
+
+    if (params.id) {
+      // Pasar el formData que contiene todos los datos, incluyendo archivos y archivos a eliminar
+      await updateTask(params.id, formData);
       Swal.close();
       Swal.fire({
-        title: "Error",
-        text: "Ocurrió un error al guardar el registro.",
-        icon: "error",
+        title: "¡Éxito!",
+        text: "Registro actualizado correctamente.",
+        icon: "success",
         timer: 2000,
         showConfirmButton: false,
       });
     }
-  });
+
+    // Navegar y limpiar el estado de archivos para eliminar
+    setFilesToRemove([]);
+    navigate("/task");
+  } catch (error) {
+    console.error(
+      "Error al guardar la tarea:",
+      error.response?.data || error.message
+    );
+    Swal.close();
+    Swal.fire({
+      title: "Error",
+      text: "Ocurrió un error al guardar el registro. El expediente no puede ser editado, por favor contactar al administrador del sistema. Contactar al Administrador",
+      icon: "error",
+      timer: 4000,
+      showConfirmButton: false,
+    });
+  }
+});
 
   const handleLocalidadChange = (event) => {
     setSelectedLocalidadValue(event.target.value);
@@ -136,71 +164,67 @@ const [filesToRemove, setFilesToRemove] = useState([]);
     setFiles((prevFiles) => [...prevFiles, ...selectedFiles]); // Acumular archivos
   };
 
-// Función para marcar un archivo actual para eliminar
-const removeCurrentFile = (index) => {
-  const fileIdToRemove = selectedFiles[index].id;
+  // Función para marcar un archivo actual para eliminar
+  const removeCurrentFile = (index) => {
+    const fileIdToRemove = selectedFiles[index].id;
 
-  // Agregar el archivo a la lista de archivos a eliminar
-  setFilesToRemove((prev) => [...prev, fileIdToRemove]);
+    // Agregar el archivo a la lista de archivos a eliminar
+    setFilesToRemove((prev) => [...prev, fileIdToRemove]);
 
-  // Eliminarlo de la vista
-  setPdfUrl((prevFiles) => prevFiles.filter((_, i) => i !== index));
-  setSelectedFiles((prevFiles) => prevFiles.filter((_, i) => i !== index));
-};
+    // Eliminarlo de la vista
+    setPdfUrl((prevFiles) => prevFiles.filter((_, i) => i !== index));
+    setSelectedFiles((prevFiles) => prevFiles.filter((_, i) => i !== index));
+  };
 
-
-// Función para alternar la selección de archivos a eliminar
-const toggleFileSelection = (index) => {
-  setFilesToRemove((prev) => {
-    if (prev.includes(index)) {
-      // Si el archivo ya está seleccionado, desmarcarlo
-      return prev.filter((i) => i !== index);
-    } else {
-      // Si no está seleccionado, marcarlo
-      return [...prev, index];
-    }
-  });
-};
-
-// Función para eliminar los archivos seleccionados
-const removeSelectedFiles = () => {
-  setPdfUrl((prevFiles) => prevFiles.filter((_, i) => !filesToRemove.includes(i)));
-  setSelectedFiles((prevFiles) => prevFiles.filter((_, i) => !filesToRemove.includes(i)));
-  setFilesToRemove([]); // Limpiar la lista de archivos seleccionados
-};
-
-
-
-// Función para eliminar archivos seleccionados que aún no se han subido
-const removeFile = (index) => {
-  setFiles((prevFiles) => prevFiles.filter((_, i) => i !== index));
-  resetFileInput(); // Restablecer el campo después de eliminar
-};
-
-
-
-// Función para restablecer el campo de entrada de archivos
-const resetFileInput = () => {
-  document.querySelector('input[type="file"]').value = files;
-};
-
-const handleSave = async () => {
-  try {
-    // Enviar la solicitud de actualización, incluyendo los archivos a eliminar
-    await updateTask(params.id, {
-      filesToRemove, // archivos marcados para eliminar
-      // otros datos de la tarea, incluyendo nuevos archivos y campos actualizados
+  // Función para alternar la selección de archivos a eliminar
+  const toggleFileSelection = (index) => {
+    setFilesToRemove((prev) => {
+      if (prev.includes(index)) {
+        // Si el archivo ya está seleccionado, desmarcarlo
+        return prev.filter((i) => i !== index);
+      } else {
+        // Si no está seleccionado, marcarlo
+        return [...prev, index];
+      }
     });
+  };
 
-    // Limpiar la lista de archivos a eliminar después de la solicitud
-    setFilesToRemove([]);
-  } catch (error) {
-    console.error("Error al guardar la tarea:", error);
-  }
-};
+  // Función para eliminar los archivos seleccionados
+  const removeSelectedFiles = () => {
+    setPdfUrl((prevFiles) =>
+      prevFiles.filter((_, i) => !filesToRemove.includes(i))
+    );
+    setSelectedFiles((prevFiles) =>
+      prevFiles.filter((_, i) => !filesToRemove.includes(i))
+    );
+    setFilesToRemove([]); // Limpiar la lista de archivos seleccionados
+  };
 
+  // Función para eliminar archivos seleccionados que aún no se han subido
+  const removeFile = (index) => {
+    setFiles((prevFiles) => prevFiles.filter((_, i) => i !== index));
+    resetFileInput(); // Restablecer el campo después de eliminar
+  };
 
+  // Función para restablecer el campo de entrada de archivos
+  const resetFileInput = () => {
+    document.querySelector('input[type="file"]').value = files;
+  };
 
+  const handleSave = async () => {
+    try {
+      // Enviar la solicitud de actualización, incluyendo los archivos a eliminar
+      await updateTask(params.id, {
+        filesToRemove, // archivos marcados para eliminar
+        // otros datos de la tarea, incluyendo nuevos archivos y campos actualizados
+      });
+
+      // Limpiar la lista de archivos a eliminar después de la solicitud
+      setFilesToRemove([]);
+    } catch (error) {
+      console.error("Error al guardar la tarea:", error);
+    }
+  };
 
   const handleTipoExpendioChange = (e) => {
     const selectedExpendio = e.target.value;
@@ -245,6 +269,34 @@ const handleSave = async () => {
           </Link>
         </div>
         <form onSubmit={handleSubmit(onSubmit)} className="mt-4">
+          <label
+            htmlFor="nroexpediente"
+            className="block text-sm font-medium text-black"
+          >
+            Número de Expediente
+          </label>
+          <div className="flex gap-2">
+            <input
+              type="text"
+              {...register("correlativo")}
+              className="w-1/3 bg-gray-100 text-black px-4 py-2 rounded-md my-2"
+              placeholder="Correlativo"
+            />
+            <span className="text-black text-3xl my-2">-</span>
+            <input
+              type="text"
+              {...register("codigoOrganismo")}
+              className="w-1/3 bg-gray-100 text-black px-4 py-2 rounded-md my-2"
+              placeholder="Cod. Organismo"
+            />
+            <span className="text-black text-3xl my-2">/</span>
+            <input
+              type="text"
+              {...register("anio")}
+              className="w-1/3 bg-gray-100 text-black px-4 py-2 rounded-md my-2"
+              placeholder="Año"
+            />
+          </div>
           {/* Selección de Tipo de Evento */}
           <label
             htmlFor="Evento"
@@ -683,7 +735,8 @@ const handleSave = async () => {
             </ul>
           </div>
 
-          <button  onClick={handleSave}
+          <button
+            onClick={handleSave}
             type="submit"
             className="w-full bg-blue-500 text-white px-4 py-2 rounded-md mt-4"
           >

@@ -65,52 +65,73 @@ function TaskFormPage() {
     loadTask();
   }, [params.id, setValue, getTask]);
 
-  const onSubmit = handleSubmit(async (data) => {
-    try {
-      Swal.fire({
-        title: "Cargando...",
-        text: "Por favor, espere mientras se guarda el registro.",
-        allowOutsideClick: false,
-        didOpen: () => {
-          Swal.showLoading();
-        },
-      });
+ const onSubmit = handleSubmit(async (data) => {
+  try {
+    Swal.fire({
+      title: "Cargando...",
+      text: "Por favor, espere mientras se guarda el registro.",
+      allowOutsideClick: false,
+      didOpen: () => {
+        Swal.showLoading();
+      },
+    });
 
-      const formData = new FormData();
-      Object.keys(data).forEach((key) => {
-        formData.append(key, data[key]);
-      });
+    const formData = new FormData();
 
-      // Agregar los archivos al FormData
+    // Lógica para agregar campos del formulario de forma inteligente
+    Object.keys(data).forEach((key) => {
+      const value = data[key];
+      // Verifica que el valor no sea nulo, indefinido o una cadena vacía
+      if (
+        value !== null &&
+        value !== undefined &&
+        value !== ""
+      ) {
+        formData.append(key, value);
+      }
+    });
+
+    // Lógica para agregar los archivos al FormData
+    if (files && files.length > 0) {
       files.forEach((file) => {
         formData.append("files", file);
       });
-
-      if (params.id) {
-        await updateTask(params.id, formData);
-      } else {
-        await createTasksPublic(formData);
-      }
-
-      Swal.close();
-      Swal.fire({
-        icon: "success",
-        title: "¡Éxito!",
-        text: "El registro se guardó correctamente.",
-        confirmButtonText: "OK",
-      });
-
-      navigate("/task");
-    } catch (error) {
-      console.error("Error:", error);
-      Swal.close();
-      Swal.fire({
-        icon: "error",
-        title: "Error",
-        text: "Ocurrió un error al guardar el registro.",
-      });
     }
-  });
+
+    // Opcional: para depurar y ver el contenido
+    console.log("Contenido del FormData a enviar:");
+    for (let [key, value] of formData.entries()) {
+      console.log(`${key}: ${value}`);
+    }
+
+    if (params.id) {
+      // Envía la solicitud de actualización con el FormData
+      await updateTask(params.id, formData);
+    } else {
+      // Envía la solicitud de creación con el FormData
+      await createTasksPublic(formData);
+    }
+
+    // Mantener los mensajes de éxito y error como los tienes
+    Swal.close();
+    Swal.fire({
+      icon: "success",
+      title: "¡Éxito!",
+      text: "El registro se guardó correctamente.",
+      confirmButtonText: "OK",
+    });
+
+    navigate("/task");
+  } catch (error) {
+    console.error("Error:", error);
+    Swal.close();
+    Swal.fire({
+      icon: "error",
+      title: "Error",
+      text: "Ocurrió un error al guardar el registro.",
+    });
+  }
+});
 
   const handleLocalidadChange = (event) => {
     setSelectedLocalidadValue(event.target.value);

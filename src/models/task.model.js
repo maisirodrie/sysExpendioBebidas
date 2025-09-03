@@ -2,7 +2,10 @@ import mongoose from "mongoose";
 
 const taskSchema = new mongoose.Schema(
   {
-    nroexpediente: { type: String, required: true, trim: true  },
+    nroexpediente: {
+        type: String,
+        default: null, // Asegura que el valor por defecto sea null
+    },
     expendio: { type: String, trim: true },
     persona: { type: String, trim: true },
     dni: { type: String, trim: true },

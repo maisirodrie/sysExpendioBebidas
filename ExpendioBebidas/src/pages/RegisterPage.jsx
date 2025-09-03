@@ -85,67 +85,85 @@ function RegisterPage() {
     });
   }, []);
 
-  const onSubmit = handleSubmit(async (data) => {
-    try {
-      Swal.fire({
-        title: "Cargando...",
-        text: "Por favor, espere mientras se guarda el registro.",
-        allowOutsideClick: false,
-        didOpen: () => {
-          Swal.showLoading();
-        },
-      });
+const onSubmit = handleSubmit(async (data) => {
+  try {
+    Swal.fire({
+      title: "Cargando...",
+      text: "Por favor, espere mientras se guarda el registro.",
+      allowOutsideClick: false,
+      didOpen: () => {
+        Swal.showLoading();
+      },
+    });
 
-      const formData = new FormData();
-      Object.keys(data).forEach((key) => {
-        formData.append(key, data[key]);
-      });
+    const formData = new FormData();
 
-      // Agregar los horarios al formData
-      horarios.forEach((horario) => {
-        if (horario) formData.append("horarios[]", horario);
-      });
+    // 1. Añadir los campos de texto del formulario a FormData
+    // Esta lógica itera sobre todos los campos y los agrega si existen
+    Object.keys(data).forEach((key) => {
+      // Si el valor no es nulo, indefinido, o un array/objeto vacío, lo agrega
+      const value = data[key];
+      if (value !== null && value !== undefined && value !== "" && (typeof value !== 'object' || Object.keys(value).length > 0)) {
+        formData.append(key, value);
+      }
+    });
 
+    // 2. Añadir los archivos seleccionados a FormData si existen
+    if (files && files.length > 0) {
       files.forEach((file) => {
         formData.append("files", file);
       });
-
-      let res; // Aquí usamos 'res' en lugar de 'response'
-      if (params.id) {
-        res = await updateTask(params.id, formData); // Si es una actualización
-      } else {
-        res = await createTasksPublic(formData); // Si es una creación
-      }
-
-      if (res && res.nroexpediente) {
-        const nroexpediente = res.nroexpediente;
-        console.log("Número de expediente:", nroexpediente); // Verifica que se recibe el nroexpediente correctamente
-        Swal.fire({
-          icon: "success",
-          title: "¡Éxito!",
-          html: `
-                  <p>Su registro se ha generado con éxito con el número de trámite: <strong>${nroexpediente}</strong>.</p>
-                  <p>Para cualquier consulta, llame al: <strong>0376-448963</strong>.</p>
-              `,
-          confirmButtonText: "OK",
-          allowOutsideClick: false,
-          showCloseButton: false,
-        });
-        navigate("/"); // Redirigir después de la creación/actualización
-      } else {
-        console.error("Número de expediente no encontrado:", res);
-        throw new Error("El número de expediente no se recibió correctamente");
-      }
-    } catch (error) {
-      console.error("Error:", error);
-      Swal.close();
-      Swal.fire({
-        icon: "error",
-        title: "Error",
-        text: error.message || "Ocurrió un error al guardar el registro.",
-      });
     }
-  });
+
+    // Opcional: Para verificar el contenido de FormData antes de enviar
+    console.log("Contenido del FormData a enviar:");
+    for (let [key, value] of formData.entries()) {
+      console.log(`${key}: ${value}`);
+    }
+
+    let res;
+    if (params.id) {
+      res = await updateTask(params.id, formData);
+    } else {
+      res = await createTasksPublic(formData);
+    }
+
+    // Manejo de la respuesta del servidor
+    if (res && res.nroexpediente) {
+      Swal.fire({
+        icon: "success",
+        title: "¡Éxito!",
+        html: `<p>Su registro se ha actualizado con éxito. El número de trámite es: <strong>${res.nroexpediente}</strong>.</p><p>Para cualquier consulta, llame al: <strong>0376-448963</strong>.</p>`,
+        confirmButtonText: "OK",
+        allowOutsideClick: false,
+        showCloseButton: false,
+      });
+      navigate("/");
+    } else if (res && res.message) {
+      Swal.fire({
+        icon: "success",
+        title: "¡Éxito!",
+        html: `<p>Su registro se ha generado con éxito.</p><p>El número de expediente será asignado por mesa de entrada.</p><p>Para cualquier consulta, llame al: <strong>0376-448963</strong>.</p>`,
+        confirmButtonText: "OK",
+        allowOutsideClick: false,
+        showCloseButton: false,
+      });
+      navigate("/");
+    } else {
+      console.error("Respuesta inesperada del servidor:", res);
+      throw new Error("La respuesta del servidor no fue la esperada");
+    }
+  } catch (error) {
+    console.error("Error:", error);
+    Swal.close();
+    Swal.fire({
+      icon: "error",
+      title: "Error",
+      text: error.message || "Ocurrió un error al guardar el registro. Intente de nuevo más tarde.",
+    });
+  }
+});
+
 
   const handleLocalidadChange = (event) => {
     const selectedValue = event.target.value;
@@ -864,14 +882,14 @@ function RegisterPage() {
             <h3 className="text-lg font-semibold">Archivos seleccionados:</h3>
             <ul className="list-disc list-inside">
               {files.map((file, index) => (
-                <li key={index} className="flex justify-between">
-                  {file.name}
+                <li key={index} className="flex justify-between items-center">
+                  <span>{file.name}</span>
                   <button
                     type="button"
                     onClick={() => removeFile(index)}
-                    className="text-red-600 hover:underline"
+                    className="ml-2 text-red-500 hover:text-red-700"
                   >
-                    Eliminar
+                    <FontAwesomeIcon icon={faTimes} />
                   </button>
                 </li>
               ))}

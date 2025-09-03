@@ -44,14 +44,17 @@ function Busquedadni() {
       };
   
       const colorEstado = estadoColores[estado.toLowerCase()] || "black";
-  
+      
+       // ✅ Lógica de verificación para el número de expediente
+    const nroExpedienteDisplay = nroexpediente === null ? "No asignado" : nroexpediente;
+
       // Mostrar datos con SweetAlert2
       Swal.fire({
         icon: "info",
         title: "Estado del trámite",
         html: `
           <strong>Nombre:</strong> ${nombre} ${apellido}<br/>
-          <strong>Nro. Expediente:</strong> ${nroexpediente}<br/>
+          <strong>Nro. Expediente:</strong> ${nroExpedienteDisplay}<br/>
           <strong>Estado:</strong> 
           <span style="color: ${colorEstado}; font-weight: bold;">${estadoMayusculas}</span>
         `,
