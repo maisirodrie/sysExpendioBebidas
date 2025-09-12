@@ -1,94 +1,107 @@
 import React, { useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { useAuth } from "../context/AuthContext";
-import { Link, useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import "./login.css";
 
 function LoginPage() {
-  const {
-    register,
-    handleSubmit,
-    formState: { errors },
-  } = useForm();
-  const { signin, errors: signinErrors, isAuthenticated, user } = useAuth();
-  const navigate = useNavigate();
+    const {
+        register,
+        handleSubmit,
+        formState: { errors },
+    } = useForm();
+    const { signin, errors: signinErrors, isAuthenticated, user, loading } = useAuth();
+    const navigate = useNavigate();
 
-  const onSubmit = handleSubmit((data) => {
-    signin(data);
-  });
-  useEffect(() => {
-    if (isAuthenticated) {
-      navigate("/task");
-    }
-  }, [isAuthenticated, navigate]);
+    useEffect(() => {
+        // Redirigir solo si la autenticación está completa y el usuario está cargado
+        if (!loading && isAuthenticated && user) {
+            if (user.mustChangePassword) {
+                navigate("/change-password");
+            } else {
+                navigate("/task");
+            }
+        }
+    }, [isAuthenticated, navigate, user, loading]);
 
-  return (
-    <section>
-      <header
-        className="bg-cover bg-no-repeat py-10 text-white relative flex flex-col justify-center items-center"
-        style={{
-          backgroundImage: `url('./fondos/fondo.jpg')`,
-          backgroundPosition: "center bottom", // Centra horizontalmente y alinea en la parte inferior
-          padding: "10vw 2rem", // Padding ajustable en unidades relativas (viewport width)
-        }}
-      >
-        <div className="bg-dark-overlay absolute inset-0"></div>{" "}
-        {/* Superposición de color oscuro */}
-        <div className="container mx-auto relative z-10 text-center">
-          <div className=" flex items-center justify-center">
-            <div className="bg-gray-200 shadow-md max-w-md w-full p-10 rounded-md">
-              {Array.isArray(signinErrors) &&
-                signinErrors.map((error, i) => (
-                  <div className="bg-red-500 p-2 text-white" key={i}>
-                    {error}
-                  </div>
-                ))}
+    const onSubmit = handleSubmit((data) => {
+        signin(data);
+    });
 
-              <h1 className="text-2xl font-bold text-black">Acceso</h1>
-              <form onSubmit={onSubmit}>
-                <label
-                  htmlFor="username"
-                  className="block text-sm font-medium text-black text-left"
-                >
-                  Usuario
-                </label>
-                <input
-                  type="text"
-                  {...register("username", { required: true })}
-                  className="w-full bg-white text-gray-600 px-4 py-2 rounded-md my-2 border border-gray-300"
-                  placeholder="Usuario"
-                />
-                {errors.username && (
-                  <p className="text-red-500">Usuario es requerido</p>
-                )}
+    return (
+        <section>
+            <header
+                className="bg-gray-800 bg-cover bg-no-repeat py-10 text-white relative flex flex-col justify-center items-center rounded-b-lg"
+                style={{
+                    backgroundImage: `url('./fondos/fondo.jpg')`,
+                    backgroundPosition: "center bottom",
+                    height: "85vh",
+                }}
+            >
+                <div className="bg-dark-overlay absolute inset-0 bg-black opacity-75"></div>
+                <div className="container mx-auto relative z-10 text-center">
+                    <div className="flex items-center justify-center">
+                        <div className="bg-gray-200 shadow-xl max-w-md w-full p-10 rounded-xl">
+                            {/* Muestra los errores de autenticación */}
+                            {Array.isArray(signinErrors) && signinErrors.length > 0 && (
+                                <div className="bg-red-500 p-3 text-white rounded-md mb-4 text-sm font-semibold">
+                                    {signinErrors.map((error, i) => (
+                                        <p key={i}>{error}</p>
+                                    ))}
+                                </div>
+                            )}
 
-                <label
-                  htmlFor="password"
-                  className="block text-sm font-medium text-black text-left"
-                >
-                  Contraseña
-                </label>
-                <input
-                  type="password"
-                  {...register("password", { required: true })}
-                  className="w-full bg-white text-gray-600 px-4 py-2 rounded-md my-2 border border-gray-300"
-                  placeholder="Contraseña"
-                />
-                {errors.password && (
-                  <p className="text-red-500">Contraseña es requerida</p>
-                )}
-                <button className="custom-button">Iniciar Sesión</button>
-              </form>
-              {/* <p className="flex gap-x-2 justify-between text-black">
-                ¿No tienes una cuenta?
-                <Link to="/register" className="text-sky-500">Registrate</Link>
-              </p> */}
-            </div>
-          </div>
-        </div>
-      </header>
-    </section>
-  );
+                            <h1 className="text-3xl font-bold text-gray-800 mb-6">Acceso</h1>
+                            <form onSubmit={onSubmit}>
+                                <div className="mb-4 text-left">
+                                    <label
+                                        htmlFor="username"
+                                        className="block text-sm font-medium text-gray-700"
+                                    >
+                                        Usuario
+                                    </label>
+                                    <input
+                                        type="text"
+                                        {...register("username", { required: true })}
+                                        className="mt-1 w-full bg-white text-gray-800 px-4 py-2 rounded-md border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                        placeholder="Usuario"
+                                    />
+                                    {errors.username && (
+                                        <p className="text-red-500 text-xs mt-1 font-semibold">Usuario es requerido</p>
+                                    )}
+                                </div>
+
+                                <div className="mb-6 text-left">
+                                    <label
+                                        htmlFor="password"
+                                        className="block text-sm font-medium text-gray-700"
+                                    >
+                                        Contraseña
+                                    </label>
+                                    <input
+                                        type="password"
+                                        {...register("password", { required: true })}
+                                        className="mt-1 w-full bg-white text-gray-800 px-4 py-2 rounded-md border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                        placeholder="Contraseña"
+                                    />
+                                    {errors.password && (
+                                        <p className="text-red-500 text-xs mt-1 font-semibold">Contraseña es requerida</p>
+                                    )}
+                                </div>
+
+                                <button
+                                    type="submit"
+                                    className="custom-button w-full bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 text-white font-bold py-2 px-4 rounded-md transition-all duration-300 transform hover:scale-105 shadow-lg"
+                                >
+                                    Iniciar Sesión
+                                </button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </header>
+        </section>
+    );
 }
 
 export default LoginPage;

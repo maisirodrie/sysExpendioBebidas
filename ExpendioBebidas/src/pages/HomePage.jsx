@@ -1,13 +1,11 @@
 import React, { useState } from "react";
 import { Link } from "react-router-dom";
 import Swal from "sweetalert2";
-import { getEstadoDniRequest } from "../api/tasks";// Asegúrate de importar correctamente
+import { getEstadoDniRequest } from "../api/tasks"; // Asegúrate de importar correctamente
 import "./login.css";
 
 function HomePage() {
   const [dni, setDni] = useState(""); // Estado para el DNI ingresado
-
-  
 
   return (
     <section>
@@ -16,10 +14,10 @@ function HomePage() {
         style={{
           backgroundImage: `url('./fondos/fondo.jpg')`,
           backgroundPosition: "center bottom",
-          padding: "12vw 2rem",
+          height: "85vh",
         }}
       >
-        <div className="bg-dark-overlay absolute inset-0"></div>
+        <div className="bg-dark-overlay absolute inset-0 bg-black opacity-75"></div>
         <div className="container mx-auto relative z-10 text-center space-x-4">
           <h1 className="text-5xl font-bold mb-4">
             Solicitud Provincial de Expendio de Bebidas
@@ -37,8 +35,6 @@ function HomePage() {
           >
             Consultar Estado
           </Link>
-
-          
         </div>
       </header>
     </section>

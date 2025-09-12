@@ -1,13 +1,17 @@
 import React, { useState } from "react";
 import { Link } from "react-router-dom";
 import Swal from "sweetalert2";
-import { getEstadoDniRequest } from "../api/tasks";// Asegúrate de importar correctamente
+import { getEstadoDniRequest } from "../api/tasks"; // Asegúrate de importar correctamente
 import "./login.css";
+import { faArrowLeft } from "@fortawesome/free-solid-svg-icons";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 
 function Busquedadni() {
   const [dni, setDni] = useState(""); // Estado para el DNI ingresado
 
-  const handleSearch = async () => {
+  const handleSearch = async (e) => {
+    e.preventDefault(); // Evita que el formulario se envíe y recargue la página
+
     if (!dni) {
       Swal.fire({
         icon: "warning",
@@ -44,9 +48,9 @@ function Busquedadni() {
       };
   
       const colorEstado = estadoColores[estado.toLowerCase()] || "black";
-      
-       // ✅ Lógica de verificación para el número de expediente
-    const nroExpedienteDisplay = nroexpediente === null ? "No asignado" : nroexpediente;
+        
+      // ✅ Lógica de verificación para el número de expediente
+      const nroExpedienteDisplay = nroexpediente === null ? "No asignado" : nroexpediente;
 
       // Mostrar datos con SweetAlert2
       Swal.fire({
@@ -79,21 +83,33 @@ function Busquedadni() {
         style={{
           backgroundImage: `url('./fondos/fondo.jpg')`,
           backgroundPosition: "center bottom",
-          padding: "12vw 2rem",
+          height: "85vh",
         }}
       >
-        <div className="bg-dark-overlay absolute inset-0"></div>
+        
+        <div className="bg-dark-overlay absolute inset-0 bg-black opacity-75"></div>
+        
         <div className="container mx-auto relative z-10 text-center">
-          <h1 className="text-5xl font-bold mb-4">
-          Solicitud Provincial de Expendio de Bebidas
+             <Link
+                      to="/"
+                      className="btn btn-success"
+                      onClick={() => navigate("/")}
+                    >
+                      <FontAwesomeIcon icon={faArrowLeft} />{" "}
+                      {/* Ícono de flecha hacia la izquierda */}
+                    </Link>
           
+          <h1 className="text-5xl font-bold mb-4">
+            Solicitud Provincial de Expendio de Bebidas
           </h1>
-          <p>Introduce tu DNI para consultar el estado de tu trámite.</p>
+         
           
 
 
           {/* Campo de búsqueda */}
-          <div className="flex flex-col items-center mt-8">
+          <p>Introduce tu DNI para consultar el estado de tu trámite.</p>
+          <form onSubmit={handleSearch} className="flex flex-col items-center mt-8">
+            
             <input
               type="text"
               value={dni}
@@ -102,12 +118,13 @@ function Busquedadni() {
               className="border px-2 py-2 rounded-md text-black w-34 text-center"
             />
             <button
-              onClick={handleSearch}
-              className="custom-button mt-4  hover:bg-blue-600 hover:border-blue-600 hover:text-white border-blue-500 border-2 px-4 py-2 rounded-md"
+              type="submit"
+              className="custom-button mt-4 hover:bg-blue-600 hover:border-blue-600 hover:text-white border-blue-500 border-2 px-4 py-2 rounded-md"
             >
               Consultar
             </button>
-          </div>
+            
+          </form>
         </div>
       </header>
     </section>

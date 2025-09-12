@@ -1,5 +1,5 @@
 import { BrowserRouter, Route, Routes } from "react-router-dom"
-import { AuthProvvider } from "./context/AuthContext"
+import { AuthProvider } from "./context/AuthContext"
 
 
 import RegisterPage from "./pages/RegisterPage"
@@ -17,10 +17,11 @@ import TaskFormPageEdit from "./pages/TaskFormPageEdit"
 import RegisterPageAdmin from "./pages/RegisterPageAdmin"
 import Busquedadni from "./pages/Busquedadni"
 import Pago from "./pages/Pago"
+import ChangePasswordPage from "./pages/ChangePasswordPage.jsx"
 
 function App() {
   return(
-    <AuthProvvider>
+    <AuthProvider>
       <TaskProvider>
       <BrowserRouter>
       <main className="container mx-auto">
@@ -30,8 +31,8 @@ function App() {
           <Route path='/login' element={<LoginPage/>} />
           <Route path='/register' element={<RegisterPage/>} />
           <Route path='/consulta-estado' element={<Busquedadni/>} />
-          
-          
+         
+          <Route path='/change-password' element={<ChangePasswordPage/>} />
           
           
           <Route element={<ProtectedRoute/>}>
@@ -49,7 +50,7 @@ function App() {
       </main>
     </BrowserRouter>
       </TaskProvider>
-    </AuthProvvider>
+    </AuthProvider>
 
   )
   

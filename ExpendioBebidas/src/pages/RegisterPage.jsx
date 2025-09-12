@@ -80,7 +80,7 @@ function RegisterPage() {
     Swal.fire({
       icon: "info",
       title: "Aviso Importante",
-      text: "Se solicita que el trámite se realice con 72hs de antelación.",
+      html: "Si posee antecedentes judiciales, el expendio será rechazado.<br/><br/>Se solicita que el trámite se realice con 72hs de antelación.",
       confirmButtonText: "OK",
     });
   }, []);
@@ -133,7 +133,7 @@ const onSubmit = handleSubmit(async (data) => {
       Swal.fire({
         icon: "success",
         title: "¡Éxito!",
-        html: `<p>Su registro se ha actualizado con éxito. El número de trámite es: <strong>${res.nroexpediente}</strong>.</p><p>Para cualquier consulta, llame al: <strong>0376-448963</strong>.</p>`,
+        html: `<p>Su registro se ha actualizado con éxito. El número de trámite es: <strong>${res.nroexpediente}</strong>.</p><p>Para cualquier consulta, llame al: <strong>0376-4448963</strong>.</p>`,
         confirmButtonText: "OK",
         allowOutsideClick: false,
         showCloseButton: false,
@@ -143,7 +143,7 @@ const onSubmit = handleSubmit(async (data) => {
       Swal.fire({
         icon: "success",
         title: "¡Éxito!",
-        html: `<p>Su registro se ha generado con éxito.</p><p>El número de expediente será asignado por mesa de entrada.</p><p>Para cualquier consulta, llame al: <strong>0376-448963</strong>.</p>`,
+        html: `<p>Su registro se ha generado con éxito.</p><p>El número de expediente será asignado por mesa de entrada.</p><p>Para cualquier consulta, llame al: <strong>0376-4448963</strong>.</p>`,
         confirmButtonText: "OK",
         allowOutsideClick: false,
         showCloseButton: false,
@@ -293,7 +293,7 @@ const onSubmit = handleSubmit(async (data) => {
             </div>
 
             <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', textAlign: 'center', marginTop: '20px' }}>
-  <p>Para cualquier consulta, llame al: <strong>0376-448963</strong>.</p>
+  <p>Para cualquier consulta, llame al: <strong>0376-4448963</strong>.</p>
 </div>
 
           </div>
@@ -313,23 +313,23 @@ const onSubmit = handleSubmit(async (data) => {
     <tbody>
       <tr>
         <td data-label="Categoría" className="border border-gray-400 px-4 py-2">Eventos Temporarios</td>
-        <td data-label="Arancel" className="border border-gray-400 px-4 py-2">$7.140</td>
+        <td data-label="Arancel" className="border border-gray-400 px-4 py-2">S/Arancel</td>
       </tr>
       <tr>
         <td data-label="Categoría" className="border border-gray-400 px-4 py-2">Kioskos</td>
-        <td data-label="Arancel" className="border border-gray-400 px-4 py-2">$7.140</td>
+        <td data-label="Arancel" className="border border-gray-400 px-4 py-2">$1.100</td>
       </tr>
       <tr>
-        <td data-label="Categoría" className="border border-gray-400 px-4 py-2">Mini Mercados</td>
-        <td data-label="Arancel" className="border border-gray-400 px-4 py-2">$11.494</td>
+        <td data-label="Categoría" className="border border-gray-400 px-4 py-2">MiniMercados</td>
+        <td data-label="Arancel" className="border border-gray-400 px-4 py-2">$1.100</td>
       </tr>
       <tr>
         <td data-label="Categoría" className="border border-gray-400 px-4 py-2">Supermercados</td>
-        <td data-label="Arancel" className="border border-gray-400 px-4 py-2">$17.136</td>
+        <td data-label="Arancel" className="border border-gray-400 px-4 py-2">$1.100</td>
       </tr>
       <tr>
         <td data-label="Categoría" className="border border-gray-400 px-4 py-2">Locales Bailables, Bares, Pub</td>
-        <td data-label="Arancel" className="border border-gray-400 px-4 py-2">$21.420</td>
+        <td data-label="Arancel" className="border border-gray-400 px-4 py-2">$1.100</td>
       </tr>
     </tbody>
   </table>

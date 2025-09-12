@@ -33,7 +33,11 @@ const userSchema = new mongoose.Schema(
       enum: ["admin","editor", "user", "viewer","mesa","juridicos"],
       default: "user",
     },
-    // No necesitas el campo 'task' aquí, ya que se manejará la relación inversa desde el modelo 'Task'
+       // Añade este campo
+    mustChangePassword: {
+        type: Boolean,
+        default: false,
+    },
   },
   {
     timestamps: true,
