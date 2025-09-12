@@ -118,7 +118,7 @@ function Table() {
     canAddTask: ["admin", "editor"].includes(user.role),
     canViewStatus: ["admin", "viewer", "juridicos", "mesa"].includes(user.role),
     canEditStatus: ["mesa", "juridicos","admin"].includes(user.role),
-    canPagoEditStatus: ["admin"].includes(user.role),
+    canPagoEditStatus: ["admin","mesa"].includes(user.role),
     canPagado: ["admin","mesa"].includes(user.role),
   };
 
