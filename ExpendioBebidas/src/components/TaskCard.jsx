@@ -114,12 +114,12 @@ function Table() {
   const permissions = {
     canEdit: ["admin", "editor", "mesa"].includes(user.role),
     canDelete: ["admin", "editor"].includes(user.role),
-    canAddUser: ["admin"].includes(user.role),
+    canAddUser: ["super"].includes(user.role),
     canAddTask: ["admin", "editor"].includes(user.role),
     canViewStatus: ["admin", "viewer", "juridicos", "mesa"].includes(user.role),
     canEditStatus: ["mesa", "juridicos","admin"].includes(user.role),
     canPagoEditStatus: ["admin","mesa"].includes(user.role),
-    canPagado: ["admin","mesa"].includes(user.role),
+    canPagado: ["admin"].includes(user.role),
   };
 
   const handleRefresh = async () => await getTasks();
