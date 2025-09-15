@@ -86,82 +86,75 @@ function RegisterPage() {
   }, []);
 
 const onSubmit = handleSubmit(async (data) => {
-  try {
-    Swal.fire({
-      title: "Cargando...",
-      text: "Por favor, espere mientras se guarda el registro.",
-      allowOutsideClick: false,
-      didOpen: () => {
-        Swal.showLoading();
-      },
-    });
+    try {
+        Swal.fire({
+            title: "Cargando...",
+            text: "Por favor, espere mientras se guarda el registro.",
+            allowOutsideClick: false,
+            didOpen: () => {
+                Swal.showLoading();
+            },
+        });
 
-    const formData = new FormData();
+        const formData = new FormData();
 
-    // 1. Añadir los campos de texto del formulario a FormData
-    // Esta lógica itera sobre todos los campos y los agrega si existen
-    Object.keys(data).forEach((key) => {
-      // Si el valor no es nulo, indefinido, o un array/objeto vacío, lo agrega
-      const value = data[key];
-      if (value !== null && value !== undefined && value !== "" && (typeof value !== 'object' || Object.keys(value).length > 0)) {
-        formData.append(key, value);
-      }
-    });
+        // Añade todos los campos de texto del formulario a FormData,
+        // incluso si sus valores son cadenas vacías.
+        Object.keys(data).forEach((key) => {
+            const value = data[key];
+            if (value !== null && value !== undefined && (typeof value !== 'object' || Object.keys(value).length > 0)) {
+                formData.append(key, value);
+            }
+        });
 
-    // 2. Añadir los archivos seleccionados a FormData si existen
-    if (files && files.length > 0) {
-      files.forEach((file) => {
-        formData.append("files", file);
-      });
+        // Añade los archivos seleccionados a FormData si existen
+        if (files && files.length > 0) {
+            files.forEach((file) => {
+                formData.append("files", file);
+            });
+        }
+
+        let res;
+        if (params.id) {
+            res = await updateTask(params.id, formData);
+        } else {
+            res = await createTasksPublic(formData);
+        }
+
+        // Manejo de la respuesta del servidor
+        if (res && res.nroexpediente) {
+            Swal.fire({
+                icon: "success",
+                title: "¡Éxito!",
+                html: `<p>Su registro se ha actualizado con éxito. El número de trámite es: <strong>${res.nroexpediente}</strong>.</p><p>Para cualquier consulta, llame al: <strong>0376-4448963</strong>.</p>`,
+                confirmButtonText: "OK",
+                allowOutsideClick: false,
+                showCloseButton: false,
+            });
+            navigate("/");
+        } else if (res && res.message) {
+            Swal.fire({
+                icon: "success",
+                title: "¡Éxito!",
+                html: `<p>Su registro se ha generado con éxito.</p><p>El número de expediente será asignado por mesa de entrada.</p><p>Para cualquier consulta, llame al: <strong>0376-4448963</strong>.</p>`,
+                confirmButtonText: "OK",
+                allowOutsideClick: false,
+                showCloseButton: false,
+            });
+            navigate("/");
+        } else {
+            console.error("Respuesta inesperada del servidor:", res);
+            throw new Error("La respuesta del servidor no fue la esperada");
+        }
+    } catch (error) {
+        console.error("Error:", error);
+        Swal.close();
+        Swal.fire({
+            icon: "error",
+            title: "Error",
+            text: error.message || "Ocurrió un error al guardar el registro. Intente de nuevo más tarde.",
+        });
     }
-
-    // Opcional: Para verificar el contenido de FormData antes de enviar
-    console.log("Contenido del FormData a enviar:");
-    for (let [key, value] of formData.entries()) {
-      console.log(`${key}: ${value}`);
-    }
-
-    let res;
-    if (params.id) {
-      res = await updateTask(params.id, formData);
-    } else {
-      res = await createTasksPublic(formData);
-    }
-
-    // Manejo de la respuesta del servidor
-    if (res && res.nroexpediente) {
-      Swal.fire({
-        icon: "success",
-        title: "¡Éxito!",
-        html: `<p>Su registro se ha actualizado con éxito. El número de trámite es: <strong>${res.nroexpediente}</strong>.</p><p>Para cualquier consulta, llame al: <strong>0376-4448963</strong>.</p>`,
-        confirmButtonText: "OK",
-        allowOutsideClick: false,
-        showCloseButton: false,
-      });
-      navigate("/");
-    } else if (res && res.message) {
-      Swal.fire({
-        icon: "success",
-        title: "¡Éxito!",
-        html: `<p>Su registro se ha generado con éxito.</p><p>El número de expediente será asignado por mesa de entrada.</p><p>Para cualquier consulta, llame al: <strong>0376-4448963</strong>.</p>`,
-        confirmButtonText: "OK",
-        allowOutsideClick: false,
-        showCloseButton: false,
-      });
-      navigate("/");
-    } else {
-      console.error("Respuesta inesperada del servidor:", res);
-      throw new Error("La respuesta del servidor no fue la esperada");
-    }
-  } catch (error) {
-    console.error("Error:", error);
-    Swal.close();
-    Swal.fire({
-      icon: "error",
-      title: "Error",
-      text: error.message || "Ocurrió un error al guardar el registro. Intente de nuevo más tarde.",
-    });
-  }
 });
 
 
@@ -225,6 +218,7 @@ const downloadFile = async (filePath) => {
         // Si no se usa SweetAlert, puedes mostrar el error en la consola o de otra manera
     }
 };
+
   return (
     <div
       className="flex items-center justify-center overflow-y-auto"
