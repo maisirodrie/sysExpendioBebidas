@@ -220,24 +220,11 @@ const downloadFile = async (filePath) => {
         // Limpiar el enlace
         link.parentNode.removeChild(link);
 
-        // Mostrar una confirmación al usuario
-        Swal.fire({
-            icon: "success",
-            title: "¡Descarga iniciada!",
-            text: "El archivo se está descargando. Revisa la barra de notificaciones de tu teléfono para ver el progreso.",
-            confirmButtonText: "OK"
-        });
-
     } catch (error) {
         console.error("Error al descargar el archivo:", error);
-        Swal.fire({
-            icon: "error",
-            title: "Error",
-            text: "Se ha producido un error al cargar el documento PDF.",
-        });
+        // Si no se usa SweetAlert, puedes mostrar el error en la consola o de otra manera
     }
 };
-
   return (
     <div
       className="flex items-center justify-center overflow-y-auto"
