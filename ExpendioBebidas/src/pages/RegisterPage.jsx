@@ -200,34 +200,37 @@ const onSubmit = handleSubmit(async (data) => {
     setValue("persona", e.target.value);
   };
 
-  const downloadFile = async (filePath) => {
+const downloadFile = async (filePath) => {
     try {
-      // Solicitar el archivo como blob
-      const response = await axios.get(filePath, {
-        responseType: "blob", // Asegura que el archivo se reciba como un blob
-      });
+        const response = await axios.get(filePath, {
+            responseType: "blob",
+        });
 
-      // Crear una URL para el blob
-      const url = window.URL.createObjectURL(new Blob([response.data]));
+        const url = window.URL.createObjectURL(new Blob([response.data]));
+        const link = document.createElement("a");
+        link.href = url;
+        link.setAttribute("download", filePath.split("/").pop());
+        document.body.appendChild(link);
+        link.click();
+        link.parentNode.removeChild(link);
 
-      // Crear un enlace invisible para descargar el archivo
-      const link = document.createElement("a");
-      link.href = url;
-      link.setAttribute("download", filePath.split("/").pop()); // Extrae el nombre del archivo del path
-      document.body.appendChild(link);
-      link.click();
+        // Muestra un mensaje de éxito para el usuario
+        Swal.fire({
+            icon: "success",
+            title: "¡Descarga iniciada!",
+            text: "Por favor, revisa la barra de notificaciones o la carpeta de descargas de tu teléfono para encontrar el archivo.",
+            confirmButtonText: "Entendido"
+        });
 
-      // Eliminar el enlace después de la descarga
-      link.parentNode.removeChild(link);
     } catch (error) {
-      console.error("Error al descargar el archivo:", error);
-      Swal.fire({
-        icon: "error",
-        title: "Error",
-        text: "Se ha producido un error al cargar el documento PDF.",
-      });
+        console.error("Error al descargar el archivo:", error);
+        Swal.fire({
+            icon: "error",
+            title: "Error",
+            text: "Se ha producido un error al cargar el documento PDF. Intenta de nuevo más tarde.",
+        });
     }
-  };
+};
 
   return (
     <div
