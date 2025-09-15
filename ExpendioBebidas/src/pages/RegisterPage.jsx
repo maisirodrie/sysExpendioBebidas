@@ -202,24 +202,30 @@ const onSubmit = handleSubmit(async (data) => {
 
 const downloadFile = async (filePath) => {
     try {
+        // Solicitar el archivo como blob
         const response = await axios.get(filePath, {
             responseType: "blob",
         });
 
+        // Crear una URL temporal para el blob
         const url = window.URL.createObjectURL(new Blob([response.data]));
+
+        // Crear un enlace invisible y simular un clic para iniciar la descarga
         const link = document.createElement("a");
         link.href = url;
-        link.setAttribute("download", filePath.split("/").pop());
+        link.setAttribute("download", filePath.split("/").pop()); 
         document.body.appendChild(link);
         link.click();
+        
+        // Limpiar el enlace
         link.parentNode.removeChild(link);
 
-        // Muestra un mensaje de éxito para el usuario
+        // Mostrar una confirmación al usuario
         Swal.fire({
             icon: "success",
             title: "¡Descarga iniciada!",
-            text: "Por favor, revisa la barra de notificaciones o la carpeta de descargas de tu teléfono para encontrar el archivo.",
-            confirmButtonText: "Entendido"
+            text: "El archivo se está descargando. Revisa la barra de notificaciones de tu teléfono para ver el progreso.",
+            confirmButtonText: "OK"
         });
 
     } catch (error) {
@@ -227,7 +233,7 @@ const downloadFile = async (filePath) => {
         Swal.fire({
             icon: "error",
             title: "Error",
-            text: "Se ha producido un error al cargar el documento PDF. Intenta de nuevo más tarde.",
+            text: "Se ha producido un error al cargar el documento PDF.",
         });
     }
 };
