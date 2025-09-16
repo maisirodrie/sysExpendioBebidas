@@ -206,7 +206,7 @@ export const createTasksPublic = async (req, res) => {
     // Verificar si ya existe una tarea con el mismo DNI
     const existingTask = await Task.findOne({ dni });
     if (existingTask) {
-      return res.status(400).json({ message: "El expediente ya ha sido cargado." });
+      return res.status(400).json({ message: "El DNI ya ha sido registrado." });
     }
 
     // Si se subió un archivo
@@ -288,7 +288,7 @@ export const createTasks = async (req, res) => {
     // Verificar si ya existe una tarea con el mismo DNI
     const existingTask = await Task.findOne({ dni });
     if (existingTask) {
-      return res.status(400).json({ message: "El expediente ya ha sido cargado." });
+      return res.status(400).json({ message: "El DNI ya ha sido cargado." });
     }
 
     let finalNroExpediente = nroexpediente;
