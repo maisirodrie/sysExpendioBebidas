@@ -3,6 +3,11 @@
   margin: 20px;
 }
 
+.motivo-rechazo {
+  white-space: pre-wrap;
+}
+
+
 .button-container {
   margin-bottom: 20px;
 }

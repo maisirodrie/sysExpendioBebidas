@@ -9,79 +9,84 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 function Busquedadni() {
   const [dni, setDni] = useState(""); // Estado para el DNI ingresado
 
-  const handleSearch = async (e) => {
-    e.preventDefault(); // Evita que el formulario se envíe y recargue la página
+  // ... (resto de tu código)
 
-    if (!dni) {
+const handleSearch = async (e) => {
+  e.preventDefault();
+
+  if (!dni) {
+    Swal.fire({
+      icon: "warning",
+      title: "Campo vacío",
+      text: "Por favor, ingresa un DNI.",
+    });
+    return;
+  }
+
+  try {
+    const res = await getEstadoDniRequest(dni);
+    const { nombre, apellido, nroexpediente, estado, motivoRechazo } = res.data;
+
+    if (!nombre || !apellido) {
       Swal.fire({
-        icon: "warning",
-        title: "Campo vacío",
-        text: "Por favor, ingresa un DNI.",
+        icon: "info",
+        title: "No encontrado",
+        text: "No se encontraron datos para este DNI.",
       });
       return;
     }
 
-    try {
-      // Modificación: Desestructurar motivoRechazo de la respuesta
-      const res = await getEstadoDniRequest(dni);
-      const { nombre, apellido, nroexpediente, estado, motivoRechazo } = res.data;
+    // Preparación de datos para el modal
+    const estadoMayusculas = estado.toUpperCase();
+    const estadoColores = {
+      ingresado: "gray",
+      pendiente: "orange",
+      controlado: "blue",
+      aprobado: "green",
+      rechazado: "red",
+      finalizado: "black",
+    };
+    const colorEstado = estadoColores[estado.toLowerCase()] || "black";
+    const nroExpedienteDisplay = nroexpediente === null ? "No asignado" : nroexpediente;
 
-      if (!nombre || !apellido) {
-        Swal.fire({
-          icon: "info",
-          title: "No encontrado",
-          text: "No se encontraron datos para este DNI.",
-        });
-        return;
-      }
+    // Formatear el motivo de rechazo con saltos de línea
+    const motivoRechazoConSaltos = motivoRechazo ? motivoRechazo.replace(/\n/g, '<br/>') : '';
 
-      // Convertir el estado a mayúsculas
-      const estadoMayusculas = estado.toUpperCase();
+   let motivoRechazoHTML = "";
+if (estado.toLowerCase() === "rechazado" && motivoRechazo) {
+  motivoRechazoHTML = `
+    <div style="text-align: left; padding-left: 10px; margin-top: 10px;">
+      <strong>Motivo:</strong>
+      <span style="display: block; padding-left: 30px;">${motivoRechazoConSaltos}</span>
+    </div>`;
+}
 
-      // Determinar color del estado
-      const estadoColores = {
-        ingresado: "gray",
-        pendiente: "orange",
-        controlado: "blue",
-        aprobado: "green",
-        rechazado: "red",
-        finalizado: "black",
-      };
+    // Mostrar el modal con el contenido formateado
+    Swal.fire({
+      icon: "info",
+      title: "Estado del trámite",
+      html: `
+  
+    <strong>Nombre:</strong> ${nombre} ${apellido}<br/>
+    <strong>Nro. Expediente:</strong> ${nroExpedienteDisplay}<br/>
+    <strong>Estado:</strong> 
+    <span style="color: ${colorEstado}; font-weight: bold;">${estadoMayusculas}</span>
+  
+  ${motivoRechazoHTML}
+`,
+    });
+  } catch (error) {
+    console.error("Error al buscar el estado:", error);
+    Swal.fire({
+      icon: "error",
+      title: "Error",
+      text:
+        error.response?.data?.message ||
+        "Ocurrió un error al buscar el estado de la tarea.",
+    });
+  }
+};
 
-      const colorEstado = estadoColores[estado.toLowerCase()] || "black";
-        
-      // Lógica de verificación para el número de expediente
-      const nroExpedienteDisplay = nroexpediente === null ? "No asignado" : nroexpediente;
-
-      // Nuevo: Lógica para mostrar el motivo de rechazo
-      let motivoRechazoHTML = "";
-      if (estado.toLowerCase() === "rechazado" && motivoRechazo) {
-        motivoRechazoHTML = `<br/>
-          <strong>Motivo:</strong> ${motivoRechazo}`;
-      }
-
-      // Mostrar datos con SweetAlert2
-      Swal.fire({
-        icon: "info",
-        title: "Estado del trámite",
-        html: `
-          <strong>Nombre:</strong> ${nombre} ${apellido}<br/>
-          <strong>Nro. Expediente:</strong> ${nroExpedienteDisplay}<br/>
-          <strong>Estado:</strong> 
-          <span style="color: ${colorEstado}; font-weight: bold;">${estadoMayusculas}</span>
-          ${motivoRechazoHTML} `,
-      });
-    } catch (error) {
-      console.error("Error al buscar el estado:", error);
-      Swal.fire({
-        icon: "error",
-        title: "Error",
-        text:
-          error.response?.data?.message ||
-          "Ocurrió un error al buscar el estado de la tarea.",
-      });
-    }
-  };
   
 
   return (
