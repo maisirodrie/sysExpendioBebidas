@@ -98,8 +98,6 @@ const onSubmit = handleSubmit(async (data) => {
 
         const formData = new FormData();
 
-        // Añade todos los campos de texto del formulario a FormData,
-        // incluso si sus valores son cadenas vacías.
         Object.keys(data).forEach((key) => {
             const value = data[key];
             if (value !== null && value !== undefined && (typeof value !== 'object' || Object.keys(value).length > 0)) {
@@ -107,7 +105,6 @@ const onSubmit = handleSubmit(async (data) => {
             }
         });
 
-        // Añade los archivos seleccionados a FormData si existen
         if (files && files.length > 0) {
             files.forEach((file) => {
                 formData.append("files", file);
@@ -121,7 +118,6 @@ const onSubmit = handleSubmit(async (data) => {
             res = await createTasksPublic(formData);
         }
 
-        // Manejo de la respuesta del servidor
         if (res && res.nroexpediente) {
             Swal.fire({
                 icon: "success",
@@ -149,10 +145,13 @@ const onSubmit = handleSubmit(async (data) => {
     } catch (error) {
         console.error("Error:", error);
         Swal.close();
+        
+        const serverMessage = error.response?.data?.message || "Ocurrió un error al guardar el registro. Intente de nuevo más tarde.";
+
         Swal.fire({
             icon: "error",
             title: "Error",
-            text: error.message || "Ocurrió un error al guardar el registro. Intente de nuevo más tarde.",
+            text: serverMessage,
         });
     }
 });
