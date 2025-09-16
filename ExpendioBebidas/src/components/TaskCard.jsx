@@ -112,7 +112,7 @@ function Table() {
   };
 
   const permissions = {
-    canEdit: ["admin", "editor", "mesa"].includes(user.role),
+    canEdit: ["admin", "editor", "mesa",].includes(user.role),
     canDelete: ["admin", "editor"].includes(user.role),
     canAddUser: ["super"].includes(user.role),
     canAddTask: ["admin", "editor"].includes(user.role),
@@ -132,7 +132,9 @@ function Table() {
       rechazado: ["rechazado", "finalizado"]
     },
     juridicos: {
-      controlado: ["controlado", "aprobado", "rechazado"]
+      controlado: ["controlado", "aprobado", "rechazado"],
+
+
     },
     admin: {
       any: ["pendiente", "controlado", "aprobado", "rechazado", "finalizado", "ingresado"] // Admin puede cambiar cualquier estado
@@ -146,9 +148,59 @@ function Table() {
   };
 
   const handleStatusChange = async (taskId, newStatus) => {
-    await updateTaskStatus(taskId, newStatus);
-    Swal.fire("Estado actualizado", "El estado se ha modificado correctamente", "success");
-  };
+  try {
+    // 1. Obtener la tarea actual para acceder a su 'motivoRechazo'
+    const currentTask = tasks.find(t => t._id === taskId);
+
+    if (!currentTask) {
+      Swal.fire("Error", "No se encontró el expediente.", "error");
+      return; 
+    }
+
+    // 2. Condición que activa el modo "edición" o "rechazo inicial"
+    // Esto se ejecuta tanto si el estado cambia a 'rechazado'
+    // como si ya está en 'rechazado' y se selecciona nuevamente.
+    if ((user.role === "juridicos" || user.role === "admin") && newStatus === "rechazado") {
+      
+      // 3. Abrir el modal. La clave para la edición es la propiedad 'inputValue'.
+      const { value: motivoRechazo } = await Swal.fire({
+        title: "Motivo del Rechazo",
+        input: "textarea",
+        inputLabel: "Por favor, especifique la razón del rechazo.",
+        inputPlaceholder: "Escriba aquí...",
+        // **Esta línea llena el modal con el texto existente**
+        // Si ya hay un motivo, se muestra. Si no, el campo está vacío.
+        inputValue: currentTask.motivoRechazo || '', 
+        showCancelButton: true,
+        confirmButtonText: "Guardar",
+        cancelButtonText: "Cancelar",
+        inputValidator: (value) => {
+          if (!value) {
+            return "Necesita escribir un motivo para rechazar el expediente.";
+          }
+        },
+      });
+
+      if (motivoRechazo !== undefined) {
+        // 4. Si se confirma el modal, se envía el nuevo motivo
+        // a la función 'updateTask', que lo guarda en el backend.
+        await updateTask(taskId, { estado: newStatus, motivoRechazo: motivoRechazo });
+        Swal.fire("Expediente Actualizado", "El motivo de rechazo ha sido guardado.", "success");
+        await getTasks(); // Refrescar la lista
+      } else {
+        Swal.fire("Cambio Cancelado", "El cambio de estado ha sido cancelado.", "info");
+      }
+    } else {
+      // Para cualquier otro cambio de estado que no sea 'rechazado'
+      await updateTask(taskId, { estado: newStatus });
+      Swal.fire("Estado actualizado", "El estado se ha modificado correctamente", "success");
+      await getTasks();
+    }
+  } catch (error) {
+    console.error("Error al cambiar el estado:", error);
+    Swal.fire("Error", "No se pudo actualizar el estado de la tarea.", "error");
+  }
+};
 
   const getStatusColor = (status) => {
     return {
@@ -366,6 +418,16 @@ function Table() {
                               {task.estado?.charAt(0).toUpperCase() + task.estado?.slice(1)} {getStatusIcon(task.estado)}
                             </span>
                           )}
+                          {/* AÑADE ESTE BOTÓN AQUÍ */}
+  {task.estado === "rechazado" && (user.role === "juridicos" || user.role === "admin") && (
+    <button
+      onClick={() => handleStatusChange(task._id, "rechazado")}
+      className="btn-dark"
+      title="Editar motivo de rechazo"
+    >
+      <FontAwesomeIcon icon={faEdit} />Editar Motivo
+    </button>
+  )}
                         </td>
                       )}
                       {permissions.canPagado && (

@@ -129,7 +129,7 @@ export const getTaskByDni = async (req, res) => {
 
   try {
     // Busca la tarea asociada al DNI proporcionado
-    const task = await Task.findOne({ dni }).select("estado dni nroexpediente nombre apellido");
+    const task = await Task.findOne({ dni }).select("estado dni nroexpediente nombre apellido motivoRechazo"); // <-- Añadido
     if (!task) {
       return res.status(404).json({ message: "No se encontraron datos para este DNI." });
     }
@@ -142,6 +142,7 @@ export const getTaskByDni = async (req, res) => {
       apellido: task.apellido,
       nroexpediente: task.nroexpediente,
       estado: task.estado,
+      motivoRechazo: task.motivoRechazo, // <-- AñadidoF
     });
   } catch (error) {
     console.error("Error al buscar el estado de la tarea:", error);
@@ -374,9 +375,9 @@ export const getTask = async (req, res) => {
 export const updateTasks = async (req, res) => {
   try {
     const { id } = req.params;
-    console.log("Rol de usuario recibido:", req.user.role);
+    console.log("Rol de usuario recibido:", req.user.role);
     const {
-      filesToRemove, // Array de IDs de archivos a eliminar
+      filesToRemove,
       expendio,
       persona,
       dni,
@@ -397,7 +398,8 @@ export const updateTasks = async (req, res) => {
       horarioAtencion,
       habilitacionComercial,
       pago,
-      nroexpediente // <-- Campo que puede ser modificado
+      nroexpediente,
+      motivoRechazo // <-- Campo agregado
     } = req.body;
 
     // 1. Buscar la tarea existente
@@ -410,7 +412,9 @@ export const updateTasks = async (req, res) => {
 
     // Si el expediente está en un estado final y el usuario no es un administrador,
     // no se permite la edición.
-    if (finalStates.includes(task.estado) && userRole !== 'admin') {
+    // Se agrega una excepción para el rol de Jurídico que debe poder
+    // modificar el motivo de rechazo.
+    if (finalStates.includes(task.estado) && userRole !== 'admin' && userRole !== 'juridicos') {
       return res.status(403).json({
         message: "El expediente no puede ser editado, por favor contactar al administrador del sistema."
       });
@@ -421,7 +425,7 @@ export const updateTasks = async (req, res) => {
       return res.status(403).json({ message: "No tienes permiso para actualizar el número de expediente." });
     }
 
-    // 4. Manejar los nuevos archivos subidos
+    // 4. Manejar los nuevos archivos subidos (no hay cambios aquí)
     const newFiles = req.files
       ? req.files.map((file) => ({
           filename: file.filename,
@@ -432,7 +436,7 @@ export const updateTasks = async (req, res) => {
         }))
       : [];
 
-    // 5. Eliminar los archivos que se hayan especificado
+    // 5. Eliminar los archivos que se hayan especificado (no hay cambios aquí)
     if (filesToRemove && filesToRemove.length > 0) {
       console.log("Eliminando archivos: ", filesToRemove);
 
@@ -440,7 +444,6 @@ export const updateTasks = async (req, res) => {
         if (mongoose.Types.ObjectId.isValid(fileId)) {
           const objectId = new mongoose.Types.ObjectId(fileId);
           await Task.updateOne({ _id: id }, { $pull: { file: { id: objectId } } });
-          // La función gfs.delete() podría no estar definida. Se usa el bucket de GridFS.
           await gfs.delete(objectId);
           console.log(`Archivo con ID ${fileId} eliminado.`);
         } else {
@@ -449,7 +452,7 @@ export const updateTasks = async (req, res) => {
       }
     }
 
-    // 6. Combinar los archivos existentes con los nuevos
+    // 6. Combinar los archivos existentes con los nuevos (no hay cambios aquí)
     const updatedFiles = [...task.file, ...newFiles];
 
     // 7. Construir el objeto de actualización de forma dinámica
@@ -459,15 +462,20 @@ export const updateTasks = async (req, res) => {
       rubro, estado, horarioAtencion, habilitacionComercial, pago, file: updatedFiles
     };
 
-    // Agregar el nroexpediente al objeto de actualización si se proporcionó
+    // Agregar el nroexpediente y el motivo de rechazo al objeto de actualización si se proporcionaron
     if (nroexpediente) {
       updateFields.nroexpediente = nroexpediente;
     }
 
-    // 8. Actualizar la tarea en la base de datos
+    // Añade esta línea para incluir el motivo de rechazo
+    if (motivoRechazo !== undefined) {
+      updateFields.motivoRechazo = motivoRechazo;
+    }
+
+    // 8. Actualizar la tarea en la base de datos (no hay cambios aquí)
     const updatedTask = await Task.findByIdAndUpdate(id, updateFields, { new: true });
 
-    // 9. Registrar la actividad y enviar la respuesta
+    // 9. Registrar la actividad y enviar la respuesta (no hay cambios aquí)
     await logActivity(req.user.id, "actualizó tarea", "tarea", updatedTask._id);
     res.json(updatedTask);
 
@@ -476,8 +484,6 @@ export const updateTasks = async (req, res) => {
     return res.status(500).json({ message: error.message });
   }
 };
-
-
 
 
 export const taskEstados = async (req, res) => {

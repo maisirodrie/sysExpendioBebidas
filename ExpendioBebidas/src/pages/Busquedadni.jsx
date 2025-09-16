@@ -20,11 +20,12 @@ function Busquedadni() {
       });
       return;
     }
-  
+
     try {
+      // Modificación: Desestructurar motivoRechazo de la respuesta
       const res = await getEstadoDniRequest(dni);
-      const { nombre, apellido, nroexpediente, estado } = res.data;
-  
+      const { nombre, apellido, nroexpediente, estado, motivoRechazo } = res.data;
+
       if (!nombre || !apellido) {
         Swal.fire({
           icon: "info",
@@ -33,10 +34,10 @@ function Busquedadni() {
         });
         return;
       }
-  
+
       // Convertir el estado a mayúsculas
       const estadoMayusculas = estado.toUpperCase();
-  
+
       // Determinar color del estado
       const estadoColores = {
         ingresado: "gray",
@@ -46,11 +47,18 @@ function Busquedadni() {
         rechazado: "red",
         finalizado: "black",
       };
-  
+
       const colorEstado = estadoColores[estado.toLowerCase()] || "black";
         
-      // ✅ Lógica de verificación para el número de expediente
+      // Lógica de verificación para el número de expediente
       const nroExpedienteDisplay = nroexpediente === null ? "No asignado" : nroexpediente;
+
+      // Nuevo: Lógica para mostrar el motivo de rechazo
+      let motivoRechazoHTML = "";
+      if (estado.toLowerCase() === "rechazado" && motivoRechazo) {
+        motivoRechazoHTML = `<br/>
+          <strong>Motivo:</strong> ${motivoRechazo}`;
+      }
 
       // Mostrar datos con SweetAlert2
       Swal.fire({
@@ -61,7 +69,7 @@ function Busquedadni() {
           <strong>Nro. Expediente:</strong> ${nroExpedienteDisplay}<br/>
           <strong>Estado:</strong> 
           <span style="color: ${colorEstado}; font-weight: bold;">${estadoMayusculas}</span>
-        `,
+          ${motivoRechazoHTML} `,
       });
     } catch (error) {
       console.error("Error al buscar el estado:", error);
@@ -90,7 +98,7 @@ function Busquedadni() {
         <div className="bg-dark-overlay absolute inset-0 bg-black opacity-75"></div>
         
         <div className="container mx-auto relative z-10 text-center">
-             <Link
+            <Link
                       to="/"
                       className="btn btn-success"
                       onClick={() => navigate("/")}
@@ -102,10 +110,8 @@ function Busquedadni() {
           <h1 className="text-5xl font-bold mb-4">
             Solicitud Provincial de Expendio de Bebidas
           </h1>
-         
           
-
-
+          
           {/* Campo de búsqueda */}
           <p>Introduce tu DNI para consultar el estado de tu trámite.</p>
           <form onSubmit={handleSearch} className="flex flex-col items-center mt-8">

@@ -37,6 +37,7 @@ export const creatTaskSchema = z.object({
   horarioAtencion: z.string().optional(), // Opcional si aplica
   habilitacionComercial: z.string().optional(), // Opcional si aplica
   estado: z.string().optional().default("Ingresado"),
+  motivoRechazo: z.string().optional(),
   pago: z.boolean().optional().default(false), // Campo de pago opcional y con valor por defecto false
   file: z.any().optional(), // Correcta utilización de optional
   user: z.string().optional(),
