@@ -48,33 +48,30 @@ const handleSearch = async (e) => {
     };
     const colorEstado = estadoColores[estado.toLowerCase()] || "black";
     const nroExpedienteDisplay = nroexpediente === null ? "No asignado" : nroexpediente;
-
-    // Formatear el motivo de rechazo con saltos de línea
     const motivoRechazoConSaltos = motivoRechazo ? motivoRechazo.replace(/\n/g, '<br/>') : '';
 
-   let motivoRechazoHTML = "";
-if (estado.toLowerCase() === "rechazado" && motivoRechazo) {
-  motivoRechazoHTML = `
-    <div style="text-align: left; padding-left: 10px; margin-top: 10px;">
-      <strong>Motivo:</strong>
-      <span style="display: block; padding-left: 30px;">${motivoRechazoConSaltos}</span>
-    </div>`;
-}
+    // Unifica todo el contenido HTML en una sola cadena
+    const modalHtml = `
+      <div style="text-align: left; padding-left: 20px;">
+        <strong>Nombre:</strong> ${nombre} ${apellido}<br/>
+        <strong>Nro. Expediente:</strong> ${nroExpedienteDisplay}<br/>
+        <strong>Estado:</strong> 
+        <span style="color: ${colorEstado}; font-weight: bold;">${estadoMayusculas}</span>
+        ${estado.toLowerCase() === "rechazado" && motivoRechazo ? `
+          <div style="margin-top: 10px;">
+            <strong>Motivo:</strong><br/>
+            <span style="display: block; padding-left: 20px;">${motivoRechazoConSaltos}</span>
+          </div>` : ''}
+      </div>
+    `;
 
-    // Mostrar el modal con el contenido formateado
+    // Muestra el modal con el contenido unificado
     Swal.fire({
       icon: "info",
       title: "Estado del trámite",
-      html: `
-  
-    <strong>Nombre:</strong> ${nombre} ${apellido}<br/>
-    <strong>Nro. Expediente:</strong> ${nroExpedienteDisplay}<br/>
-    <strong>Estado:</strong> 
-    <span style="color: ${colorEstado}; font-weight: bold;">${estadoMayusculas}</span>
-  
-  ${motivoRechazoHTML}
-`,
+      html: modalHtml,
     });
+
   } catch (error) {
     console.error("Error al buscar el estado:", error);
     Swal.fire({
@@ -83,8 +80,8 @@ if (estado.toLowerCase() === "rechazado" && motivoRechazo) {
       text:
         error.response?.data?.message ||
         "Ocurrió un error al buscar el estado de la tarea.",
-    });
-  }
+    });
+  }
 };
 
   
