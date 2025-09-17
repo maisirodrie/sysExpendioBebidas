@@ -17,6 +17,10 @@ export const deleteTasksRequest = (id) => axios.delete(`/tasks/${id}`);
 // En src/api/tasks.js
 export const createTasksPublicRequest = (task) => axios.post("/taskspublico", task);
 
+// Función para cambiar el estado de una tarea
+export const updateTaskStatusRequest = (id, newState) => 
+  axios.put(`/tasks/estado/${id}`, { newState });
+
 // src/api/taskApi.js
 export const getPagoRequest = () => axios.get("/admin/pago");
 

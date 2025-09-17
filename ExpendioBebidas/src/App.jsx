@@ -18,6 +18,8 @@ import RegisterPageAdmin from "./pages/RegisterPageAdmin"
 import Busquedadni from "./pages/Busquedadni"
 import Pago from "./pages/Pago"
 import ChangePasswordPage from "./pages/ChangePasswordPage.jsx"
+import ForgotPasswordPage from "./pages/ForgotPasswordPage.jsx"
+import ResetPasswordPage from "./pages/ResetPasswordPage.jsx"
 
 function App() {
   return(
@@ -31,8 +33,9 @@ function App() {
           <Route path='/login' element={<LoginPage/>} />
           <Route path='/register' element={<RegisterPage/>} />
           <Route path='/consulta-estado' element={<Busquedadni/>} />
-         
+          <Route path="/forgot-password" element={<ForgotPasswordPage />} />
           <Route path='/change-password' element={<ChangePasswordPage/>} />
+          <Route path='/reset-password' element={<ResetPasswordPage/>} />
           
           
           <Route element={<ProtectedRoute/>}>

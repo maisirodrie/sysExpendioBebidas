@@ -1,6 +1,6 @@
 import React, { createContext, useContext, useState, useEffect } from "react";
 import axios from "axios";
-import { registerRequest, loginRequest, verifyTokenRequest, changePasswordRequest } from '../api/auth';
+import { registerRequest, loginRequest, verifyTokenRequest, changePasswordRequest, resetPasswordRequest  } from '../api/auth';
 import Cookies from "js-cookie";
 
 export const AuthContext = createContext();
@@ -100,7 +100,23 @@ export const AuthProvider = ({ children }) => {
         setMessage(null);
         return { success: false, error: errorMessage };
     }
+
+    
 };
+  // 🚨 Nueva función para el restablecimiento de contraseña
+    const resetPassword = async (token, newPassword) => {
+        try {
+            const res = await resetPasswordRequest(token, newPassword);
+            setMessage(res.data.message);
+            setErrors([]);
+            return { success: true, message: res.data.message };
+        } catch (error) {
+            const errorMessage = error.response?.data?.message || ["Error al restablecer la contraseña."];
+            setErrors(Array.isArray(errorMessage) ? errorMessage : [errorMessage]);
+            setMessage(null);
+            return { success: false, error: errorMessage };
+        }
+    };
 
     useEffect(() => {
         async function checkLogin() {
@@ -135,6 +151,7 @@ export const AuthProvider = ({ children }) => {
             signin,
             logout,
             changePassword,
+            resetPassword,
             user,
             loading,
             isAuthenticated,

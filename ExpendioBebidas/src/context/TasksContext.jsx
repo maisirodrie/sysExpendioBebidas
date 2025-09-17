@@ -1,5 +1,5 @@
 import { createContext, useContext, useState, useEffect } from "react";
-import { createTasksRequest, createTasksPublicRequest, deleteTasksRequest, getTaskRequest, getTasksRequest, updateTasksRequest, getPagoRequest, updatePagoRequest, getEstadoDniRequest, reporteExcelRequest, reportePDFRequest } from "../api/tasks";
+import { createTasksRequest, createTasksPublicRequest, deleteTasksRequest, getTaskRequest, getTasksRequest, updateTasksRequest, getPagoRequest, updatePagoRequest, getEstadoDniRequest, reporteExcelRequest, reportePDFRequest,updateTaskStatusRequest } from "../api/tasks";
 import { useAuth } from "../context/AuthContext";
 
 const TaskContext = createContext();
@@ -81,7 +81,7 @@ export function TaskProvider({ children }) {
 
     const updateTaskStatus = async (taskId, newStatus) => {
         try {
-            const res = await updateTasksRequest(taskId, { estado: newStatus });
+            const res = await updateTaskStatusRequest(taskId, newStatus);
             if (res.status === 200) {
                 setTasks((prevTasks) =>
                     prevTasks.map((task) =>

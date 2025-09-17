@@ -147,59 +147,49 @@ function Table() {
     return availableOptions.length ? availableOptions : [];
   };
 
-  const handleStatusChange = async (taskId, newStatus) => {
-  try {
-    // 1. Obtener la tarea actual para acceder a su 'motivoRechazo'
-    const currentTask = tasks.find(t => t._id === taskId);
+ const handleStatusChange = async (taskId, newStatus) => {
+    try {
+        const currentTask = tasks.find(t => t._id === taskId);
 
-    if (!currentTask) {
-      Swal.fire("Error", "No se encontró el expediente.", "error");
-      return; 
+        if (!currentTask) {
+            Swal.fire("Error", "No se encontró el expediente.", "error");
+            return;
+        }
+
+        if ((user.role === "juridicos" || user.role === "admin") && newStatus === "rechazado") {
+            const { value: motivoRechazo } = await Swal.fire({
+                title: "Motivo del Rechazo",
+                input: "textarea",
+                inputLabel: "Por favor, especifique la razón del rechazo.",
+                inputPlaceholder: "Escriba aquí...",
+                inputValue: currentTask.motivoRechazo || '',
+                showCancelButton: true,
+                confirmButtonText: "Guardar",
+                cancelButtonText: "Cancelar",
+                inputValidator: (value) => {
+                    if (!value) {
+                        return "Necesita escribir un motivo para rechazar el expediente.";
+                    }
+                },
+            });
+
+            if (motivoRechazo !== undefined) {
+                await updateTask(taskId, { estado: newStatus, motivoRechazo: motivoRechazo });
+                Swal.fire("Expediente Actualizado", "El motivo de rechazo ha sido guardado.", "success");
+                await getTasks();
+            } else {
+                Swal.fire("Cambio Cancelado", "El cambio de estado ha sido cancelado.", "info");
+            }
+        } else {
+            // 🚨 CAMBIO CLAVE AQUÍ: Usar updateTaskStatus
+            await updateTaskStatus(taskId, newStatus); 
+            Swal.fire("Estado actualizado", "El estado se ha modificado correctamente", "success");
+            await getTasks();
+        }
+    } catch (error) {
+        console.error("Error al cambiar el estado:", error);
+        Swal.fire("Error", "No se pudo actualizar el estado de la tarea.", "error");
     }
-
-    // 2. Condición que activa el modo "edición" o "rechazo inicial"
-    // Esto se ejecuta tanto si el estado cambia a 'rechazado'
-    // como si ya está en 'rechazado' y se selecciona nuevamente.
-    if ((user.role === "juridicos" || user.role === "admin") && newStatus === "rechazado") {
-      
-      // 3. Abrir el modal. La clave para la edición es la propiedad 'inputValue'.
-      const { value: motivoRechazo } = await Swal.fire({
-        title: "Motivo del Rechazo",
-        input: "textarea",
-        inputLabel: "Por favor, especifique la razón del rechazo.",
-        inputPlaceholder: "Escriba aquí...",
-        // **Esta línea llena el modal con el texto existente**
-        // Si ya hay un motivo, se muestra. Si no, el campo está vacío.
-        inputValue: currentTask.motivoRechazo || '', 
-        showCancelButton: true,
-        confirmButtonText: "Guardar",
-        cancelButtonText: "Cancelar",
-        inputValidator: (value) => {
-          if (!value) {
-            return "Necesita escribir un motivo para rechazar el expediente.";
-          }
-        },
-      });
-
-      if (motivoRechazo !== undefined) {
-        // 4. Si se confirma el modal, se envía el nuevo motivo
-        // a la función 'updateTask', que lo guarda en el backend.
-        await updateTask(taskId, { estado: newStatus, motivoRechazo: motivoRechazo });
-        Swal.fire("Expediente Actualizado", "El motivo de rechazo ha sido guardado.", "success");
-        await getTasks(); // Refrescar la lista
-      } else {
-        Swal.fire("Cambio Cancelado", "El cambio de estado ha sido cancelado.", "info");
-      }
-    } else {
-      // Para cualquier otro cambio de estado que no sea 'rechazado'
-      await updateTask(taskId, { estado: newStatus });
-      Swal.fire("Estado actualizado", "El estado se ha modificado correctamente", "success");
-      await getTasks();
-    }
-  } catch (error) {
-    console.error("Error al cambiar el estado:", error);
-    Swal.fire("Error", "No se pudo actualizar el estado de la tarea.", "error");
-  }
 };
 
   const getStatusColor = (status) => {

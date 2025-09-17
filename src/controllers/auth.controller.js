@@ -5,6 +5,7 @@ import jwt from 'jsonwebtoken';
 import { TOKEN_SECRET } from '../config.js';
 import Activity from '../models/activity.model.js';
 import nodemailer from 'nodemailer';
+import crypto from 'crypto'; // Añadido para generar tokens de restablecimiento
 
 // Función para generar una contraseña temporal
 const generateRandomPassword = (length = 12) => {
@@ -20,13 +21,11 @@ const generateRandomPassword = (length = 12) => {
 export const register = async (req, res) => {
     const { username, email, role, nombre, apellido } = req.body;
 
-    // Verificar que las variables de entorno estén cargadas
     if (!process.env.EMAIL_HOST || !process.env.EMAIL_PORT) {
         console.error('Error: Las variables de entorno para el host y puerto del correo no están definidas.');
         return res.status(500).json({ message: 'Error en la configuración del servidor de correo.' });
     }
 
-    // Configuración del transportador de Nodemailer
     const transporter = nodemailer.createTransport({
         host: process.env.EMAIL_HOST,
         port: parseInt(process.env.EMAIL_PORT, 10),
@@ -70,7 +69,7 @@ export const register = async (req, res) => {
 
         const mailOptions = {
             from: `"Centro de Cómputos Misiones" <${process.env.EMAIL_USER}>`,
-            to: email, // El email del usuario que se está registrando
+            to: email,
             subject: 'Credenciales de acceso para el Sistema de Expendio de Bebidas',
             html: `
                 <p>Estimado/a ${apellido}, ${nombre}</p>
@@ -121,17 +120,13 @@ export const login = async (req, res) => {
         const isMatch = await bcrypt.compare(password, userFound.password);
         if (!isMatch) return res.status(400).json({ message: "Contraseña Incorrecta" });
 
-        // Si la contraseña es correcta, crea un token de acceso independientemente
-        // de si el usuario debe cambiar su contraseña o no.
         const token = await createAccessToke({ id: userFound._id, role: userFound.role });
         res.cookie('token', token, {
-            httpOnly: true, // Esto es una buena práctica de seguridad
+            httpOnly: true,
             secure: process.env.NODE_ENV === 'production',
             sameSite: 'strict'
         });
 
-        // Si mustChangePassword es true, la respuesta del servidor incluye este flag
-        // para que la aplicación cliente sepa que debe redirigir al usuario.
         if (userFound.mustChangePassword) {
             return res.status(200).json({
                 id: userFound._id,
@@ -143,7 +138,6 @@ export const login = async (req, res) => {
             });
         }
         
-        // Si mustChangePassword es false, el flujo continúa normal.
         res.status(200).json({
             id: userFound._id,
             username: userFound.username,
@@ -159,7 +153,6 @@ export const login = async (req, res) => {
         res.status(500).json({ message: error.message });
     }
 };
-
 
 // Cerrar sesión
 export const logout = async (req, res) => {
@@ -218,7 +211,6 @@ export const updateProfile = async (req, res) => {
         return res.status(500).json({ message: error.message });
     }
 };
-
 
 // Obtener todos los usuarios
 export const getUsers = async (req, res) => {
@@ -295,10 +287,8 @@ export const changePassword = async (req, res) => {
 
         await userFound.save();
 
-        // 🚨 Paso clave: Limpia la cookie del token después de un cambio exitoso
         res.cookie('token', '', { expires: new Date(0) });
 
-        // Devuelve una respuesta JSON simple
         res.json({ message: "Contraseña cambiada con éxito" });
 
     } catch (error) {
@@ -422,5 +412,114 @@ export const getAllUserActivities = async (req, res) => {
     } catch (error) {
         console.error("Error al obtener actividades:", error);
         return res.status(500).json({ message: error.message });
+    }
+};
+
+
+export const forgotPassword = async (req, res) => {
+    const { identifier } = req.body;
+
+    try {
+        // Buscar usuario por 'username' o 'email' usando la sintaxis de Mongoose
+        const userFound = await User.findOne({
+            $or: [
+                { username: identifier },
+                { email: identifier }
+            ]
+        });
+
+        // Si no se encuentra el usuario, devuelve un mensaje genérico por seguridad
+        if (!userFound) {
+            return res.status(404).json({ message: ["Si el usuario existe, se ha enviado un enlace de restablecimiento."] });
+        }
+
+        if (!userFound.email) {
+            return res.status(400).json({ message: ["Este usuario no tiene un correo electrónico registrado para restablecer la contraseña."] });
+        }
+
+        const resetToken = crypto.randomBytes(32).toString('hex');
+        const resetExpires = new Date(Date.now() + 3600000); // Expira en 1 hora
+
+        userFound.resetPasswordToken = resetToken;
+        userFound.resetPasswordExpires = resetExpires;
+        await userFound.save();
+
+        // Asegurarse de que las variables de entorno para el correo estén disponibles
+        if (!process.env.EMAIL_USER || !process.env.VITE_FRONTEND_URL) {
+            console.error('Error: Las variables de entorno para el correo y la URL del frontend no están definidas.');
+            return res.status(500).json({ message: 'Error en la configuración del servidor de correo.' });
+        }
+
+        const resetUrl = `${process.env.VITE_FRONTEND_URL}/reset-password?token=${resetToken}`;
+
+        const transporter = nodemailer.createTransport({
+            host: process.env.EMAIL_HOST,
+            port: parseInt(process.env.EMAIL_PORT, 10),
+            secure: process.env.EMAIL_SECURE === 'true',
+            auth: {
+                user: process.env.EMAIL_USER,
+                pass: process.env.EMAIL_PASS,
+            },
+            tls: {
+                rejectUnauthorized: false
+            }
+        });
+
+        const mailOptions = {
+            from: process.env.EMAIL_USER,
+            to: userFound.email,
+            subject: 'Restablecimiento de Contraseña',
+            html: `
+                <p>Hola ${userFound.nombre || userFound.username},</p>
+                <p>Has solicitado restablecer tu contraseña. Por favor, haz clic en el siguiente enlace para completar el proceso:</p>
+                <p><a href="${resetUrl}">${resetUrl}</a></p>
+                <p>Este enlace expirará en 1 hora.</p>
+                <p>Si no solicitaste esto, por favor ignora este correo.</p>
+                <p>Saludos,</p>
+                <p>Tu Equipo de Soporte</p>
+            `,
+        };
+
+        await transporter.sendMail(mailOptions);
+        console.log(`✅ Email de restablecimiento enviado a ${userFound.email}`);
+        res.status(200).json({
+            message: ["Se ha enviado un enlace de restablecimiento a tu correo electrónico."]
+        });
+
+    } catch (error) {
+        console.error('❌ Error al solicitar restablecimiento de contraseña:', error.message);
+        res.status(500).json({ message: ["Error interno del servidor al solicitar restablecimiento."] });
+    }
+};
+
+export const resetPassword = async (req, res) => {
+    const { token, newPassword } = req.body;
+    console.log('Token recibido:', token); // 🚨 Agrega esta línea
+    console.log('Nueva contraseña recibida:', newPassword);
+
+    try {
+        // Buscar el usuario por el token y verificar que no haya expirado usando Mongoose
+        const userFound = await User.findOne({
+            resetPasswordToken: token,
+            resetPasswordExpires: { $gt: new Date() }
+        });
+
+        if (!userFound) {
+            return res.status(400).json({ message: ["Token de restablecimiento inválido o expirado."] });
+        }
+
+        const passwordHash = await bcrypt.hash(newPassword, 10);
+        userFound.password = passwordHash;
+        userFound.resetPasswordToken = undefined; // Eliminar el token
+        userFound.resetPasswordExpires = undefined; // Eliminar la fecha de expiración
+        userFound.mustChangePassword = false; // Desactivar la obligación de cambiar la contraseña
+        
+        await userFound.save();
+
+        res.status(200).json({ message: ["Contraseña restablecida correctamente. Ya puedes iniciar sesión con tu nueva contraseña."] });
+
+    } catch (error) {
+        console.error('❌ Error al restablecer contraseña:', error.message);
+        res.status(500).json({ message: ["Error interno del servidor al restablecer la contraseña."] });
     }
 };

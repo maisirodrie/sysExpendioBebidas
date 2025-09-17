@@ -373,168 +373,115 @@ export const getTask = async (req, res) => {
 };
 
 export const updateTasks = async (req, res) => {
-  try {
-    const { id } = req.params;
-    console.log("Rol de usuario recibido:", req.user.role);
-    const {
-      filesToRemove,
-      expendio,
-      persona,
-      dni,
-      apellido,
-      nombre,
-      localidad,
-      domicilio,
-      lugar,
-      dias,
-      horarios,
-      tipoevento,
-      email,
-      contacto,
-      nroHabilitacion,
-      domicilioLocalComercial,
-      rubro,
-      estado,
-      horarioAtencion,
-      habilitacionComercial,
-      pago,
-      nroexpediente,
-      motivoRechazo // <-- Campo agregado
-    } = req.body;
+    try {
+        const { id } = req.params;
+        const { filesToRemove, ...updateData } = req.body; // Usa `updateData` para evitar conflictos
+        const userRole = req.user.role.toLowerCase();
 
-    // 1. Buscar la tarea existente
-    const task = await Task.findById(id);
-    if (!task) return res.status(404).json({ message: "Tarea no encontrada" });
+        const task = await Task.findById(id);
+        if (!task) return res.status(404).json({ message: "Tarea no encontrada" });
 
-    // 2. Validar permiso de edición según el estado del expediente
-    const userRole = req.user.role;
-    const finalStates = ['aprobado', 'finalizado', 'rechazado'];
+        const finalStates = ['aprobado', 'finalizado', 'rechazado'];
+        if (finalStates.includes(task.estado) && userRole !== 'admin' && userRole !== 'juridicos') {
+            return res.status(403).json({
+                message: "El expediente no puede ser editado, por favor contactar al administrador del sistema."
+            });
+        }
 
-    // Si el expediente está en un estado final y el usuario no es un administrador,
-    // no se permite la edición.
-    // Se agrega una excepción para el rol de Jurídico que debe poder
-    // modificar el motivo de rechazo.
-    if (finalStates.includes(task.estado) && userRole !== 'admin' && userRole !== 'juridicos') {
-      return res.status(403).json({
-        message: "El expediente no puede ser editado, por favor contactar al administrador del sistema."
-      });
-    }
+        if (updateData.nroexpediente && userRole !== 'mesa' && userRole !== 'admin') {
+            return res.status(403).json({ message: "No tienes permiso para actualizar el número de expediente." });
+        }
 
-    // 3. Validar si el rol tiene permiso para modificar el nroexpediente
-    if (nroexpediente && userRole !== 'mesa' && userRole !== 'admin') {
-      return res.status(403).json({ message: "No tienes permiso para actualizar el número de expediente." });
-    }
+        const newFiles = req.files ? req.files.map(file => ({
+            filename: file.filename,
+            bucketName: file.bucketName,
+            mimetype: file.mimetype,
+            encoding: file.encoding,
+            id: file.id
+        })) : [];
 
-    // 4. Manejar los nuevos archivos subidos (no hay cambios aquí)
-    const newFiles = req.files
-      ? req.files.map((file) => ({
-          filename: file.filename,
-          bucketName: file.bucketName,
-          mimetype: file.mimetype,
-          encoding: file.encoding,
-          id: file.id
-        }))
-      : [];
+        if (filesToRemove && filesToRemove.length > 0) {
+            for (const fileId of filesToRemove) {
+                if (mongoose.Types.ObjectId.isValid(fileId)) {
+                    const objectId = new mongoose.Types.ObjectId(fileId);
+                    await Task.updateOne({ _id: id }, { $pull: { file: { id: objectId } } });
+                    await gfs.delete(objectId);
+                } else {
+                    console.warn(`ID inválido en filesToRemove: ${fileId}`);
+                }
+            }
+        }
+        
+        const updatedFiles = [...task.file.filter(f => !filesToRemove.includes(f.id.toString())), ...newFiles];
+        
+        const updatedTask = await Task.findByIdAndUpdate(
+            id, 
+            { ...updateData, file: updatedFiles }, 
+            { new: true }
+        );
 
-    // 5. Eliminar los archivos que se hayan especificado (no hay cambios aquí)
-    if (filesToRemove && filesToRemove.length > 0) {
-      console.log("Eliminando archivos: ", filesToRemove);
+        await logActivity(req.user.id, "actualizó tarea", "tarea", updatedTask._id);
+        res.json(updatedTask);
 
-      for (const fileId of filesToRemove) {
-        if (mongoose.Types.ObjectId.isValid(fileId)) {
-          const objectId = new mongoose.Types.ObjectId(fileId);
-          await Task.updateOne({ _id: id }, { $pull: { file: { id: objectId } } });
-          await gfs.delete(objectId);
-          console.log(`Archivo con ID ${fileId} eliminado.`);
-        } else {
-          console.warn(`ID inválido en filesToRemove: ${fileId}`);
-        }
-      }
-    }
-
-    // 6. Combinar los archivos existentes con los nuevos (no hay cambios aquí)
-    const updatedFiles = [...task.file, ...newFiles];
-
-    // 7. Construir el objeto de actualización de forma dinámica
-    const updateFields = {
-      expendio, persona, dni, apellido, nombre, localidad, domicilio, lugar, dias,
-      horarios, tipoevento, email, contacto, nroHabilitacion, domicilioLocalComercial,
-      rubro, estado, horarioAtencion, habilitacionComercial, pago, file: updatedFiles
-    };
-
-    // Agregar el nroexpediente y el motivo de rechazo al objeto de actualización si se proporcionaron
-    if (nroexpediente) {
-      updateFields.nroexpediente = nroexpediente;
-    }
-
-    // Añade esta línea para incluir el motivo de rechazo
-    if (motivoRechazo !== undefined) {
-      updateFields.motivoRechazo = motivoRechazo;
-    }
-
-    // 8. Actualizar la tarea en la base de datos (no hay cambios aquí)
-    const updatedTask = await Task.findByIdAndUpdate(id, updateFields, { new: true });
-
-    // 9. Registrar la actividad y enviar la respuesta (no hay cambios aquí)
-    await logActivity(req.user.id, "actualizó tarea", "tarea", updatedTask._id);
-    res.json(updatedTask);
-
-  } catch (error) {
-    console.error("Error al guardar la tarea:", error);
-    return res.status(500).json({ message: error.message });
-  }
+    } catch (error) {
+        console.error("Error al guardar la tarea:", error);
+        return res.status(500).json({ message: error.message });
+    }
 };
 
-
+// En tu archivo tasks.controller.js
 export const taskEstados = async (req, res) => {
-  try {
-    const { id } = req.params;
-    const { newState } = req.body;
-    const userRole = req.user.role;
+    try {
+        const { id } = req.params;
+        const { newState } = req.body;
 
-    // Obtener la tarea de la base de datos
-    const task = await Task.findById(id);
-    if (!task) return res.status(404).json({ message: "Tarea no encontrada" });
+        const userRole = req.user.role.toLowerCase();
 
-    // Definir los estados válidos y normalizar el nuevo estado
-    const validStates = ['pendiente', 'controlado', 'aprobado', 'rechazado', 'finalizado', 'ingresado'];
-    const newStateLower = newState.toLowerCase();
-    if (!validStates.includes(newStateLower)) {
-      return res.status(400).json({ message: "Estado inválido" });
-    }
+        const task = await Task.findById(id);
+        if (!task) return res.status(404).json({ message: "Tarea no encontrada" });
 
-    // Funciones auxiliares para verificar las transiciones válidas por rol
-    const canMesaChangeState = () => {
-      return (
-        (task.estado === 'ingresado' && (newStateLower === 'pendiente' || newStateLower === 'controlado')) ||
-        (task.estado === 'pendiente' && newStateLower === 'controlado') ||
-        ((task.estado === 'aprobado' || task.estado === 'rechazado') && newStateLower === 'finalizado')
-      );
-    };
+        const validStates = ['pendiente', 'controlado', 'aprobado', 'rechazado', 'finalizado', 'ingresado'];
+        const newStateLower = newState.toLowerCase();
+        if (!validStates.includes(newStateLower)) {
+            return res.status(400).json({ message: "Estado inválido" });
+        }
 
-    const canJuridicosChangeState = () => {
-      return task.estado === 'controlado' && (newStateLower === 'aprobado' || newStateLower === 'rechazado');
-    };
+        // Lógica de transiciones de estado
+        const canMesaChangeState = () => {
+            return (
+                (task.estado === 'ingresado' && (newStateLower === 'pendiente' || newStateLower === 'controlado')) ||
+                (task.estado === 'pendiente' && newStateLower === 'controlado') ||
+                ((task.estado === 'aprobado' || task.estado === 'rechazado') && newStateLower === 'finalizado')
+            );
+        };
 
-    const canAdminChangeState = () => true;  // Admin puede cambiar a cualquier estado
+        const canJuridicosChangeState = () => {
+            return task.estado === 'controlado' && (newStateLower === 'aprobado' || newStateLower === 'rechazado');
+        };
 
-    // Verificar permisos y actualizar estado según el rol
-    if (userRole === 'mesa' && canMesaChangeState()) {
-      task.estado = newStateLower;
-    } else if (userRole === 'juridicos' && canJuridicosChangeState()) {
-      task.estado = newStateLower;
-    } else if (userRole === 'admin' && canAdminChangeState()) {
-      task.estado = newStateLower; // Admin puede cambiar el estado a cualquiera
-    } else {
-      return res.status(403).json({ message: "No tienes permiso para cambiar el estado en este momento" });
-    }
+        const canAdminChangeState = () => true;
 
-    // Guardar la tarea actualizada y responder
-    const updatedTask = await task.save();
-    res.json(updatedTask);
-  } catch (error) {
-    return res.status(500).json({ message: error.message });
-  }
+        // Verificación de permisos
+        if (userRole === 'mesa' && canMesaChangeState()) {
+            task.estado = newStateLower;
+        } else if (userRole === 'juridicos' && canJuridicosChangeState()) {
+            task.estado = newStateLower;
+        } else if (userRole === 'admin' && canAdminChangeState()) {
+            task.estado = newStateLower;
+        } else {
+            // Este es el mensaje de error que te ayudará a depurar
+            console.log(`Intento fallido de cambio de estado. Usuario: ${userRole}, Estado actual: ${task.estado}, Nuevo estado: ${newStateLower}`);
+            return res.status(403).json({ message: "No tienes permiso para cambiar el estado en este momento." });
+        }
+
+        const updatedTask = await task.save();
+        await logActivity(req.user.id, "cambió estado de tarea", "tarea", updatedTask._id); // Añadir registro
+        res.json(updatedTask);
+
+    } catch (error) {
+        console.error("Error al cambiar el estado:", error);
+        return res.status(500).json({ message: error.message });
+    }
 };
 
 

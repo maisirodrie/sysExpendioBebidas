@@ -31,10 +31,12 @@ import {
   editUser,
   verifyToken,
   changePassword,
+  forgotPassword, 
   deleteUser,
   adminChangeUserPassword,
   getAllUserActivities,
   getUserActivities,
+  resetPassword,
 } from "../controllers/auth.controller.js";
 
 const router = Router();
@@ -46,11 +48,14 @@ router.get("/verify-token", verifyToken);
 router.get("/profile", authRequired, profile);
 router.put("/profile", authRequired, updateProfile);
 router.put('/change-password', authRequired, changePassword);
+// Rutas para "Olvidé mi Contraseña" (NO protegidas por authMiddleware, ya que el usuario no está logueado)
+router.post('/forgot-password', forgotPassword); // 🚨 Agrega esta ruta
+router.post('/reset-password', resetPassword);
 
 // --- Rutas de Tareas (Públicas y Privadas) ---
 router.get("/tasks", authRequired, getTasks);
 router.get("/tasks/:id", authRequired, getTask);
-router.put('/tasks', authRequired, taskEstados);
+router.put('/tasks/estado/:id', authRequired, taskEstados);
 router.get("/user/tasks/:taskId", authRequired, getTaskWithUser);
 router.get("/tasks/file/:filename", authRequired, downloadFile);
 router.post('/taskspublico', upload.array('files', 15), streamUpload, validateSchema(creatTaskSchema), createTasksPublic);

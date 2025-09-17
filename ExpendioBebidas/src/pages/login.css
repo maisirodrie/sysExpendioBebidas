@@ -22,4 +22,13 @@
     background-color: rgba(0, 0, 0, 0.5); /* Fondo oscuro semitransparente */
   }
 
+  /* login.css */
+
+/*
+  Asegúrate de que no haya otras reglas que afecten al ícono.
+  Esta regla lo posicionará exactamente al 70% de la altura del contenedor.
+*/
+.password-icon {
+  top: 55%;
+}
   
