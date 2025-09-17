@@ -465,20 +465,23 @@ export const forgotPassword = async (req, res) => {
             }
         });
 
-        const mailOptions = {
-            from: process.env.EMAIL_USER,
-            to: userFound.email,
-            subject: 'Restablecimiento de Contraseña',
-            html: `
-                <p>Hola ${userFound.nombre || userFound.username},</p>
-                <p>Has solicitado restablecer tu contraseña. Por favor, haz clic en el siguiente enlace para completar el proceso:</p>
-                <p><a href="${resetUrl}">${resetUrl}</a></p>
-                <p>Este enlace expirará en 1 hora.</p>
-                <p>Si no solicitaste esto, por favor ignora este correo.</p>
-                <p>Saludos,</p>
-                <p>Tu Equipo de Soporte</p>
-            `,
-        };
+const mailOptions = {
+    from: `"Centro de Cómputos Misiones" <${process.env.EMAIL_USER}>`,
+    to: userFound.email,
+    subject: 'Restablecimiento de Contraseña para el Sistema de Expendio de Bebidas',
+    html: `
+        <p>Estimado/a ${userFound.nombre || userFound.username} ${userFound.apellido || ''},</p>
+        <p>Has solicitado restablecer tu contraseña. Por favor, haz clic en el siguiente enlace para completar el proceso:</p>
+        <p><a href="${resetUrl}">${resetUrl}</a></p>
+        <p>Este enlace expirará en 1 hora.</p>
+        <p>Si no solicitaste esto, por favor ignora este correo.</p>
+        <p>Saludos,</p>
+        <br>
+        <p>Centro de Cómputos de la Provincia de Misiones</p>
+        <p>25 de Mayo 1460 - CP 3300</p>
+        <p>Teléfono: 4447479 Centrex 7479</p>
+    `,
+};
 
         await transporter.sendMail(mailOptions);
         console.log(`✅ Email de restablecimiento enviado a ${userFound.email}`);
