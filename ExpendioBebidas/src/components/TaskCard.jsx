@@ -138,6 +138,9 @@ function Table() {
     },
     admin: {
       any: ["pendiente", "controlado", "aprobado", "rechazado", "finalizado", "ingresado"] // Admin puede cambiar cualquier estado
+    },
+    editor: {
+      any: ["pendiente", "controlado", "aprobado", "rechazado", "finalizado", "ingresado"] // Admin puede cambiar cualquier estado
     }
   };
   
