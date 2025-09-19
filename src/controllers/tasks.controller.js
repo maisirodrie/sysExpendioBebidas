@@ -496,8 +496,8 @@ export const taskEstados = async (req, res) => {
             task.estado = newStateLower;
         } else if (userRole === 'juridicos' && canJuridicosChangeState()) {
             task.estado = newStateLower;
-        } else if (userRole === 'admin' && canAdminChangeState()) {
-            task.estado = newStateLower;
+        } else if (userRole === 'admin' || userRole === 'editor') {
+    task.estado = newStateLower;
         } else {
             // Este es el mensaje de error que te ayudará a depurar
             console.log(`Intento fallido de cambio de estado. Usuario: ${userRole}, Estado actual: ${task.estado}, Nuevo estado: ${newStateLower}`);
