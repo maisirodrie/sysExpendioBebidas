@@ -114,11 +114,11 @@ function Table() {
   const permissions = {
     canEdit: ["admin", "editor", "mesa",].includes(user.role),
     canDelete: ["admin", "editor"].includes(user.role),
-    canAddUser: ["super"].includes(user.role),
+    canAddUser: ["admin"].includes(user.role),
     canAddTask: ["admin", "editor"].includes(user.role),
-    canViewStatus: ["admin", "viewer", "juridicos", "mesa"].includes(user.role),
-    canEditStatus: ["mesa", "juridicos","admin"].includes(user.role),
-    canPagoEditStatus: ["admin","mesa"].includes(user.role),
+    canViewStatus: ["admin", "viewer", "juridicos", "mesa","editor"].includes(user.role),
+    canEditStatus: ["mesa", "juridicos","admin","editor"].includes(user.role),
+    canPagoEditStatus: ["admin"].includes(user.role),
     canPagado: ["admin"].includes(user.role),
   };
 
