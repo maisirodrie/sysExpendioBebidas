@@ -399,23 +399,26 @@ const downloadFile = async (filePath) => {
                 readOnly
               />
 
-              <label
-                htmlFor="dni"
-                className="block text-sm font-medium text-black"
-              >
-                DNI
-              </label>
-              {errors.dni && (
-                <p className="text-red-500 text-sm mt-1">
-                  {errors.dni.message}
-                </p>
-              )}
-              <input
-                type="text"
-                {...register("dni", { required: "El DNI es requerido" })}
-                className="w-full bg-gray-100 text-black px-4 py-2 rounded-md my-2"
-                placeholder="DNI"
-              />
+              <label htmlFor="dni" className="block text-sm font-medium text-black">
+              DNI del Propietario
+            </label>
+            {errors.dni && (
+              <p className="text-red-500 text-sm mt-1">
+                {errors.dni.message}
+              </p>
+            )}
+            <input
+              type="tel" // Se ha cambiado de "text" a "tel"
+              {...register("dni", { 
+                required: "El DNI es requerido",
+                pattern: {
+                  value: /^\d{7,8}$/,
+                  message: "El DNI debe contener 7 u 8 dígitos numerales."
+                }
+              })}
+              className="w-full bg-gray-100 text-black px-4 py-2 rounded-md my-2"
+              placeholder="DNI del Propietario"
+            />
 
               <label
                 htmlFor="apellido"
@@ -591,7 +594,7 @@ const downloadFile = async (filePath) => {
                 </p>
               )}
               <input
-                type="text"
+                type="email"
                 {...register("email", { required: "El Email es requerido" })}
                 className="w-full bg-gray-100 text-black px-4 py-2 rounded-md my-2"
                 placeholder="Email"
@@ -610,7 +613,7 @@ const downloadFile = async (filePath) => {
                 </p>
               )}
               <input
-                type="text"
+                type="tel"
                 {...register("contacto", {
                   required: "El Nro de WhatsApp es requerido",
                 })}
@@ -814,7 +817,7 @@ const downloadFile = async (filePath) => {
                 </p>
               )}
               <input
-                type="text"
+                type="email"
                 {...register("email", { required: "El Email es requerido" })}
                 className="w-full bg-gray-100 text-black px-4 py-2 rounded-md my-2"
                 placeholder="Email"
@@ -832,7 +835,7 @@ const downloadFile = async (filePath) => {
                 </p>
               )}
               <input
-                type="text"
+                type="tel"
                 {...register("contacto", {
                   required: "El contacto es requerido",
                 })}

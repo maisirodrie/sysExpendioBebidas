@@ -1,16 +1,24 @@
 import { z } from "zod";
 
 export const creatTaskSchema = z.object({
-  nroexpediente:z.string().optional(),
+  // Se valida que el número de expediente sea una cadena de texto opcional que contenga solo dígitos.
+  nroexpediente: z
+    .string()
+    .regex(/^\d+$/, "El número de expediente debe contener solo dígitos.")
+    .optional(),
   expendio: z.string({
     required_error: "El expendio es requerido",
   }),
   persona: z.string({
     required_error: "La persona es requerida",
   }),
-  dni: z.string({
-    required_error: "El número de DNI es requerido",
-  }),
+  // Se valida que el DNI sea una cadena de texto que contenga solo dígitos y tenga al menos 8 caracteres.
+  dni: z
+    .string({
+      required_error: "El número de DNI es requerido",
+    })
+    .regex(/^\d+$/, "El DNI debe contener solo dígitos.")
+    .min(8, "El DNI debe tener al menos 8 dígitos."),
   apellido: z.string({
     required_error: "El apellido es requerido",
   }),
@@ -20,25 +28,34 @@ export const creatTaskSchema = z.object({
   localidad: z.string({
     required_error: "La localidad es requerida",
   }),
-  domicilio: z.string().optional(), // Opcional si aplica
+  domicilio: z.string().optional(),
   lugar: z.string().optional(),
-  dias: z.string().optional(), // Opcional si aplica
-  horarios: z.string().optional(), // Opcional si aplica
-  tipoevento: z.string().optional(), // Opcional si aplica
-  email: z.string({
-    message: "El email debe ser válido",
-  }),
-  contacto: z.string({
-    required_error: "El contacto es requerido",
-  }),
-  nroHabilitacion: z.string().optional(), // Opcional si aplica
-  domicilioLocalComercial: z.string().optional(), // Opcional si aplica
-  rubro: z.string().optional(), // Opcional si aplica
-  horarioAtencion: z.string().optional(), // Opcional si aplica
-  habilitacionComercial: z.string().optional(), // Opcional si aplica
+  dias: z.string().optional(),
+  horarios: z.string().optional(),
+  tipoevento: z.string().optional(),
+  // Se usa z.string().email() para una validación de correo electrónico.
+  email: z
+    .string({
+      required_error: "El email es requerido",
+    })
+    .email("El email debe ser una dirección de correo válida."),
+  // Se valida que el contacto sea una cadena de texto que contenga solo dígitos.
+  contacto: z
+    .string({
+      required_error: "El contacto es requerido",
+    })
+    .regex(/^\d+$/, "El número de contacto debe contener solo dígitos."),
+  nroHabilitacion: z
+    .string()
+    .regex(/^\d+$/, "El número de habilitación debe contener solo dígitos.")
+    .optional(),
+  domicilioLocalComercial: z.string().optional(),
+  rubro: z.string().optional(),
+  horarioAtencion: z.string().optional(),
+  habilitacionComercial: z.string().optional(),
   estado: z.string().optional().default("Ingresado"),
   motivoRechazo: z.string().optional(),
-  pago: z.boolean().optional().default(false), // Campo de pago opcional y con valor por defecto false
-  file: z.any().optional(), // Correcta utilización de optional
+  pago: z.boolean().optional().default(false),
+  file: z.any().optional(),
   user: z.string().optional(),
 });

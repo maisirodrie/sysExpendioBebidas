@@ -375,7 +375,7 @@ export const getTask = async (req, res) => {
 export const updateTasks = async (req, res) => {
     try {
         const { id } = req.params;
-        const { filesToRemove, ...updateData } = req.body; // Usa `updateData` para evitar conflictos
+        let { filesToRemove, ...updateData } = req.body;
         const userRole = req.user.role.toLowerCase();
 
         const task = await Task.findById(id);
@@ -392,6 +392,38 @@ export const updateTasks = async (req, res) => {
             return res.status(403).json({ message: "No tienes permiso para actualizar el número de expediente." });
         }
 
+        // --- INICIO DE LA LÓGICA DE VALIDACIÓN ---
+        // Se valida que el nuevo nroexpediente, si es diferente al actual,
+        // no exista ya en la base de datos.
+        if (updateData.nroexpediente && updateData.nroexpediente !== task.nroexpediente) {
+            // Busca si ya existe una tarea con el mismo número de expediente COMPLETO,
+            // excluyendo la tarea actual para evitar conflictos de ID.
+            const existingTask = await Task.findOne({
+                nroexpediente: updateData.nroexpediente,
+                _id: { $ne: id }
+            });
+
+            if (existingTask) {
+                return res.status(400).json({ 
+                    message: "El número de expediente ya existe. El correlativo debe ser único para el organismo y el año." 
+                });
+            }
+        }
+        // --- FIN DE LA LÓGICA DE VALIDACIÓN ---
+
+        let idsToRemove = [];
+        if (filesToRemove) {
+            try {
+                idsToRemove = JSON.parse(filesToRemove);
+                if (!Array.isArray(idsToRemove)) {
+                    idsToRemove = [];
+                }
+            } catch (parseError) {
+                console.error("Error al analizar filesToRemove:", parseError);
+                return res.status(400).json({ message: "Formato de archivos a eliminar inválido." });
+            }
+        }
+        
         const newFiles = req.files ? req.files.map(file => ({
             filename: file.filename,
             bucketName: file.bucketName,
@@ -400,23 +432,21 @@ export const updateTasks = async (req, res) => {
             id: file.id
         })) : [];
 
-        if (filesToRemove && filesToRemove.length > 0) {
-            for (const fileId of filesToRemove) {
-                if (mongoose.Types.ObjectId.isValid(fileId)) {
-                    const objectId = new mongoose.Types.ObjectId(fileId);
-                    await Task.updateOne({ _id: id }, { $pull: { file: { id: objectId } } });
-                    await gfs.delete(objectId);
-                } else {
-                    console.warn(`ID inválido en filesToRemove: ${fileId}`);
-                }
+        const updatedFiles = task.file.filter(f => !idsToRemove.includes(f.id.toString()));
+
+        const finalFiles = [...updatedFiles, ...newFiles];
+
+        for (const fileId of idsToRemove) {
+            if (mongoose.Types.ObjectId.isValid(fileId)) {
+                await gfs.delete(new mongoose.Types.ObjectId(fileId));
+            } else {
+                console.warn(`ID inválido en filesToRemove: ${fileId}`);
             }
         }
-        
-        const updatedFiles = [...task.file.filter(f => !filesToRemove.includes(f.id.toString())), ...newFiles];
-        
+
         const updatedTask = await Task.findByIdAndUpdate(
-            id, 
-            { ...updateData, file: updatedFiles }, 
+            id,
+            { ...updateData, file: finalFiles },
             { new: true }
         );
 

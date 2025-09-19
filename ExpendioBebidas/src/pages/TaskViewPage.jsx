@@ -43,7 +43,7 @@ function TaskViewPage() {
   const renderTaskDetails = () => {
     if (!task) return null;
 
-    const { expendio, persona, dni, apellido, nombre, localidad, domicilio,horarios, lugar, dias, rubro, tipoevento, email, contacto, nroHabilitacion, domicilioLocalComercial, horarioAtencion, createdAt } = task;
+    const { nroexpediente,expendio, persona, dni, apellido, nombre, localidad, domicilio,horarios, lugar, dias, rubro, tipoevento, email, contacto, nroHabilitacion, domicilioLocalComercial, horarioAtencion, createdAt } = task;
 
     const isEventoParticular = expendio === "Evento Particular";
     const isLocalComercial = expendio === "Local Comercial";
@@ -55,6 +55,7 @@ function TaskViewPage() {
         
         <p className="my-4">
           <strong>Fecha de Creación:</strong> {formatDate(createdAt)}
+          <p className="my-4"><strong>Nro Expediente:</strong> {nroexpediente || 'No asignado'}</p>
         </p>
         {isEventoParticular && (
           <>

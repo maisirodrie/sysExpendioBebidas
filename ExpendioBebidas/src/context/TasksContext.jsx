@@ -13,13 +13,25 @@ export const useTasks = () => {
 };
 
 export function TaskProvider({ children }) {
-    const { isAuthenticated, loading } = useAuth();
+    // Obtenemos isAuthenticated, loading y logout del hook useAuth
+    const { isAuthenticated, loading, logout } = useAuth();
     const [tasks, setTasks] = useState([]);
+    const [errors, setErrors] = useState([]); // Añadido para manejar los errores
     const [pago, setPago] = useState({
         unidaduf: 0,
         valoruf: 0,
         valortotal: 0,
     });
+
+    // Efecto para limpiar los errores después de 5 segundos
+    useEffect(() => {
+        if (errors.length > 0) {
+            const timer = setTimeout(() => {
+                setErrors([]);
+            }, 5000);
+            return () => clearTimeout(timer);
+        }
+    }, [errors]);
 
     const getTasks = async () => {
         try {
@@ -27,6 +39,13 @@ export function TaskProvider({ children }) {
             setTasks(res.data);
         } catch (error) {
             console.error(error);
+            // Manejamos el error de token inválido o expirado
+            if (error.response && error.response.status === 403) {
+                logout(); // Llama a la función de logout para limpiar el token
+                setErrors(["Sesión expirada o token inválido. Por favor, inicia sesión de nuevo."]);
+            } else {
+                setErrors(["No se pudieron cargar las tareas."]);
+            }
         }
     };
 
@@ -167,7 +186,8 @@ export function TaskProvider({ children }) {
             updatePagoStatus,
             updatePago,
             generateReportpdf,
-            generateReportxlsx
+            generateReportxlsx,
+            errors, // Añadido para que los componentes puedan acceder a los errores
         }}>
             {children}
         </TaskContext.Provider>
