@@ -3,11 +3,9 @@ import mongoose from "mongoose";
 const taskSchema = new mongoose.Schema(
   {
     nroexpediente: {
-        type: String,
-        unique: true, 
-      sparse: true, 
-      default: null, 
-    },
+    type: String,
+    default: null,
+},
     expendio: { type: String, trim: true },
     persona: { type: String, trim: true },
     dni: { type: String, trim: true, unique:true },
