@@ -27,13 +27,8 @@ const taskSchema = new mongoose.Schema(
     nroexpediente: {
       type: String,
       trim: true,
-      unique: true,
-      // La opción `sparse: true` es la clave para este campo.
-      // Permite que haya múltiples documentos con un valor `null`
-      // en `nroexpediente`. La unicidad se aplica solo a los documentos que
-      // tienen un valor asignado.
-      sparse: true,
-      default: null,
+      unique: true, // Asegura que el número de expediente sea único
+      sparse: true, // <--- ¡Esta es la corrección clave!
     },
     file: [
       {
