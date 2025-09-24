@@ -6,7 +6,7 @@ import multer from 'multer';
 import { Readable } from 'stream';
 
 // Configura tu URI de MongoDB
-const mongoURI = 'mongodb://127.0.0.1/sysexpendiobebidasdb';
+const mongoURI = process.env.MONGO_URI;
 
 // Configura la conexión a MongoDB
 const conn = mongoose.createConnection(mongoURI);
