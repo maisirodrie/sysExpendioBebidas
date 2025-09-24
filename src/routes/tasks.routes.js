@@ -64,7 +64,7 @@ router.put("/tasks/:id", authRequired, upload.array('files', 15), streamUpload, 
 router.delete("/tasks/:id", authRequired, deleteTasks);
 
 // --- Rutas de Reportes ---
-router.get("tasks/reporte", authRequired, generateTasksPDF);
+router.get("/tasks/reporte", authRequired, generateTasksPDF);
 router.post("/tasks/reporte", authRequired, generateTasksExcel);
 
 // --- Rutas de Búsqueda ---
@@ -74,7 +74,7 @@ router.get("/tasks/search/:dni", getTaskByDni);
 // Usuarios
 router.get("/admin/users", authRequired, getUsers);
 router.get("/admin/users/:id", authRequired, getUser);
-router.post("/admin/register", register);
+router.post("/admin/register", authRequired, register);
 router.put("/admin/users/:id", authRequired, editUser);
 router.get("/admin/users/profile/:userId", authRequired, getUserProfileWithTask);
 router.delete('/admin/users/:id', authRequired, deleteUser);

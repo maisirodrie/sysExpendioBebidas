@@ -187,34 +187,10 @@ function RegisterPageAdmin() {
               <option value="boss">Jefe</option>
               <option value="viewer">Observador</option>
               <option value="mesa">Mesa de entrada</option>
-              
               <option value="jurídicos">Jurídicos</option>
-              
-              
-              
             </select>
             {errors.role && <p className="text-red-500">El rol es requerido</p>}
           </div>
-
-          {/* Campo para contraseña */}
-          <div className="flex flex-col">
-            <label
-              htmlFor="password"
-              className="block text-sm font-medium text-black text-left"
-            >
-              Contraseña
-            </label>
-            <input
-              type="password"
-              {...register("password", { required: true })}
-              className="w-full bg-white text-gray-600 px-4 py-2 rounded-md my-2 border border-gray-300"
-              placeholder="Contraseña"
-            />
-            {errors.password && (
-              <p className="text-red-500">Contraseña es requerida</p>
-            )}
-          </div>
-
           <button className="custom-button">Registrar</button>
         </form>
       </div>

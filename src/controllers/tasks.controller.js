@@ -171,7 +171,6 @@ const logActivity = async (userId, action, entity, entityId) => {
 export const getTasks = async (req, res) => {
   try {
     const tasks = await Task.find().populate("user");
-    console.log(tasks); // Verifica si hay tareas antes de responder
     res.json(tasks);
   } catch (error) {
     return res.status(500).json({ message: error.message });
