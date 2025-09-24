@@ -4,8 +4,9 @@ const taskSchema = new mongoose.Schema(
   {
     nroexpediente: {
         type: String,
-        default: null, // Asegura que el valor por defecto sea null
-        index: { unique: true, sparse: true }, // Esto asegura que sea único si no es nulo
+        unique: true, 
+      sparse: true, 
+      default: null, 
     },
     expendio: { type: String, trim: true },
     persona: { type: String, trim: true },
