@@ -76,8 +76,8 @@ export const register = async (req, res) => {
                 <p>Le enviamos en el presente mail las credenciales para acceder al Sistema de Expendio de Bebidas.</p>
                 <p>Deberá ingresar la primera vez con los siguientes datos:</p>
                 <ul>
-                    <li><strong>Usuario:</strong> ${username}</li>
-                    <li><strong>Contraseña:</strong> ${tempPassword}</li>
+                    <li><strong>Usuario:</strong>${username}</li>
+                    <li><strong>Contraseña:</strong>${tempPassword}</li>
                 </ul>
                 <p>Tenga en cuenta que la contraseña proporcionada es provisoria, deberá cambiarla al ingresar.</p>
                 <p>Link para ingresar: <a href="${process.env.VITE_FRONTEND_URL}/login">${process.env.VITE_FRONTEND_URL}/login</a></p>
