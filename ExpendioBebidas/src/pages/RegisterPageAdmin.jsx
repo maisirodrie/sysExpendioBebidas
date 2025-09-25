@@ -1,9 +1,9 @@
-import React from "react";
+import React, { useState } from "react";
 import { useForm } from "react-hook-form";
 import { useAuth } from "../context/AuthContext";
 import { Link, useNavigate } from "react-router-dom";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faArrowLeft } from "@fortawesome/free-solid-svg-icons";
+import { faArrowLeft, faSpinner } from "@fortawesome/free-solid-svg-icons";
 import Swal from "sweetalert2";
 
 function RegisterPageAdmin() {
@@ -12,54 +12,45 @@ function RegisterPageAdmin() {
     handleSubmit,
     formState: { errors },
   } = useForm();
-  const { signup, errors: RegisterErrors } = useAuth();
+  const { signup, errors: registerErrors } = useAuth();
   const navigate = useNavigate();
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
-  // Lógica para manejar el registro y la redirección según el rol del usuario
   const onSubmit = handleSubmit(async (values) => {
+    setIsSubmitting(true);
     try {
-      // Mostrar alerta de carga
-      Swal.fire({
-        title: "Cargando...",
-        text: "Por favor, espere mientras se carga el registro.",
-        allowOutsideClick: false,
-        didOpen: () => {
-          Swal.showLoading();
-        },
-      });
-
       // Intentar el registro del usuario
       await signup(values);
-
-      // Cerrar la alerta de carga
-      Swal.close();
 
       // Mostrar alerta de éxito
       Swal.fire({
         icon: "success",
         title: "¡Éxito!",
-        text: "El usuario fue registrado correctamente.",
+        text: "El usuario fue registrado correctamente y las credenciales fueron enviadas al correo.",
         confirmButtonText: "OK",
       });
 
       // Redirigir según el rol del usuario registrado
       if (values.role === "admin") {
-        navigate("/task"); // Redirigir a la página de tareas si es admin
+        navigate("/task");
       } else {
-        navigate("/profile"); // Redirigir a la página de perfil si es un usuario común
+        navigate("/profile");
       }
     } catch (error) {
-      // Cerrar la alerta de carga
-      Swal.close();
+      // Si el error es una respuesta de la API, usa el mensaje que viene con ella.
+      const errorMessage =
+        error.response?.data?.message || "Ocurrió un problema durante el registro. Inténtalo nuevamente.";
 
       // Mostrar alerta de error
       Swal.fire({
         icon: "error",
         title: "Error",
-        text: "Ocurrió un problema durante el registro. Inténtalo nuevamente.",
+        text: errorMessage,
       });
 
       console.error("Error en el registro:", error);
+    } finally {
+      setIsSubmitting(false);
     }
   });
 
@@ -74,13 +65,14 @@ function RegisterPageAdmin() {
       }}
     >
       <div className="bg-gray-300 max-w-screen-md w-full p-10 rounded-md">
-        {RegisterErrors &&
-          Array.isArray(RegisterErrors) &&
-          RegisterErrors.map((error, i) => (
-            <div className="bg-red-500 p-2 text-white" key={i}>
+        {/* Muestra los errores del servidor */}
+        {Array.isArray(registerErrors) &&
+          registerErrors.map((error, i) => (
+            <div className="bg-red-500 p-2 text-white my-2 rounded-md" key={i}>
               {error}
             </div>
           ))}
+
         <div className="flex justify-between items-center mb-4">
           <h1 className="text-2xl font-bold text-black">Registro</h1>
           <Link
@@ -88,7 +80,7 @@ function RegisterPageAdmin() {
             className="btn btn-success"
             onClick={() => navigate("/")}
           >
-            <FontAwesomeIcon icon={faArrowLeft} />{" "}
+            <FontAwesomeIcon icon={faArrowLeft} />
           </Link>
         </div>
 
@@ -191,7 +183,21 @@ function RegisterPageAdmin() {
             </select>
             {errors.role && <p className="text-red-500">El rol es requerido</p>}
           </div>
-          <button className="custom-button">Registrar</button>
+
+          <button
+            className="custom-button mt-4"
+            type="submit"
+            disabled={isSubmitting}
+          >
+            {isSubmitting ? (
+              <>
+                <FontAwesomeIcon icon={faSpinner} spin className="mr-2" />
+                Cargando...
+              </>
+            ) : (
+              "Registrar"
+            )}
+          </button>
         </form>
       </div>
     </div>
