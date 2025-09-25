@@ -12,17 +12,17 @@ function RegisterPageAdmin() {
     handleSubmit,
     formState: { errors },
   } = useForm();
-  const { signup, errors: registerErrors } = useAuth();
+  const { signup } = useAuth(); // Se elimina la importación de `errors` del contexto
   const navigate = useNavigate();
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   const onSubmit = handleSubmit(async (values) => {
     setIsSubmitting(true);
     try {
-      // Intentar el registro del usuario
+      // Intenta el registro del usuario
       await signup(values);
 
-      // Mostrar alerta de éxito
+      // Muestra la alerta de éxito
       Swal.fire({
         icon: "success",
         title: "¡Éxito!",
@@ -30,18 +30,25 @@ function RegisterPageAdmin() {
         confirmButtonText: "OK",
       });
 
-      // Redirigir según el rol del usuario registrado
+      // Redirige según el rol del usuario registrado
       if (values.role === "admin") {
         navigate("/task");
       } else {
         navigate("/profile");
       }
     } catch (error) {
-      // Si el error es una respuesta de la API, usa el mensaje que viene con ella.
-      const errorMessage =
-        error.response?.data?.message || "Ocurrió un problema durante el registro. Inténtalo nuevamente.";
+      // Manejo específico para errores de usuario/correo duplicado
+      let errorMessage = "Ocurrió un problema durante el registro. Inténtalo nuevamente.";
+      
+      // Si el error es un array (del backend), lo unimos para mostrarlo en SweetAlert
+      if (Array.isArray(error.response?.data)) {
+        errorMessage = error.response.data.join(", ");
+      } else if (error.response?.data?.message) {
+        // Si el error es un objeto con una propiedad 'message'
+        errorMessage = error.response.data.message;
+      }
 
-      // Mostrar alerta de error
+      // Muestra la alerta de error con el mensaje dinámico
       Swal.fire({
         icon: "error",
         title: "Error",
@@ -65,14 +72,8 @@ function RegisterPageAdmin() {
       }}
     >
       <div className="bg-gray-300 max-w-screen-md w-full p-10 rounded-md">
-        {/* Muestra los errores del servidor */}
-        {Array.isArray(registerErrors) &&
-          registerErrors.map((error, i) => (
-            <div className="bg-red-500 p-2 text-white my-2 rounded-md" key={i}>
-              {error}
-            </div>
-          ))}
-
+        {/* Se eliminó la sección que renderizaba los errores del contexto */}
+        
         <div className="flex justify-between items-center mb-4">
           <h1 className="text-2xl font-bold text-black">Registro</h1>
           <Link
@@ -179,7 +180,7 @@ function RegisterPageAdmin() {
               <option value="boss">Jefe</option>
               <option value="viewer">Observador</option>
               <option value="mesa">Mesa de entrada</option>
-              <option value="jurídicos">Jurídicos</option>
+              <option value="juridicos">Jurídicos</option>
             </select>
             {errors.role && <p className="text-red-500">El rol es requerido</p>}
           </div>
