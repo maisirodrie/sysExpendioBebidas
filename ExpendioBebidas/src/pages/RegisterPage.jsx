@@ -9,8 +9,7 @@ import { faArrowLeft, faTimes } from "@fortawesome/free-solid-svg-icons";
 import Swal from "sweetalert2";
 import Vistapago from "./Vistapago";
 import "./taskformpage.css";
-import "./RegisterPage.css"
-
+import "./RegisterPage.css";
 
 function RegisterPage() {
   const {
@@ -85,77 +84,82 @@ function RegisterPage() {
     });
   }, []);
 
-const onSubmit = handleSubmit(async (data) => {
+  const onSubmit = handleSubmit(async (data) => {
     try {
+      Swal.fire({
+        title: "Cargando...",
+        text: "Por favor, espere mientras se guarda el registro.",
+        allowOutsideClick: false,
+        didOpen: () => {
+          Swal.showLoading();
+        },
+      });
+
+      const formData = new FormData();
+
+      Object.keys(data).forEach((key) => {
+        const value = data[key];
+        if (
+          value !== null &&
+          value !== undefined &&
+          (typeof value !== "object" || Object.keys(value).length > 0)
+        ) {
+          formData.append(key, value);
+        }
+      });
+
+      if (files && files.length > 0) {
+        files.forEach((file) => {
+          formData.append("files", file);
+        });
+      }
+
+      let res;
+      if (params.id) {
+        res = await updateTask(params.id, formData);
+      } else {
+        res = await createTasksPublic(formData);
+      }
+
+      if (res && res.nroexpediente) {
         Swal.fire({
-            title: "Cargando...",
-            text: "Por favor, espere mientras se guarda el registro.",
-            allowOutsideClick: false,
-            didOpen: () => {
-                Swal.showLoading();
-            },
+          icon: "success",
+          title: "¡Éxito!",
+          html: `<p>Su registro se ha actualizado con éxito. El número de trámite es: <strong>${res.nroexpediente}</strong>.</p><p>Para cualquier consulta, llame al: <strong>0376-4448963</strong>.</p>`,
+          confirmButtonText: "OK",
+          allowOutsideClick: false,
+          showCloseButton: false,
         });
-
-        const formData = new FormData();
-
-        Object.keys(data).forEach((key) => {
-            const value = data[key];
-            if (value !== null && value !== undefined && (typeof value !== 'object' || Object.keys(value).length > 0)) {
-                formData.append(key, value);
-            }
+        navigate("/");
+      } else if (res && res.message) {
+        Swal.fire({
+          icon: "success",
+          title: "¡Éxito!",
+          html: `<p>Su registro se ha generado con éxito.</p><p>El número de expediente será asignado por mesa de entrada.</p><p>Para cualquier consulta, llame al: <strong>0376-4448963</strong>.</p>`,
+          confirmButtonText: "OK",
+          allowOutsideClick: false,
+          showCloseButton: false,
         });
-
-        if (files && files.length > 0) {
-            files.forEach((file) => {
-                formData.append("files", file);
-            });
-        }
-
-        let res;
-        if (params.id) {
-            res = await updateTask(params.id, formData);
-        } else {
-            res = await createTasksPublic(formData);
-        }
-
-        if (res && res.nroexpediente) {
-            Swal.fire({
-                icon: "success",
-                title: "¡Éxito!",
-                html: `<p>Su registro se ha actualizado con éxito. El número de trámite es: <strong>${res.nroexpediente}</strong>.</p><p>Para cualquier consulta, llame al: <strong>0376-4448963</strong>.</p>`,
-                confirmButtonText: "OK",
-                allowOutsideClick: false,
-                showCloseButton: false,
-            });
-            navigate("/");
-        } else if (res && res.message) {
-            Swal.fire({
-                icon: "success",
-                title: "¡Éxito!",
-                html: `<p>Su registro se ha generado con éxito.</p><p>El número de expediente será asignado por mesa de entrada.</p><p>Para cualquier consulta, llame al: <strong>0376-4448963</strong>.</p>`,
-                confirmButtonText: "OK",
-                allowOutsideClick: false,
-                showCloseButton: false,
-            });
-            navigate("/");
-        } else {
-            console.error("Respuesta inesperada del servidor:", res);
-            throw new Error("La respuesta del servidor no fue la esperada");
-        }
+        navigate("/");
+      } else {
+        console.error("Respuesta inesperada del servidor:", res);
+        throw new Error("La respuesta del servidor no fue la esperada");
+      }
     } catch (error) {
-        console.error("Error:", error);
-        Swal.close();
-        
-        const serverMessage = error.response?.data?.message || "Ocurrió un error al guardar el registro. Intente de nuevo más tarde.";
+      console.error("Error:", error);
+      Swal.close();
 
-        Swal.fire({
-            icon: "error",
-            title: "Error",
-            text: serverMessage,
-        });
+      const serverMessage =
+        error.response?.data?.message ||
+        "Ocurrió un error al guardar el registro. Intente de nuevo más tarde.";
+
+      Swal.fire({
+        icon: "error",
+        title: "Error",
+        text: serverMessage,
+      });
     }
-});
-
+  });
 
   const handleLocalidadChange = (event) => {
     const selectedValue = event.target.value;
@@ -192,31 +196,30 @@ const onSubmit = handleSubmit(async (data) => {
     setValue("persona", e.target.value);
   };
 
-const downloadFile = async (filePath) => {
+  const downloadFile = async (filePath) => {
     try {
-        // Solicitar el archivo como blob
-        const response = await axios.get(filePath, {
-            responseType: "blob",
-        });
+      // Solicitar el archivo como blob
+      const response = await axios.get(filePath, {
+        responseType: "blob",
+      });
 
-        // Crear una URL temporal para el blob
-        const url = window.URL.createObjectURL(new Blob([response.data]));
+      // Crear una URL temporal para el blob
+      const url = window.URL.createObjectURL(new Blob([response.data]));
 
-        // Crear un enlace invisible y simular un clic para iniciar la descarga
-        const link = document.createElement("a");
-        link.href = url;
-        link.setAttribute("download", filePath.split("/").pop()); 
-        document.body.appendChild(link);
-        link.click();
-        
-        // Limpiar el enlace
-        link.parentNode.removeChild(link);
+      // Crear un enlace invisible y simular un clic para iniciar la descarga
+      const link = document.createElement("a");
+      link.href = url;
+      link.setAttribute("download", filePath.split("/").pop());
+      document.body.appendChild(link);
+      link.click();
 
+      // Limpiar el enlace
+      link.parentNode.removeChild(link);
     } catch (error) {
-        console.error("Error al descargar el archivo:", error);
-        // Si no se usa SweetAlert, puedes mostrar el error en la consola o de otra manera
+      console.error("Error al descargar el archivo:", error);
+      // Si no se usa SweetAlert, puedes mostrar el error en la consola o de otra manera
     }
-};
+  };
 
   return (
     <div
@@ -281,55 +284,121 @@ const downloadFile = async (filePath) => {
               </button>
             </div>
 
-            <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', textAlign: 'center', marginTop: '20px' }}>
-  <p>Para cualquier consulta, llame al: <strong>0376-4448963</strong>.</p>
-</div>
-
+            <div
+              style={{
+                display: "flex",
+                justifyContent: "center",
+                alignItems: "center",
+                textAlign: "center",
+                marginTop: "20px",
+              }}
+            >
+              <p>
+                Para cualquier consulta, llame al: <strong>0376-4448963</strong>
+                .
+              </p>
+            </div>
           </div>
         )}
         <div>
-              {/* Tabla con fondo blanco */}
-    <div className="text-center mt-4">
-    <div className="flex justify-center items-center 
-     bg-gray-100">
-  <table className="table" style={{ textTransform: "uppercase" }}>
-    <thead className="bg-blue-500 text-white">
-      <tr>
-        <th className="border border-gray-400 px-4 py-2">Categoría</th>
-        <th className="border border-gray-400 px-4 py-2">Arancel</th>
-      </tr>
-    </thead>
-    <tbody>
-      <tr>
-        <td data-label="Categoría" className="border border-gray-400 px-4 py-2">Eventos Temporarios</td>
-        <td data-label="Arancel" className="border border-gray-400 px-4 py-2">S/Arancel</td>
-      </tr>
-      <tr>
-        <td data-label="Categoría" className="border border-gray-400 px-4 py-2">Kioskos</td>
-        <td data-label="Arancel" className="border border-gray-400 px-4 py-2">$1.100</td>
-      </tr>
-      <tr>
-        <td data-label="Categoría" className="border border-gray-400 px-4 py-2">MiniMercados</td>
-        <td data-label="Arancel" className="border border-gray-400 px-4 py-2">$1.100</td>
-      </tr>
-      <tr>
-        <td data-label="Categoría" className="border border-gray-400 px-4 py-2">Supermercados</td>
-        <td data-label="Arancel" className="border border-gray-400 px-4 py-2">$1.100</td>
-      </tr>
-      <tr>
-        <td data-label="Categoría" className="border border-gray-400 px-4 py-2">Locales Bailables, Bares, Pub</td>
-        <td data-label="Arancel" className="border border-gray-400 px-4 py-2">$1.100</td>
-      </tr>
-    </tbody>
-  </table>
-</div>
+          {/* Tabla con fondo blanco */}
+          <div className="text-center mt-4">
+            <div
+              className="flex justify-center items-center 
+     bg-gray-100"
+            >
+              <table className="table" style={{ textTransform: "uppercase" }}>
+                <thead className="bg-blue-500 text-white">
+                  <tr>
+                    <th className="border border-gray-400 px-4 py-2">
+                      Categoría
+                    </th>
+                    <th className="border border-gray-400 px-4 py-2">
+                      Arancel
+                    </th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td
+                      data-label="Categoría"
+                      className="border border-gray-400 px-4 py-2"
+                    >
+                      Eventos Temporarios
+                    </td>
+                    <td
+                      data-label="Arancel"
+                      className="border border-gray-400 px-4 py-2"
+                    >
+                      S/Arancel
+                    </td>
+                  </tr>
+                  <tr>
+                    <td
+                      data-label="Categoría"
+                      className="border border-gray-400 px-4 py-2"
+                    >
+                      Kioskos
+                    </td>
+                    <td
+                      data-label="Arancel"
+                      className="border border-gray-400 px-4 py-2"
+                    >
+                      $1.100
+                    </td>
+                  </tr>
+                  <tr>
+                    <td
+                      data-label="Categoría"
+                      className="border border-gray-400 px-4 py-2"
+                    >
+                      MiniMercados
+                    </td>
+                    <td
+                      data-label="Arancel"
+                      className="border border-gray-400 px-4 py-2"
+                    >
+                      $1.100
+                    </td>
+                  </tr>
+                  <tr>
+                    <td
+                      data-label="Categoría"
+                      className="border border-gray-400 px-4 py-2"
+                    >
+                      Supermercados
+                    </td>
+                    <td
+                      data-label="Arancel"
+                      className="border border-gray-400 px-4 py-2"
+                    >
+                      $1.100
+                    </td>
+                  </tr>
+                  <tr>
+                    <td
+                      data-label="Categoría"
+                      className="border border-gray-400 px-4 py-2"
+                    >
+                      Locales Bailables, Bares, Pub
+                    </td>
+                    <td
+                      data-label="Arancel"
+                      className="border border-gray-400 px-4 py-2"
+                    >
+                      $1.100
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
 
-      <p className="text-sm mt-4">
-        El monto deberá ser depositado en la cuenta corriente Nº{" "}
-        <strong>xxxxxxxxxx</strong> una vez terminado el procedimiento de
-        verificación de documentación presentada.
-      </p>
-    </div>
+            <p className="text-sm mt-4">
+              El monto deberá ser depositado en la cuenta corriente Nº{" "}
+              <strong>xxxxxxxxxx</strong> una vez terminado el procedimiento de
+              verificación de documentación presentada.
+            </p>
+          </div>
           {/* <h1 className="text-2xl font-bold text-black text-center">
             <Vistapago />
           </h1> */}
@@ -399,26 +468,29 @@ const downloadFile = async (filePath) => {
                 readOnly
               />
 
-              <label htmlFor="dni" className="block text-sm font-medium text-black">
-              DNI del Propietario
-            </label>
-            {errors.dni && (
-              <p className="text-red-500 text-sm mt-1">
-                {errors.dni.message}
-              </p>
-            )}
-            <input
-              type="tel" // Se ha cambiado de "text" a "tel"
-              {...register("dni", { 
-                required: "El DNI es requerido",
-                pattern: {
-                  value: /^\d{7,8}$/,
-                  message: "El DNI debe contener 7 u 8 dígitos numerales."
-                }
-              })}
-              className="w-full bg-gray-100 text-black px-4 py-2 rounded-md my-2"
-              placeholder="DNI del Propietario"
-            />
+              <label
+                htmlFor="dni"
+                className="block text-sm font-medium text-black"
+              >
+                DNI del Propietario
+              </label>
+              {errors.dni && (
+                <p className="text-red-500 text-sm mt-1">
+                  {errors.dni.message}
+                </p>
+              )}
+              <input
+                type="tel"
+                {...register("dni", {
+                  required: "El DNI es requerido",
+                  pattern: {
+                    value: /^\d+$/,
+                    message: "El DNI debe contener solo dígitos numéricos.",
+                  },
+                })}
+                className="w-full bg-gray-100 text-black px-4 py-2 rounded-md my-2"
+                placeholder="DNI del Propietario"
+              />
 
               <label
                 htmlFor="apellido"
