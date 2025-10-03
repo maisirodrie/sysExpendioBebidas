@@ -412,7 +412,7 @@ function Table() {
                             </span>
                           )}
                           {/* AÑADE ESTE BOTÓN AQUÍ */}
-  {task.estado === "rechazado" && (user.role === "juridicos" || user.role === "admin") && (
+  {task.estado === "rechazado" && (user.role === "juridicos" || user.role === "admin" || user.role === "editor") && (
     <button
       onClick={() => handleStatusChange(task._id, "rechazado")}
       className="btn-dark"
