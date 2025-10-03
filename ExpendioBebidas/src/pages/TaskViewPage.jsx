@@ -91,14 +91,14 @@ function TaskViewPage() {
         {/* Aplicación dinámica del color al estado */}
         <p className="my-4">
           <strong className="text-xl mr-2">Estado:</strong> 
-          <span className={`font-bold p-1 rounded-md text-white bg-${statusColorName}-600`}>
+          <strong>
             {estado ? estado.toUpperCase() : 'DESCONOCIDO'}
-          </span>
+          </strong>
         </p>
 
         {/* Bloque condicional para mostrar el motivoRechazo con colores dinámicos */}
         {isRechazado && motivoRechazo && (
-          <div className={`bg-${statusColorName}-200 border-l-4 border-${statusColorName}-500 text-${statusColorName}-700 p-4 my-6 rounded-md shadow-lg`}>
+          <div className="my-4">
             <h3 className="text-xl font-bold mb-2">Motivo de Rechazo</h3>
             <p className="text-lg">{motivoRechazo}</p>
           </div>
@@ -158,7 +158,6 @@ function TaskViewPage() {
              className="bg-green-600 hover:bg-green-700 text-white font-bold py-2 px-4 rounded transition duration-200 shadow-md flex items-center space-x-2"
           >
             <FontAwesomeIcon icon={faArrowLeft} className="mr-2" />
-             <span>Volver</span>
           </Link>
         </div>
         <div className="text-gray-700 text-base leading-relaxed">
