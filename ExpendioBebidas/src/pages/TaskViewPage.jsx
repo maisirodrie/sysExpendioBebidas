@@ -161,9 +161,13 @@ function TaskViewPage() {
       <div className="bg-gray-300 max-w-screen-md w-full p-10 rounded-md">
         <div className="flex justify-between items-center mb-4">
           <h1 className="text-2xl font-bold text-black">Detalles del Registro</h1>
-          <Link to="/task" className="bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded-lg transition duration-200 shadow-md">
-            <FontAwesomeIcon icon={faArrowLeft} className="mr-2" /> Volver
-          </Link>
+                    <Link
+                      to="/task"
+                      className="btn btn-success"
+                      onClick={() => navigate("/")}
+                    >
+                      <FontAwesomeIcon icon={faArrowLeft} />{" "}
+                    </Link>
         </div>
         <div className="text-black">
           {task ? (
@@ -177,14 +181,14 @@ function TaskViewPage() {
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                       {task.file.map((fileInfo, index) => (
                         <a
-                          key={index}
-                          href={`${apiUrl}/tasks/file/${fileInfo.filename}`}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          className="bg-green-500 hover:bg-green-600 text-white font-bold py-2 px-4 text-center rounded-lg transition duration-200 break-words w-full shadow-md"
-                        >
-                          {fileInfo.filename}
-                        </a>
+                    key={index}
+                    href={`${apiUrl}/tasks/file/${fileInfo.filename}`}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 text-center rounded transition duration-200 break-words w-full"
+                  >
+                    {fileInfo.filename}
+                  </a>
                       ))}
                     </div>
                 </div>
