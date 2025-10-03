@@ -161,13 +161,9 @@ function TaskViewPage() {
       <div className="bg-gray-300 max-w-screen-md w-full p-10 rounded-md">
         <div className="flex justify-between items-center mb-4">
           <h1 className="text-2xl font-bold text-black">Detalles del Registro</h1>
-                    <Link
-                      to="/task"
-                      className="btn btn-success"
-                      onClick={() => navigate("/")}
-                    >
-                      <FontAwesomeIcon icon={faArrowLeft} />{" "}
-                    </Link>
+<Link to="/task" className="btn btn-success">
+            <FontAwesomeIcon icon={faArrowLeft} />
+          </Link>
         </div>
         <div className="text-black">
           {task ? (
