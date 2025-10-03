@@ -159,7 +159,7 @@ function Table() {
             return;
         }
 
-        if ((user.role === "juridicos" || user.role === "admin") && newStatus === "rechazado") {
+        if ((user.role === "juridicos" || user.role === "admin" || user.role === "editor") && newStatus === "rechazado") {
             const { value: motivoRechazo } = await Swal.fire({
                 title: "Motivo del Rechazo",
                 input: "textarea",
