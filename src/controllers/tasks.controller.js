@@ -384,7 +384,7 @@ export const updateTasks = async (req, res) => {
         if (!task) return res.status(404).json({ message: "Tarea no encontrada" });
 
         const finalStates = ['aprobado', 'finalizado', 'rechazado'];
-        if (finalStates.includes(task.estado) && userRole !== 'admin' && userRole !== 'juridicos') {
+        if (finalStates.includes(task.estado) && userRole !== 'admin' && userRole !== 'juridicos' && userRole !== 'editor') {
             return res.status(403).json({
                 message: "El expediente no puede ser editado, por favor contactar al administrador del sistema."
             });
