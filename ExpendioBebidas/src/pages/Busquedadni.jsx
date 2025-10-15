@@ -18,7 +18,7 @@ const handleSearch = async (e) => {
     Swal.fire({
       icon: "warning",
       title: "Campo vacío",
-      text: "Por favor, ingresa un DNI.",
+      text: "Por favor, ingresa un DNI/CUIT.",
     });
     return;
   }
@@ -115,14 +115,14 @@ const handleSearch = async (e) => {
           
           
           {/* Campo de búsqueda */}
-          <p>Introduce tu DNI para consultar el estado de tu trámite.</p>
+          <p>Introduce tu DNI/CUIT para consultar el estado de tu trámite.</p>
           <form onSubmit={handleSearch} className="flex flex-col items-center mt-8">
             
             <input
               type="text"
               value={dni}
               onChange={(e) => setDni(e.target.value)}
-              placeholder="Ingresa tu DNI"
+              placeholder="Ingresa tu DNI/CUIT"
               className="border px-2 py-2 rounded-md text-black w-34 text-center"
             />
             <button

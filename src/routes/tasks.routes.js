@@ -58,9 +58,10 @@ router.get("/tasks/:id", authRequired, getTask);
 router.put('/tasks/estado/:id', authRequired, taskEstados);
 router.get("/user/tasks/:taskId", authRequired, getTaskWithUser);
 router.get("/tasks/file/:filename", authRequired, downloadFile);
-router.post('/taskspublico', upload.array('files', 15), streamUpload, validateSchema(creatTaskSchema), createTasksPublic);
+// En tu archivo de rutas (tasks.routes.js)
+router.post('/taskspublico', upload.any(), streamUpload, validateSchema(creatTaskSchema), createTasksPublic);
 router.post("/tasks", authRequired, upload.array('files', 15), streamUpload, validateSchema(creatTaskSchema), createTasks);
-router.put("/tasks/:id", authRequired, upload.array('files', 15), streamUpload, updateTasks);
+router.put("/tasks/:id", authRequired, upload.any(), streamUpload, updateTasks);
 router.delete("/tasks/:id", authRequired, deleteTasks);
 
 // --- Rutas de Reportes ---

@@ -4,19 +4,24 @@ import { useTasks } from "../context/TasksContext";
 import { Link, useNavigate, useParams } from "react-router-dom";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import axios from "axios";
-import { Municipios } from "../api/municipios";
+import { Municipios } from "../api/municipios"; 
 import { faArrowLeft, faTimes } from "@fortawesome/free-solid-svg-icons";
 import Swal from "sweetalert2";
-import Vistapago from "./Vistapago";
 import "./taskformpage.css";
 import "./RegisterPage.css";
+
+// IMPORTACIÓN DE COMPONENTES MODULARES
+import EventoParticularForm from "./EventoParticularForm";
+import LocalComercialForm from "./LocalComercialForm";
 
 function RegisterPage() {
   const {
     register,
     handleSubmit,
     setValue,
+    watch,
     clearErrors,
+    unregister,
     formState: { errors },
   } = useForm();
   const { createTasksPublic, getTask, updateTask } = useTasks();
@@ -25,39 +30,27 @@ function RegisterPage() {
   const [files, setFiles] = useState([]);
   const [tipoExpendio, setTipoExpendio] = useState("");
   const [tipoPersona, setTipoPersona] = useState("");
-  const [showRequisitos, setShowRequisitos] = useState(true);
-  const [horarios, setHorarios] = useState([""]); // Estado para los horarios
-  const [LocalidadValue, setSelectedLocalidadValue] = useState("");
+  const [showRequisitos, setShowRequisitos] = useState(true); // Se mantiene pero no se usa en el renderizado
+  const [horarios, setHorarios] = useState([""]); // Estado para los horarios (no se usa en el código actual, se mantiene por si acaso)
+  const [LocalidadValue, setSelectedLocalidadValue] = useState(""); // Estado no usado, se puede eliminar
 
+  // --- CARGA DE DATOS EXISTENTES (UPDATE) ---
   useEffect(() => {
     async function loadTask() {
-      console.log("useEffect ejecutado"); // Verificar si se ejecuta el efecto
+      console.log("useEffect ejecutado");
       if (params.id) {
         try {
           const task = await getTask(params.id);
-          console.log("Tarea cargada:", task); // Verifica qué datos se están cargando
+          console.log("Tarea cargada:", task);
           if (task) {
             // Rellenar los valores del formulario con la tarea existente
-            setValue("expendio", task.expendio);
-            setValue("persona", task.persona);
-            setValue("dni", task.dni);
-            setValue("apellido", task.apellido);
-            setValue("nombre", task.nombre);
-            setValue("localidad", task.localidad);
-            setValue("domicilio", task.domicilio);
-            setValue("lugar", task.lugar);
-            setValue("dias", task.dias);
-            setValue("horarios", task.horarios);
-            setValue("tipoevento", task.tipoevento);
-            setValue("email", task.email);
-            setValue("contacto", task.contacto);
-            setValue("nroHabilitacion", task.nroHabilitacion);
-            setValue("domicilioLocalComercial", task.domicilioLocalComercial);
-            setValue("rubro", task.rubro);
-            setValue("horarioAtencion", task.horarioAtencion);
-            setValue("habilitacionComercial", task.habilitacionComercial);
-            setTipoExpendio(task.expendio);
-            setTipoPersona(task.persona);
+            // NOTA: Se incluyen todos los campos, incluso los que podrían ser mutuos
+            Object.keys(task).forEach((key) => {
+              setValue(key, task[key]);
+            });
+
+            setTipoExpendio(task.expendio || "");
+            setTipoPersona(task.persona || "");
           } else {
             console.error("No se encontró la tarea.");
           }
@@ -74,8 +67,8 @@ function RegisterPage() {
     loadTask();
   }, [params.id, setValue, getTask]);
 
+  // --- AVISO INICIAL ---
   useEffect(() => {
-    // Mostrar el aviso con SweetAlert
     Swal.fire({
       icon: "info",
       title: "Aviso Importante",
@@ -84,110 +77,175 @@ function RegisterPage() {
     });
   }, []);
 
-  const onSubmit = handleSubmit(async (data) => {
-    try {
-      Swal.fire({
-        title: "Cargando...",
-        text: "Por favor, espere mientras se guarda el registro.",
-        allowOutsideClick: false,
-        didOpen: () => {
-          Swal.showLoading();
-        },
-      });
+// --- SUBMIT DEL FORMULARIO ---
+  const onSubmit = handleSubmit(async (data) => {
+    try {
+      Swal.fire({
+        title: "Cargando...",
+        text: "Por favor, espere mientras se guarda el registro.",
+        allowOutsideClick: false,
+        didOpen: () => {
+          Swal.showLoading();
+        },
+      });
 
-      const formData = new FormData();
+      const formData = new FormData();
 
-      Object.keys(data).forEach((key) => {
-        const value = data[key];
-        if (
-          value !== null &&
-          value !== undefined &&
-          (typeof value !== "object" || Object.keys(value).length > 0)
-        ) {
-          formData.append(key, value);
-        }
-      });
+      // 🚀 LÓGICA DE PROCESAMIENTO DE DATOS Y ARCHIVOS (MODIFICADA)
+      Object.keys(data).forEach((key) => {
+        const value = data[key];
 
-      if (files && files.length > 0) {
-        files.forEach((file) => {
-          formData.append("files", file);
-        });
-      }
+        // 1. Manejo de ARCHIVOS (FileList)
+        if (value instanceof FileList && value.length > 0) {
+          // Si es un FileList, iteramos y adjuntamos cada archivo
+          // usando la 'key' (nombre de campo: ej. 'notaSolicitud') para Multer.fields().
+          Array.from(value).forEach((file) => {
+            formData.append(key, file); 
+          });
+        } 
+        // 2. Manejo de DATOS DE TEXTO/OTROS
+        else if (
+          value !== null &&
+          value !== undefined &&
+          !(value instanceof FileList) && // Asegurar que no sea un FileList vacío
+          (typeof value !== "object" || Object.keys(value).length > 0)
+        ) {
+          formData.append(key, value);
+        }
+      });
 
-      let res;
-      if (params.id) {
-        res = await updateTask(params.id, formData);
-      } else {
-        res = await createTasksPublic(formData);
-      }
+      // ❌ Se eliminó la lógica obsoleta que usaba el estado 'files' y formData.append("files", ...)
+      // FIN DE LA LÓGICA DE PROCESAMIENTO
+      
+      let res;
+      if (params.id) {
+        res = await updateTask(params.id, formData);
+      } else {
+        res = await createTasksPublic(formData);
+      }
 
-      if (res && res.nroexpediente) {
-        Swal.fire({
-          icon: "success",
-          title: "¡Éxito!",
-          html: `<p>Su registro se ha actualizado con éxito. El número de trámite es: <strong>${res.nroexpediente}</strong>.</p><p>Para cualquier consulta, llame al: <strong>0376-4448963</strong>.</p>`,
-          confirmButtonText: "OK",
-          allowOutsideClick: false,
-          showCloseButton: false,
-        });
-        navigate("/");
-      } else if (res && res.message) {
-        Swal.fire({
-          icon: "success",
-          title: "¡Éxito!",
-          html: `<p>Su registro se ha generado con éxito.</p><p>El número de expediente será asignado por mesa de entrada.</p><p>Para cualquier consulta, llame al: <strong>0376-4448963</strong>.</p>`,
-          confirmButtonText: "OK",
-          allowOutsideClick: false,
-          showCloseButton: false,
-        });
-        navigate("/");
-      } else {
-        console.error("Respuesta inesperada del servidor:", res);
-        throw new Error("La respuesta del servidor no fue la esperada");
-      }
-    } catch (error) {
-      console.error("Error:", error);
-      Swal.close();
+      if (res && (res.nroexpediente || res.message)) {
+        Swal.fire({
+          icon: "success",
+          title: "¡Éxito!",
+          html: `<p>Su registro se ha ${
+            params.id ? "actualizado" : "generado"
+          } con éxito. ${
+            res.nroexpediente
+              ? `El número de trámite es: <strong>${res.nroexpediente}</strong>.`
+              : `El número de expediente será asignado por mesa de entrada.`
+          }</p><p>Para cualquier consulta, llame al: <strong>0376-4448963</strong>.</p>`,
+          confirmButtonText: "OK",
+          allowOutsideClick: false,
+          showCloseButton: false,
+        });
+        navigate("/");
+      } else {
+        console.error("Respuesta inesperada del servidor:", res);
+        throw new Error("La respuesta del servidor no fue la esperada");
+      }
+    } catch (error) {
+      console.error("Error:", error);
+      Swal.close();
 
-      const serverMessage =
-        error.response?.data?.message ||
-        "Ocurrió un error al guardar el registro. Intente de nuevo más tarde.";
+      const serverMessage =
+        error.response?.data?.message ||
+        "Ocurrió un error al guardar el registro. Intente de nuevo más tarde.";
 
-      Swal.fire({
-        icon: "error",
-        title: "Error",
-        text: serverMessage,
-      });
-    }
-  });
+      Swal.fire({
+        icon: "error",
+        title: "Error",
+        text: serverMessage,
+      });
+    }
+  });
 
+  // --- HANDLERS ---
   const handleLocalidadChange = (event) => {
     const selectedValue = event.target.value;
     setValue("localidad", selectedValue);
     if (selectedValue) {
-      clearErrors("localidad"); // Elimina el mensaje de error si el campo tiene un valor
+      clearErrors("localidad");
     }
   };
+
   const handleFileChange = (e) => {
-    const selectedFiles = Array.from(e.target.files); // Convertir el FileList a un array
-    setFiles((prevFiles) => [...prevFiles, ...selectedFiles]); // Acumular archivos
+    const selectedFiles = Array.from(e.target.files);
+    setFiles((prevFiles) => [...prevFiles, ...selectedFiles]);
   };
 
-  // Función para eliminar un archivo específico del acumulador
   const removeFile = (index) => {
     setFiles((prevFiles) => prevFiles.filter((_, i) => i !== index));
   };
 
-  const handleTipoExpendioChange = (e) => {
+    const handleTipoExpendioChange = (e) => {
     const selectedExpendio = e.target.value;
     setTipoExpendio(selectedExpendio);
-    setValue("expendio", selectedExpendio); // Actualiza el valor en el formulario
+    setValue("expendio", selectedExpendio);
 
-    // Si se selecciona "Evento Particular", establecer persona como "Física"
+    // --- Lógica CLAVE de Limpieza (Unregister) para evitar errores de validación cruzada ---
+    
+    // Lista de campos del Local Comercial (Persona Física/Jurídica)
+    const localComercialFields = [
+        "persona", "dni", "apellido", "nombre", "domicilio", 
+        "nroHabilitacion", "domicilioLocalComercial", "horarioAtencion", "rubro", 
+        "email", "contacto",
+        
+        // Requisitos de Local Comercial (Física)
+        "notaSolicitud", "habilitacionMunicipal", "actaInspeccion", "ddjjDistancias", 
+        "ddjjHigiene", "fotocopiaDni", "informeSocioAmbiental", "certificadoAntecedentes", 
+        "propiedadInmueble", "planContingencia", 
+        
+        // Requisitos de Local Comercial (Jurídica)
+        "notaSolicitudJuridica", "habilitacionMunicipalJuridica", "estatutoSocial", 
+        "actaAsamblea", "actaComisionDirectiva", "ddjjDistanciasJuridica", 
+        "fotocopiaDniAutorizado", "certificadoAntecedentesAutorizado", "medidasSeguridad", 
+        "propiedadInmuebleJuridica", "planContingenciaJuridica"
+    ];
+
+    // Lista de campos del Evento Particular
+    const eventoParticularFields = [
+        "dni", "apellido", "nombre", "lugar", "tipoevento", "dias", "horarios",
+        "email", "contacto", 
+
+        // Requisitos de Evento
+        "paseElevacionIntendente", "autorizacionMunicipal", "fotocopiaDniEvento", 
+        "certificadoAntecedentesEvento", "autorizacionPropietario"
+    ];
+    
+    // Limpiar el estado de persona y sus errores
+    setTipoPersona("");
+    setValue("persona", "");
+    clearErrors();
+
+
     if (selectedExpendio === "Evento Particular") {
-      setValue("persona", "Física"); // Asegura que el valor en el formulario sea "Física"
+      // Si va a Evento, limpiamos todos los campos de Local Comercial
+      localComercialFields.forEach(field => {
+          setValue(field, undefined); // Limpiar valor
+          unregister(field); // Desregistrar
+      });
+      // Restauramos el tipo de persona para Evento 
+      setValue("persona", "Física"); 
+      setTipoPersona("Física");
+      
+    } else if (selectedExpendio === "Local Comercial") {
+      // Si va a Local, limpiamos todos los campos de Evento
+      eventoParticularFields.forEach(field => {
+          setValue(field, undefined); // Limpiar valor
+          unregister(field); // Desregistrar
+      });
+      // Aseguramos que persona se mantenga vacío para forzar la selección inicial
+      
     } else {
-      setValue("persona", ""); // Limpia el campo de persona si es "Local Comercial"
+      // Si se selecciona "Seleccione un tipo...", limpiamos ambos
+      [...localComercialFields, ...eventoParticularFields].forEach(field => {
+          setValue(field, undefined);
+          unregister(field);
+      });
+      
+      setValue("persona", "");
+      setTipoPersona("");
     }
   };
 
@@ -198,26 +256,24 @@ function RegisterPage() {
 
   const downloadFile = async (filePath) => {
     try {
-      // Solicitar el archivo como blob
       const response = await axios.get(filePath, {
         responseType: "blob",
       });
 
-      // Crear una URL temporal para el blob
       const url = window.URL.createObjectURL(new Blob([response.data]));
-
-      // Crear un enlace invisible y simular un clic para iniciar la descarga
       const link = document.createElement("a");
       link.href = url;
       link.setAttribute("download", filePath.split("/").pop());
       document.body.appendChild(link);
       link.click();
-
-      // Limpiar el enlace
       link.parentNode.removeChild(link);
     } catch (error) {
       console.error("Error al descargar el archivo:", error);
-      // Si no se usa SweetAlert, puedes mostrar el error en la consola o de otra manera
+      Swal.fire({
+        icon: "error",
+        title: "Error de Descarga",
+        text: "No se pudo descargar el archivo. Por favor, inténtelo de nuevo más tarde.",
+      });
     }
   };
 
@@ -236,178 +292,109 @@ function RegisterPage() {
           <h1 className="text-2xl font-bold text-black">
             Registro de Expendio
           </h1>
-
           <Link
             to="/"
             className="btn btn-success"
             onClick={() => navigate("/")}
           >
-            <FontAwesomeIcon icon={faArrowLeft} />{" "}
-            {/* Ícono de flecha hacia la izquierda */}
+            <FontAwesomeIcon icon={faArrowLeft} />
           </Link>
         </div>
+
         {/* Sección de Requisitos con documentos descargables */}
-        {showRequisitos && (
-          <div className="relative mb-4 bg-yellow-200 p-4 rounded-md shadow-lg">
-            <h2 className="font-bold text-lg">Importante:</h2>
-            <p className="text-sm text-gray-700 mt-2">
-              Antes de proceder con el registro, es fundamental que leas y
-              comprendas los requisitos necesarios para completar el proceso de
-              manera efectiva. Por favor, asegúrate de tener los siguientes
-              documentos listos:
-            </p>
+        <div className="relative mb-4 bg-yellow-200 p-4 rounded-md shadow-lg">
+          {/* ... (Botones de descarga y aranceles) ... */}
+           <h2 className="font-bold text-lg">Importante:</h2>
+           <p className="text-sm text-gray-700 mt-2">
+            Importante: Antes de proceder con el registro, es fundamental que leas y comprendas los requisitos necesarios para completar el proceso de manera efectiva. Por favor, asegúrate de tener los siguientes documentos listos:
+           </p>
 
-            <div className="flex space-x-2 justify-center mt-2">
-              <button
-                onClick={() =>
-                  downloadFile(
-                    `${
-                      import.meta.env.VITE_API_ARCHIVO
-                    }/documentos/requisitos-local.pdf`
-                  )
-                }
-                className="bg-blue-500 text-white py-2 px-4 rounded hover:bg-blue-700"
-              >
-                Descargar para habilitación de local
-              </button>
-              <button
-                onClick={() =>
-                  downloadFile(
-                    `${
-                      import.meta.env.VITE_API_ARCHIVO
-                    }/documentos/requisitos-eventos.pdf`
-                  )
-                }
-                className="bg-blue-500 text-white py-2 px-4 rounded hover:bg-blue-700"
-              >
-                Descargar para habilitación de eventos
-              </button>
-            </div>
-
-            <div
-              style={{
-                display: "flex",
-                justifyContent: "center",
-                alignItems: "center",
-                textAlign: "center",
-                marginTop: "20px",
-              }}
+           <div className="flex space-x-2 justify-center mt-2">
+            <button
+              onClick={() =>
+                downloadFile(
+                  `${
+                    import.meta.env.VITE_API_ARCHIVO
+                  }/documentos/requisitos-local.pdf`
+                )
+              }
+              className="bg-blue-500 text-white py-2 px-4 rounded hover:bg-blue-700"
             >
-              <p>
-                Para cualquier consulta, llame al: <strong>0376-4448963</strong>
-                .
-              </p>
-            </div>
+              Descargar para habilitación de local
+            </button>
+            <button
+              onClick={() =>
+                downloadFile(
+                  `${
+                    import.meta.env.VITE_API_ARCHIVO
+                  }/documentos/requisitos-eventos.pdf`
+                )
+              }
+              className="bg-blue-500 text-white py-2 px-4 rounded hover:bg-blue-700"
+            >
+              Descargar para habilitación de eventos
+            </button>
+           </div>
+           
+           <div
+            style={{
+              display: "flex",
+              justifyContent: "center",
+              alignItems: "center",
+              textAlign: "center",
+              marginTop: "20px",
+            }}
+          >
+            <p>
+              Para cualquier consulta, llame al: <strong>0376-4448963</strong>.
+            </p>
           </div>
-        )}
+        </div>
+        
+        {/* Sección de Aranceles */}
+        {/* ... (Tabla de aranceles) ... */}
         <div>
-          {/* Tabla con fondo blanco */}
-          <div className="text-center mt-4">
-            <div
-              className="flex justify-center items-center 
-     bg-gray-100"
-            >
-              <table className="table" style={{ textTransform: "uppercase" }}>
-                <thead className="bg-blue-500 text-white">
-                  <tr>
-                    <th className="border border-gray-400 px-4 py-2">
-                      Categoría
-                    </th>
-                    <th className="border border-gray-400 px-4 py-2">
-                      Arancel
-                    </th>
-                  </tr>
-                </thead>
-                <tbody>
-                  <tr>
-                    <td
-                      data-label="Categoría"
-                      className="border border-gray-400 px-4 py-2"
-                    >
-                      Eventos Temporarios
-                    </td>
-                    <td
-                      data-label="Arancel"
-                      className="border border-gray-400 px-4 py-2"
-                    >
-                      S/Arancel
-                    </td>
-                  </tr>
-                  <tr>
-                    <td
-                      data-label="Categoría"
-                      className="border border-gray-400 px-4 py-2"
-                    >
-                      Kioskos
-                    </td>
-                    <td
-                      data-label="Arancel"
-                      className="border border-gray-400 px-4 py-2"
-                    >
-                      $1.100
-                    </td>
-                  </tr>
-                  <tr>
-                    <td
-                      data-label="Categoría"
-                      className="border border-gray-400 px-4 py-2"
-                    >
-                      MiniMercados
-                    </td>
-                    <td
-                      data-label="Arancel"
-                      className="border border-gray-400 px-4 py-2"
-                    >
-                      $1.100
-                    </td>
-                  </tr>
-                  <tr>
-                    <td
-                      data-label="Categoría"
-                      className="border border-gray-400 px-4 py-2"
-                    >
-                      Supermercados
-                    </td>
-                    <td
-                      data-label="Arancel"
-                      className="border border-gray-400 px-4 py-2"
-                    >
-                      $1.100
-                    </td>
-                  </tr>
-                  <tr>
-                    <td
-                      data-label="Categoría"
-                      className="border border-gray-400 px-4 py-2"
-                    >
-                      Locales Bailables, Bares, Pub
-                    </td>
-                    <td
-                      data-label="Arancel"
-                      className="border border-gray-400 px-4 py-2"
-                    >
-                      $1.100
-                    </td>
-                  </tr>
-                </tbody>
-              </table>
-            </div>
-
-            <p className="text-sm mt-4">
-              El monto deberá ser depositado en la cuenta corriente Nº{" "}
-              <strong>xxxxxxxxxx</strong> una vez terminado el procedimiento de
-              verificación de documentación presentada.
-            </p>
-          </div>
-          {/* <h1 className="text-2xl font-bold text-black text-center">
-            <Vistapago />
-          </h1> */}
+           <div className="text-center mt-4">
+             <div className="flex justify-center items-center bg-gray-100">
+                <table className="table" style={{ textTransform: "uppercase" }}>
+                    <thead className="bg-blue-500 text-white">
+                        <tr>
+                            <th className="border border-gray-400 px-4 py-2">Categoría</th>
+                            <th className="border border-gray-400 px-4 py-2">Arancel</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                         <tr>
+                            <td data-label="Categoría" className="border border-gray-400 px-4 py-2">Eventos Temporarios</td>
+                            <td data-label="Arancel" className="border border-gray-400 px-4 py-2">S/Arancel</td>
+                         </tr>
+                         <tr>
+                            <td data-label="Categoría" className="border border-gray-400 px-4 py-2">Kioskos</td>
+                            <td data-label="Arancel" className="border border-gray-400 px-4 py-2">$1.100</td>
+                         </tr>
+                         <tr>
+                            <td data-label="Categoría" className="border border-gray-400 px-4 py-2">Supermercados</td>
+                            <td data-label="Arancel" className="border border-gray-400 px-4 py-2">$1.100</td>
+                         </tr>
+                         <tr>
+                            <td data-label="Categoría" className="border border-gray-400 px-4 py-2">Locales Bailables, Bares, Pub</td>
+                            <td data-label="Arancel" className="border border-gray-400 px-4 py-2">$1.100</td>
+                         </tr>
+                    </tbody>
+                </table>
+             </div>
+             <p className="text-sm mt-4">
+                El monto deberá ser depositado en la cuenta corriente Nº <strong>xxxxxxxxxx</strong> una vez terminado el procedimiento de verificación de documentación presentada.
+             </p>
+           </div>
         </div>
 
+
+        {/* --- FORMULARIO PRINCIPAL --- */}
         <form onSubmit={handleSubmit(onSubmit)} className="mt-4">
-          {/* Selección de Tipo de Evento */}
+          {/* SELECCIÓN DE TIPO DE EXPENDIO (COMÚN A AMBOS) */}
           <label
-            htmlFor="Evento"
+            htmlFor="expendio"
             className="block text-sm font-medium text-black"
           >
             Tipo de Expendio de Bebidas
@@ -424,548 +411,46 @@ function RegisterPage() {
               Habilitación de Venta de Bebidas para Local Comercial
             </option>
           </select>
-
-          {tipoExpendio && (
-            <>
-              {tipoExpendio === "Local Comercial" && (
-                <>
-                  <label
-                    htmlFor="tipoPersona"
-                    className="block text-sm font-medium text-black"
-                  >
-                    Tipo de Persona
-                  </label>
-                  <select
-                    id="persona"
-                    {...register("persona", { required: true })}
-                    onChange={handleTipoPersonaChange}
-                    className="w-full bg-gray-100 text-black px-4 py-2 rounded-md my-2"
-                  >
-                    <option value="">Seleccione un tipo de persona</option>
-                    <option value="Física">Física</option>
-                    <option value="Jurídica">Jurídica</option>
-                  </select>
-                </>
-              )}
-            </>
+          {errors.expendio && (
+            <p className="text-red-500 text-sm mt-1">
+              El tipo de expendio es requerido.
+            </p>
           )}
 
+          {/* RENDERIZADO CONDICIONAL DE FORMULARIOS ESPECÍFICOS */}
           {tipoExpendio === "Evento Particular" && (
-            <>
-              {/* Campos para Evento Particular - Persona Física */}
-              <label
-                htmlFor="tipoPersona"
-                className="block text-sm font-medium text-black"
-              >
-                Tipo de Persona
-              </label>
-              <input
-                id="persona"
-                type="text"
-                {...register("persona", { required: true })}
-                className="w-full bg-gray-100 text-black px-4 py-2 rounded-md my-2"
-                value="Física"
-                readOnly
-              />
-
-              <label
-                htmlFor="dni"
-                className="block text-sm font-medium text-black"
-              >
-                DNI del Propietario
-              </label>
-              {errors.dni && (
-                <p className="text-red-500 text-sm mt-1">
-                  {errors.dni.message}
-                </p>
-              )}
-              <input
-                type="tel"
-                {...register("dni", {
-                  required: "El DNI es requerido",
-                  pattern: {
-                    value: /^\d+$/,
-                    message: "El DNI debe contener solo dígitos numéricos.",
-                  },
-                })}
-                className="w-full bg-gray-100 text-black px-4 py-2 rounded-md my-2"
-                placeholder="DNI del Propietario"
-              />
-
-              <label
-                htmlFor="apellido"
-                className="block text-sm font-medium text-black"
-              >
-                Apellido
-              </label>
-              {errors.apellido && (
-                <p className="text-red-500 text-sm mt-1">
-                  {errors.apellido.message}
-                </p>
-              )}
-              <input
-                type="text"
-                {...register("apellido", {
-                  required: "El Apellido es requerido",
-                })}
-                className="w-full bg-gray-100 text-black px-4 py-2 rounded-md my-2"
-                placeholder="Apellido"
-              />
-
-              <label
-                htmlFor="nombrePersona"
-                className="block text-sm font-medium text-black"
-              >
-                Nombre
-              </label>
-              {errors.nombre && (
-                <p className="text-red-500 text-sm mt-1">
-                  {errors.nombre.message}
-                </p>
-              )}
-              <input
-                type="text"
-                {...register("nombre", { required: "El Nombre es requerido" })}
-                className="w-full bg-gray-100 text-black px-4 py-2 rounded-md my-2"
-                placeholder="Nombre"
-              />
-
-              <label
-                htmlFor="localidad"
-                className="block text-sm font-medium text-black"
-              >
-                Localidad
-              </label>
-              {errors.localidad && (
-                <p className="text-red-500 text-sm mt-1">
-                  {errors.localidad.message}
-                </p>
-              )}
-              <select
-                {...register("localidad", {
-                  required: "La Localidad es requerida",
-                })}
-                className="w-full bg-gray-100 text-black px-4 py-2 rounded-md my-2"
-                onChange={handleLocalidadChange}
-              >
-                <option value="">Selecciona una localidad</option>
-                {Municipios.map((municipio) => (
-                  <option key={municipio.id} value={municipio.nombre}>
-                    {municipio.nombre}
-                  </option>
-                ))}
-              </select>
-
-              <label
-                htmlFor="domicilio"
-                className="block text-sm font-medium text-black"
-              >
-                Domicilio Particular
-              </label>
-              {errors.domicilio && (
-                <p className="text-red-500 text-sm mt-1">
-                  {errors.domicilio.message}
-                </p>
-              )}
-              <input
-                type="text"
-                {...register("domicilio", {
-                  required: "El Domicilio es requerido",
-                })}
-                className="w-full bg-gray-100 text-black px-4 py-2 rounded-md my-2"
-                placeholder="Domicilio"
-              />
-
-              <label
-                htmlFor="lugar"
-                className="block text-sm font-medium text-black"
-              >
-                Lugar de Realización del evento
-              </label>
-              {errors.lugar && (
-                <p className="text-red-500 text-sm mt-1">
-                  {errors.lugar.message}
-                </p>
-              )}
-              <input
-                type="text"
-                {...register("lugar", { required: "El Lugar es requerido" })}
-                className="w-full bg-gray-100 text-black px-4 py-2 rounded-md my-2"
-                placeholder="Lugar de Realización del evento"
-              />
-
-              <label
-                htmlFor="dias"
-                className="block text-sm font-medium text-black"
-              >
-                Días del evento
-              </label>
-              {errors.dias && (
-                <p className="text-red-500 text-sm mt-1">
-                  {errors.dias.message}
-                </p>
-              )}
-              <textarea
-                type="text"
-                {...register("dias", {
-                  required: "Los Días del evento es requerido",
-                })}
-                className="w-full bg-gray-100 text-black px-4 py-2 rounded-md my-2"
-                placeholder="Días"
-              />
-
-              <label
-                htmlFor="horarios"
-                className="block text-sm font-medium text-black"
-              >
-                Horarios del evento
-              </label>
-              {errors.horarios && (
-                <p className="text-red-500 text-sm mt-1">
-                  {errors.horarios.message}
-                </p>
-              )}
-              <textarea
-                type="text"
-                {...register("horarios", {
-                  required: "Los Horarios son requeridos",
-                })}
-                className="w-full bg-gray-100 text-black px-4 py-2 rounded-md my-2"
-                placeholder="Horarios"
-              />
-
-              <label
-                htmlFor="tipoevento"
-                className="block text-sm font-medium text-black"
-              >
-                Tipo de Evento
-              </label>
-              {errors.tipoevento && (
-                <p className="text-red-500 text-sm mt-1">
-                  {errors.tipoevento.message}
-                </p>
-              )}
-              <input
-                type="text"
-                {...register("tipoevento", {
-                  required: "El Tipo de Evento es requerido",
-                })}
-                className="w-full bg-gray-100 text-black px-4 py-2 rounded-md my-2"
-                placeholder="Tipo de Evento"
-              />
-
-              <label
-                htmlFor="email"
-                className="block text-sm font-medium text-black"
-              >
-                Email particular
-              </label>
-              {errors.email && (
-                <p className="text-red-500 text-sm mt-1">
-                  {errors.email.message}
-                </p>
-              )}
-              <input
-                type="email"
-                {...register("email", { required: "El Email es requerido" })}
-                className="w-full bg-gray-100 text-black px-4 py-2 rounded-md my-2"
-                placeholder="Email"
-              />
-
-              <label
-                htmlFor="contacto"
-                className="block text-sm font-medium text-black"
-              >
-                Nro de WhatsApp
-              </label>
-
-              {errors.contacto && (
-                <p className="text-red-500 text-sm mt-1">
-                  {errors.contacto.message}
-                </p>
-              )}
-              <input
-                type="tel"
-                {...register("contacto", {
-                  required: "El Nro de WhatsApp es requerido",
-                })}
-                className="w-full bg-gray-100 text-black px-4 py-2 rounded-md my-2"
-                placeholder="Teléfono de Contacto"
-              />
-            </>
+            <EventoParticularForm
+              register={register}
+              errors={errors}
+              handleLocalidadChange={handleLocalidadChange}
+              watch={watch}    
+              setValue={setValue}  
+            />
           )}
 
           {tipoExpendio === "Local Comercial" && (
-            <>
-              {/* Campos para Habilitación de Venta de Bebidas */}
-              <label
-                htmlFor="dniPropietario"
-                className="block text-sm font-medium text-black"
-              >
-                DNI del Propietario
-              </label>
-              {errors.dni && (
-                <p className="text-red-500 text-sm mt-1">
-                  {errors.dni.message}
-                </p>
-              )}
-              <input
-                type="text"
-                {...register("dni", { required: "El DNI es requerido" })}
-                className="w-full bg-gray-100 text-black px-4 py-2 rounded-md my-2"
-                placeholder="DNI del Propietario"
-              />
-
-              <label
-                htmlFor="apellidoPropietario"
-                className="block text-sm font-medium text-black"
-              >
-                Apellido
-              </label>
-              {errors.apellido && (
-                <p className="text-red-500 text-sm mt-1">
-                  {errors.apellido.message}
-                </p>
-              )}
-              <input
-                type="text"
-                {...register("apellido", {
-                  required: "El Apellido es requerido",
-                })}
-                className="w-full bg-gray-100 text-black px-4 py-2 rounded-md my-2"
-                placeholder="Apellido del Propietario"
-              />
-
-              <label
-                htmlFor="nombrePropietario"
-                className="block text-sm font-medium text-black"
-              >
-                Nombre
-              </label>
-              {errors.nombre && (
-                <p className="text-red-500 text-sm mt-1">
-                  {errors.nombre.message}
-                </p>
-              )}
-              <input
-                type="text"
-                {...register("nombre", { required: "El Nombre es requerido" })}
-                className="w-full bg-gray-100 text-black px-4 py-2 rounded-md my-2"
-                placeholder="Nombre del Propietario"
-              />
-
-              <label
-                htmlFor="localidad"
-                className="block text-sm font-medium text-black"
-              >
-                Localidad
-              </label>
-              {errors.localidad && (
-                <p className="text-red-500 text-sm mt-1">
-                  {errors.localidad.message}
-                </p>
-              )}
-              <select
-                {...register("localidad", {
-                  required: "La Localidad es requerida",
-                })}
-                className="w-full bg-gray-100 text-black px-4 py-2 rounded-md my-2"
-                onChange={handleLocalidadChange}
-              >
-                <option value="">Selecciona una localidad</option>
-                {Municipios.map((municipio) => (
-                  <option key={municipio.id} value={municipio.nombre}>
-                    {municipio.nombre}
-                  </option>
-                ))}
-              </select>
-              <label
-                htmlFor="domicilio"
-                className="block text-sm font-medium text-black"
-              >
-                Domicilio particular
-              </label>
-              {errors.domicilio && (
-                <p className="text-red-500 text-sm mt-1">
-                  {errors.domicilio.message}
-                </p>
-              )}
-              <input
-                type="text"
-                {...register("domicilio", {
-                  required: "El Domicilio es requerido",
-                })}
-                className="w-full bg-gray-100 text-black px-4 py-2 rounded-md my-2"
-                placeholder="Domicilio"
-              />
-
-              <label
-                htmlFor="nroHabilitacion"
-                className="block text-sm font-medium text-black"
-              >
-                Nro de Habilitación Municipal
-              </label>
-              {errors.nroHabilitacion && (
-                <p className="text-red-500 text-sm mt-1">
-                  {errors.nroHabilitacion.message}
-                </p>
-              )}
-              <input
-                type="text"
-                {...register("nroHabilitacion", {
-                  required: "El Nro de Habilitación es requerido",
-                })}
-                className="w-full bg-gray-100 text-black px-4 py-2 rounded-md my-2"
-                placeholder="Nro de Habilitación Municipal"
-              />
-
-              <label
-                htmlFor="horarios"
-                className="block text-sm font-medium text-black"
-              >
-                Domicilio del Local Comercial
-              </label>
-              {errors.domicilioLocalComercial && (
-                <p className="text-red-500 text-sm mt-1">
-                  {errors.domicilioLocalComercial.message}
-                </p>
-              )}
-              <input
-                type="text"
-                {...register("domicilioLocalComercial", {
-                  required: "El Domicilio del Local es requerido",
-                })}
-                className="w-full bg-gray-100 text-black px-4 py-2 rounded-md my-2"
-                placeholder="Domicilio del Local Comercial"
-              />
-
-              <label
-                htmlFor="dias"
-                className="block text-sm font-medium text-black"
-              >
-                Horario de atención
-              </label>
-              {errors.horarioAtencion && (
-                <p className="text-red-500 text-sm mt-1">
-                  {errors.horarioAtencion.message}
-                </p>
-              )}
-              <textarea
-                type="text"
-                {...register("horarioAtencion", {
-                  required: "El Horario es requerido",
-                })}
-                className="w-full bg-gray-100 text-black px-4 py-2 rounded-md my-2"
-                placeholder="Horario de atención"
-              />
-
-              <label
-                htmlFor="dias"
-                className="block text-sm font-medium text-black"
-              >
-                Rubro
-              </label>
-              {errors.rubro && (
-                <p className="text-red-500 text-sm mt-1">
-                  {errors.rubro.message}
-                </p>
-              )}
-              <textarea
-                type="text"
-                {...register("rubro", { required: "El Rubro es requerido" })}
-                className="w-full bg-gray-100 text-black px-4 py-2 rounded-md my-2"
-                placeholder="Rubro"
-              />
-
-              <label
-                htmlFor="email"
-                className="block text-sm font-medium text-black"
-              >
-                Email
-              </label>
-              {errors.email && (
-                <p className="text-red-500 text-sm mt-1">
-                  {errors.email.message}
-                </p>
-              )}
-              <input
-                type="email"
-                {...register("email", { required: "El Email es requerido" })}
-                className="w-full bg-gray-100 text-black px-4 py-2 rounded-md my-2"
-                placeholder="Email"
-              />
-
-              <label
-                htmlFor="contacto"
-                className="block text-sm font-medium text-black"
-              >
-                Nro de Whatsapp
-              </label>
-              {errors.contacto && (
-                <p className="text-red-500 text-sm mt-1">
-                  {errors.contacto.message}
-                </p>
-              )}
-              <input
-                type="tel"
-                {...register("contacto", {
-                  required: "El contacto es requerido",
-                })}
-                className="w-full bg-gray-100 text-black px-4 py-2 rounded-md my-2"
-                placeholder="Teléfono de Contacto"
-              />
-            </>
+            <LocalComercialForm
+              register={register}
+              errors={errors}
+              tipoPersona={tipoPersona}
+              handleTipoPersonaChange={handleTipoPersonaChange}
+              handleLocalidadChange={handleLocalidadChange}
+              watch={watch}      
+              setValue={setValue}  
+            />
           )}
 
-          <label
-            htmlFor="file"
-            className="block text-sm font-medium text-black"
-          >
-            Archivos
-          </label>
-          <input
-            type="file"
-            {...register("file", {
-              required: "Por favor selecciona al menos un archivo",
-              validate: {
-                maxLength: (value) =>
-                  value.length <= 15 ||
-                  "No puedes seleccionar más de 15 archivos",
-              },
-            })}
-            multiple
-            onChange={handleFileChange}
-            className="w-full bg-gray-100 text-black px-4 py-2 rounded-md my-2"
-          />
-          {errors.file && (
-            <p className="text-red-500 text-sm mt-1">{errors.file.message}</p>
+          {/* SECCIÓN DE SUBIDA DE ARCHIVOS (SE ELIMINÓ LA PARTE LOCAL) */}
+          {/* Ahora solo se muestra el botón de submit si se ha seleccionado un tipo */}
+          {tipoExpendio && (
+            <button
+              type="submit"
+              className="bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded-md mt-6 w-full"
+              disabled={!tipoExpendio}
+            >
+              {params.id ? "Actualizar Registro" : "Guardar Registro"}
+            </button>
           )}
-
-          {/* Mostrar archivos seleccionados */}
-          <div className="mt-4">
-            <h3 className="text-lg font-semibold">Archivos seleccionados:</h3>
-            <ul className="list-disc list-inside">
-              {files.map((file, index) => (
-                <li key={index} className="flex justify-between items-center">
-                  <span>{file.name}</span>
-                  <button
-                    type="button"
-                    onClick={() => removeFile(index)}
-                    className="ml-2 text-red-500 hover:text-red-700"
-                  >
-                    <FontAwesomeIcon icon={faTimes} />
-                  </button>
-                </li>
-              ))}
-            </ul>
-          </div>
-
-          <button
-            type="submit"
-            className="w-full bg-blue-500 text-white px-4 py-2 rounded-md mt-4"
-          >
-            Guardar
-          </button>
         </form>
       </div>
     </div>

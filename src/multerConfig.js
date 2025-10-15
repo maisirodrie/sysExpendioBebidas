@@ -29,38 +29,69 @@ const upload = multer({ storage });
 
 // Middleware para subir archivos a GridFS
 const streamUpload = (req, res, next) => {
-  if (!req.files) return next(); // Cambiar de req.file a req.files
+    // Si no hay archivos o req.files no existe, continúa
+    if (!req.files) return next(); 
 
-  const files = req.files; // Acceder a los archivos subidos
-  const uploadPromises = files.map((file) => {
-    return new Promise((resolve, reject) => {
-      const filename = file.originalname; // Usar solo el nombre original
-      const uploadStream = gfs.openUploadStream(filename);
-      
-      const readableStream = Readable.from(file.buffer);
-      readableStream.pipe(uploadStream);
+    // 1. APLANAR EL OBJETO req.files EN UN ÚNICO ARRAY (Maneja .fields() y .array())
+    let filesToProcess = [];
+    if (typeof req.files === 'object' && !Array.isArray(req.files)) {
+        // req.files es un objeto de arrays (si se usó upload.fields())
+        for (const fieldName in req.files) {
+            filesToProcess = filesToProcess.concat(req.files[fieldName]);
+        }
+    } else if (Array.isArray(req.files)) {
+        // req.files ya es un array (si se usó upload.array() o .any())
+        filesToProcess = req.files;
+    }
 
-      uploadStream.on('finish', () => {
-        file.filename = filename; // Guardar el nombre del archivo
-        file.id = uploadStream.id; // Guardar el ID del archivo en GridFS
-        resolve();
-      });
+    if (filesToProcess.length === 0) return next();
 
-      uploadStream.on('error', (err) => {
-        console.error('Error al subir el archivo:', err);
-        reject(err);
-      });
+    const finalFileMetadatas = []; 
+    
+    // 2. Procesar la subida a GridFS
+    const uploadPromises = filesToProcess.map((file) => {
+        return new Promise((resolve, reject) => {
+            
+            // Generar un nombre de archivo ÚNICO para GridFS (evita colisiones y el error FileNotFound)
+            // Se usa el nombre del campo original (ej: notaSolicitud) + timestamp + nombre original
+            const uniqueFilename = `${file.fieldname || 'file'}-${Date.now()}-${file.originalname}`; 
+
+            const uploadStream = gfs.openUploadStream(uniqueFilename, {
+                contentType: file.mimetype,
+            });
+            
+            const readableStream = Readable.from(file.buffer);
+            readableStream.pipe(uploadStream);
+
+            uploadStream.on('finish', () => {
+                // Capturamos los metadatos CLAVE, incluyendo el ID y el nombre único
+                finalFileMetadatas.push({
+                    id: uploadStream.id, 
+                    filename: uniqueFilename, // Este es el nombre que usarás para descargar
+                    bucketName: 'uploads',
+                    mimetype: file.mimetype,
+                    encoding: file.encoding,
+                });
+                resolve();
+            });
+
+            uploadStream.on('error', (err) => {
+                console.error('Error al subir el archivo:', err);
+                reject(err);
+            });
+        });
     });
-  });
 
-  Promise.all(uploadPromises)
-    .then(() => {
-      next(); // Continuar al siguiente middleware
-    })
-    .catch((err) => {
-      return res.status(500).json({ message: 'Error al subir uno o más archivos', error: err.message });
-    });
+    Promise.all(uploadPromises)
+        .then(() => {
+             // 3. REASIGNAR req.files: Simplifica los controladores al garantizar un array lineal
+             req.files = finalFileMetadatas; 
+             next();
+        })
+        .catch((err) => {
+            return res.status(500).json({ message: 'Error al subir uno o más archivos', error: err.message });
+        });
 };
 
-// Exportar upload y streamUpload
+// Exportar upload y streamUpload (Asegúrate que 'upload' esté definido arriba como const upload = multer({...}))
 export { upload, streamUpload, gfs };

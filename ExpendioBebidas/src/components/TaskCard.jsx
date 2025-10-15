@@ -365,7 +365,7 @@ function Table() {
                     <th>N° Expediente</th>
                     <th>Apellido</th>
                     <th>Nombre</th>
-                    <th>DNI</th>
+                    <th>DNI/CUIT</th>
                      <th className="border border-gray-400 px-4 py-2">Fecha de Creación</th>
           
                     <th>Localidad</th>
@@ -385,7 +385,7 @@ function Table() {
                       <td data-label="N° Expediente">{task.nroexpediente?.toUpperCase()}</td>
                       <td data-label="Apellido">{task.apellido?.toUpperCase()}</td>
                       <td data-label="Nombre">{task.nombre?.toUpperCase()}</td>
-                      <td data-label="DNI">{task.dni?.toUpperCase()}</td>
+                      <td data-label="DNI/CUIT">{task.dni?.toUpperCase()}</td>
                       <td data-label="Fecha de Creación" className="border border-gray-400 px-4 py-2">
                 {formatFechaCreacion(task.createdAt)}
               </td>
