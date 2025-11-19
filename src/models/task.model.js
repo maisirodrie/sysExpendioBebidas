@@ -25,10 +25,12 @@ const taskSchema = new mongoose.Schema(
     horarioAtencion: { type: String, trim: true },
     habilitacionComercial: { type: String, trim: true },
     nroexpediente: {
-      type: String,
-      trim: true,
-      unique: true, // Asegura que el número de expediente sea único
-      sparse: true, // <--- ¡Esta es la corrección clave!
+      // **¡CORRECCIÓN CRÍTICA!**: Cambiado a un Array de Strings
+      type: String, 
+    trim: true,
+      // Se elimina 'unique: true' ya que Mongoose lo aplica al array completo, 
+      // y no es lo habitual cuando se almacenan múltiples expedientes.
+      sparse: true, 
     },
     file: [
       {
@@ -60,5 +62,6 @@ const taskSchema = new mongoose.Schema(
     timestamps: true,
   }
 );
+
 
 export default mongoose.model("Task", taskSchema);

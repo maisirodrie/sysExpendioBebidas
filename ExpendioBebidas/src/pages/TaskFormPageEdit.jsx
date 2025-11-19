@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useMemo, useRef } from "react"; // 🔑 Importar useRef
+import React, { useEffect, useState, useMemo, useRef } from "react";
 import { useForm, useWatch } from "react-hook-form";
 import { useTasks } from "../context/TasksContext";
 import { Link, useNavigate, useParams } from "react-router-dom";
@@ -63,8 +63,8 @@ const getMappedFileKeys = (expendio, persona) => {
 
 
 function TaskFormPageEdit() {
-     const formRef = useRef(null);
-    const scrollRef = useRef(null); // 🔑 Referencia para el contenedor principal
+    const formRef = useRef(null);
+    const scrollRef = useRef(null);
     const {
         register,
         handleSubmit,
@@ -103,6 +103,7 @@ function TaskFormPageEdit() {
     const existingFilesMap = useMemo(() => {
         return selectedFiles.reduce((map, file) => {
             const filename = file.filename || "";
+            // Aseguramos que el fieldname se obtenga correctamente
             const inferredFieldname = file.fieldname || filename.split('_')[0].split('-')[0];
             
             if (inferredFieldname) {
@@ -144,7 +145,7 @@ function TaskFormPageEdit() {
         );
     };
 
-    // Carga de tarea (Mantenido)
+    // 🔑 Carga de tarea (MODIFICADO para priorizar campos clave y manejo de nroexpediente array)
     useEffect(() => {
         async function loadTask() {
             if (params.id) {
@@ -152,15 +153,27 @@ function TaskFormPageEdit() {
                 
                 setTaskData(task); 
 
-                // Carga de Número de Expediente
+                // 🔑 1. Establecer los campos CLAVE PRIMERO para forzar la renderización
+                if (task.expendio) setValue("expendio", task.expendio);
+                if (task.persona) setValue("persona", task.persona);
+                
+                // 🔑 2. Carga de Número de Expediente (Manejo defensivo de array/string)
                 if (task.nroexpediente) {
-                    const parts = task.nroexpediente.split("/");
-                    if (parts.length === 2) {
-                        const [correlativo, anio] = parts;
-                        const correlativoParts = correlativo.split("-");
-                        if (correlativoParts.length >= 1) {
+                    // Si es un array (por el error anterior), toma la última entrada. Si es string, lo usa directo.
+                    const nroExpString = Array.isArray(task.nroexpediente) 
+                        ? task.nroexpediente[task.nroexpediente.length - 1] 
+                        : task.nroexpediente;
+
+                    // Manejo del caso donde el array es vacío o nulo
+                    if (nroExpString) {
+                        const parts = nroExpString.split("/");
+                        
+                        if (parts.length === 2) {
+                            const [correlativoYCod, anio] = parts;
+                            const correlativoParts = correlativoYCod.split("-");
+                            
                             setNroExpedienteParts({
-                                correlativo: correlativoParts[0],
+                                correlativo: correlativoParts[0] || "",
                                 codigoOrganismo: correlativoParts[1] || "",
                                 anio: anio,
                             });
@@ -168,14 +181,19 @@ function TaskFormPageEdit() {
                     }
                 }
                 
-                // Carga de archivos existentes (IDs como string)
+                // 🔑 3. Carga de archivos existentes (IDs como string)
                 if (task.file && task.file.length > 0) {
-                    setSelectedFiles(task.file.map(f => ({ ...f, id: f.id.toString() })));
+                    setSelectedFiles(task.file.map(f => ({ 
+                        ...f, 
+                        id: f.id.toString(),
+                        // Aseguramos el fieldname para el mapeo si no viene del backend
+                        fieldname: f.fieldname || f.filename.split('_')[0].split('-')[0] 
+                    })));
                 }
 
-                // Mapeo de valores de la tarea a los campos del formulario
+                // 4. Mapeo del resto de valores de la tarea a los campos del formulario
                 Object.keys(task).forEach((key) => {
-                    if (key !== 'file' && task[key] !== null && task[key] !== undefined) {
+                    if (key !== 'file' && key !== 'expendio' && key !== 'persona' && task[key] !== null && task[key] !== undefined) {
                         setValue(key, task[key]);
                     }
                 });
@@ -184,49 +202,35 @@ function TaskFormPageEdit() {
         loadTask();
     }, [params.id, setValue, getTask]);
 
-    // 🔑 VALIDACIÓN Y SUBMIT DEL FORMULARIO (MODIFICACIÓN CLAVE)
+    // 🔑 VALIDACIÓN Y SUBMIT DEL FORMULARIO (Manejo de archivos robusto)
     const onSubmit = handleSubmit(async (data) => {
         // Validación de archivos requeridos (si existen)
         const missingFiles = currentMappedFieldnames.filter(fieldName => {
-            // Un archivo falta si:
-            // 1. No existe un archivo existente para ese fieldName en existingFilesMap
-            // Y
-            // 2. No se ha subido un archivo nuevo en el campo de entrada (data[fieldName] no es un FileList con archivos)
-            
             const existingFile = existingFilesMap[fieldName];
             const isNewFile = data[fieldName] instanceof FileList && data[fieldName].length > 0;
             
+            // Un archivo falta si NO existe uno previo Y NO se está subiendo uno nuevo
             return !existingFile && !isNewFile;
         });
 
        if (missingFiles.length > 0) {
-            const firstMissingFile = missingFiles[0];
-            const friendlyName = getFriendlyFileName(firstMissingFile);
-            
-            // 1. Mostrar alerta
-            Swal.fire({
-                title: "Archivos Faltantes",
-                html: `Debe subir el archivo requerido: <b>${friendlyName}</b>.`,
-                icon: "warning",
-                confirmButtonText: "Aceptar y ver",
-            }).then(() => {
-                
-                // 🔑 MODIFICACIÓN CLAVE: Envolver el scroll en un setTimeout(0)
+            const firstMissingFile = missingFiles[0];
+            const friendlyName = getFriendlyFileName(firstMissingFile);
+            
+            // 1. Mostrar alerta y hacer scroll
+            Swal.fire({
+                title: "Archivos Faltantes",
+                html: `Debe subir el archivo requerido: <b>${friendlyName}</b>.`,
+                icon: "warning",
+                confirmButtonText: "Aceptar y ver",
+            }).then(() => {
+                
                 setTimeout(() => {
                     const containerId = `file-upload-container-${firstMissingFile}`;
                     const targetElement = document.getElementById(containerId);
                     
-                    // --- Diagnóstico en consola ---
-                    console.log("Scroll ID buscado:", containerId);
-                    console.log("Elemento encontrado:", targetElement);
-                    console.log("Referencia de Scroll (scrollRef.current):", scrollRef.current);
-                    // -----------------------------
-
                     if (targetElement && scrollRef.current) {
-                        // Calcula la posición relativa del elemento dentro del contenedor scrollable
                         const offset = targetElement.offsetTop - scrollRef.current.offsetTop; 
-                        
-                        // Determina dónde debe estar el scroll (ej: 50px antes del elemento)
                         const scrollTo = offset -50; 
 
                         scrollRef.current.scrollTo({ 
@@ -234,17 +238,14 @@ function TaskFormPageEdit() {
                             behavior: 'smooth' 
                         });
                         
-                        // Intentamos re-enfocar para asegurar visibilidad (aunque no siempre mueva el scroll)
                         setFocus(firstMissingFile); 
-                        
                     } else if (targetElement) {
-                        // Fallback simple si no tenemos la referencia scrollRef, pero sí el elemento.
                         targetElement.scrollIntoView({ behavior: 'smooth', block: 'center' });
                     }
-                }, 0); // Ejecutar después de que SweetAlert2 haya completado su ciclo
-            });
-            return; // Detener el submit
-        }
+                }, 0);
+            });
+            return; // Detener el submit
+        }
         
         // --- CONTINÚA EL PROCESO DE SUBMIT SI NO HAY ARCHIVOS FALTANTES ---
         try {
@@ -260,7 +261,7 @@ function TaskFormPageEdit() {
             const formData = new FormData();
             const existingFilesToKeep = []; 
 
-            // 1. Añadir el número de expediente
+            // 1. Añadir el número de expediente (ahora siempre como un único string)
             if (
                 nroExpedienteParts.correlativo ||
                 nroExpedienteParts.codigoOrganismo ||
@@ -274,6 +275,7 @@ function TaskFormPageEdit() {
                     (nroExpedienteParts.anio ? `/${nroExpedienteParts.anio}` : "");
 
                 if (fullNroExpediente.trim() !== "/") {
+                    // nroexpediente es un único string para ser reemplazado en el backend
                     formData.append("nroexpediente", fullNroExpediente);
                 }
             }
@@ -281,18 +283,18 @@ function TaskFormPageEdit() {
             // 2. DETERMINAR QUÉ ARCHIVOS EXISTENTES SE DEBEN MANTENER (LÓGICA AUTOMATIZADA)
             if (taskData && taskData.file) {
                 taskData.file.forEach(file => {
-                    const isRelevantField = currentMappedFieldnames.includes(file.fieldname);
+                    // Usamos el fieldname asegurado en la carga
+                    const fileFieldname = file.fieldname || file.filename.split('_')[0].split('-')[0];
+                    const isRelevantField = currentMappedFieldnames.includes(fileFieldname);
                     const isMarkedForRemoval = filesToRemove.includes(file.id.toString());
                     
-                    // Solo mantenemos archivos si son relevantes para el formulario actual Y no han sido marcados para eliminación manual
+                    // Solo mantenemos archivos si son relevantes y no han sido eliminados manualmente
                     if (isRelevantField && !isMarkedForRemoval) {
                         existingFilesToKeep.push({ 
                             id: file.id.toString(), 
-                            fieldname: file.fieldname 
+                            fieldname: fileFieldname 
                         });
                     }
-                    // Cualquier archivo que NO esté en currentMappedFieldnames (el sobrante) 
-                    // NO se agrega a existingFilesToKeep, por lo que el backend lo ELIMINARÁ.
                 });
             }
 
@@ -306,8 +308,7 @@ function TaskFormPageEdit() {
                         formData.append(key, file);
                     });
 
-                    // Si se sube un nuevo archivo, eliminamos el archivo antiguo del mismo fieldname 
-                    // de la lista de archivos a mantener (Sustitución).
+                    // Si se sube un nuevo archivo, eliminamos el archivo antiguo del mismo fieldname de la lista a mantener.
                     const indexToRemove = existingFilesToKeep.findIndex(ef => ef.fieldname === key);
                     if (indexToRemove !== -1) {
                         existingFilesToKeep.splice(indexToRemove, 1);
@@ -321,7 +322,8 @@ function TaskFormPageEdit() {
                     key !== "anio" &&
                     value !== null &&
                     value !== undefined &&
-                    !(value instanceof FileList)
+                    !(value instanceof FileList) &&
+                    key !== 'nroexpediente' // Ya lo manejamos al inicio
                 ) {
                     formData.append(key, value);
                 }
@@ -329,8 +331,6 @@ function TaskFormPageEdit() {
 
             // 4. ADJUNTAR LAS LISTAS PARA EL BACKEND
             formData.append("existingFilesToKeep", JSON.stringify(existingFilesToKeep));
-
-            // Aseguramos que filesToRemove se envíe incluso si está vacío
             formData.append("filesToRemove", JSON.stringify(filesToRemove));
             
             if (params.id) {
@@ -367,7 +367,6 @@ function TaskFormPageEdit() {
         <div
         ref={scrollRef}
             className="flex items-center justify-center overflow-y-auto"
-             
             style={{
                 marginTop: "20px",
                 marginBottom: "20px",
@@ -388,7 +387,7 @@ function TaskFormPageEdit() {
                         <FontAwesomeIcon icon={faArrowLeft} />
                     </Link>
                 </div>
-                {/* 🔑 Asignar la referencia al formulario */}
+                {/* Asignar la referencia al formulario */}
                 <form ref={formRef} onSubmit={onSubmit} className="mt-4">
                     <label
                         htmlFor="nroexpediente"

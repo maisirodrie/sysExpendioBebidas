@@ -1,9 +1,9 @@
 import React from 'react';
 import { Municipios } from '../api/municipios';
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faCheckCircle, faUpload,faFilePdf, faTrashAlt } from "@fortawesome/free-solid-svg-icons"; // ⬅️ Agregué faTrashAlt
+import { faCheckCircle, faUpload, faFilePdf, faTrashAlt } from "@fortawesome/free-solid-svg-icons"; 
 
-// --- Constantes de Requisitos para Eventos ---
+// --- Constantes de Requisitos para Eventos (INCLUIDAS AQUÍ) ---
 const RequisitosEventos = [
   { key: "paseElevacionIntendente", label: "Pase de Elevación del Intendente (a).", required: true },
   { key: "autorizacionMunicipal", label: "Autorización Municipal con días y horarios expresos (b).", required: true },
@@ -14,34 +14,30 @@ const RequisitosEventos = [
   { key: "plazoPresentacion", label: "La solicitud debe presentarse 10 días antes del evento.", required: false, isInfo: true },
 ];
 
-// Componente para manejar la carga de un documento individual (Reutilizado)
-// 🛠️ CAMBIO CLAVE: Agregadas props existingFile, removeExistingFile y apiUrl
-// Componente para manejar la carga de un documento individual (CORREGIDO EL CIERRE DE DIV)
+// Componente para manejar la carga de un documento individual
 const DocumentUploadField = ({ req, register, watch, errors, existingFile, removeExistingFile, apiUrl }) => {
     
     const file = watch(req.key); 
+    // Corregido: Verificamos si hay un FileList (archivo subido) y si tiene elementos
     const isFileSelected = file instanceof FileList && file.length > 0;
     const hasError = errors[req.key] !== undefined;
     
     // Muestra el archivo existente SI NO se ha seleccionado uno nuevo
     const showExistingFile = existingFile && !isFileSelected;
     
-    // Creamos la URL
     const downloadUrl = showExistingFile 
         ? `${apiUrl}/tasks/file/${existingFile.filename}`
         : null;
 
-    // Variable para el texto del archivo
     const fileNameDisplay = isFileSelected 
         ? file[0].name 
         : showExistingFile ? existingFile.originalname : null;
 
     return (
-        // 🟢 CORRECCIÓN: Agregar el ID para que TaskFormPageEdit pueda hacer scroll hasta aquí.
         <div id={`file-upload-container-${req.key}`} 
-             className={`flex flex-col p-2 rounded-md my-1 border transition-all duration-300 ${
-                hasError ? "border-red-500 bg-red-50" : "border-gray-200 bg-white"
-            }`}>
+             className={`flex flex-col p-2 rounded-md my-1 border transition-all duration-300 ${
+                hasError ? "border-red-500 bg-red-50" : "border-gray-200 bg-white"
+            }`}>
             <div className="flex items-center justify-between">
                 <div className="flex items-center flex-grow">
                     <FontAwesomeIcon
@@ -78,6 +74,7 @@ const DocumentUploadField = ({ req, register, watch, errors, existingFile, remov
                                 {/* Botón Eliminar */}
                                 <button
                                     type="button"
+                                    // CLAVE: Usamos el ID del archivo para eliminarlo
                                     onClick={() => removeExistingFile(existingFile.id)}
                                     className="text-red-500 hover:text-red-700 p-1 transition-colors"
                                 >
@@ -103,9 +100,12 @@ const DocumentUploadField = ({ req, register, watch, errors, existingFile, remov
                                 id={req.key}
                                 type="file"
                                 {...register(req.key, {
+                                    // La validación required se aplica si es requerido Y NO hay un archivo existente para mantener
                                     required: req.required && !showExistingFile ? `${req.label} es obligatorio.` : false,
                                 })}
                                 className="hidden"
+                                // Esto es útil para poder subir el mismo archivo si el usuario cancela la subida
+                                onClick={(e) => { e.target.value = null; }}
                             />
                         </label>
                     </div> 
@@ -120,7 +120,7 @@ const DocumentUploadField = ({ req, register, watch, errors, existingFile, remov
     );
 };
 
-// 🛠️ CAMBIO CLAVE: Agregadas props para gestión de archivos al componente padre
+
 const RequisitosEventosDisplay = ({ register, watch, errors, existingFilesMap, removeExistingFile, apiUrl }) => {
   return (
     <div className="bg-blue-100 p-4 rounded-md mt-4 mb-4 border border-blue-300">
@@ -135,11 +135,11 @@ const RequisitosEventosDisplay = ({ register, watch, errors, existingFilesMap, r
             req={req}
             register={register}
             watch={watch}
-            errors={errors}
-                // ⬇️ Props de gestión de archivos
-                existingFile={existingFilesMap ? existingFilesMap[req.key] : null} 
-                removeExistingFile={removeExistingFile}
-                apiUrl={apiUrl}
+            errors={errors} 
+            // CLAVE: Mapeo del archivo existente
+            existingFile={existingFilesMap ? existingFilesMap[req.key] : null} 
+            removeExistingFile={removeExistingFile}
+            apiUrl={apiUrl}
           />
         ))}
       </div>
@@ -148,7 +148,6 @@ const RequisitosEventosDisplay = ({ register, watch, errors, existingFilesMap, r
 };
 
 
-// 🟢 CORRECCIÓN: Asegurar que 'setValue' esté en las props si se pasa.
 const EventoParticularForm = ({ 
     register, 
     errors, 
@@ -161,13 +160,10 @@ const EventoParticularForm = ({
     removeExistingFile, 
     apiUrl 
 }) => (
+    // ... (El resto del formulario que contiene los campos de texto)
   <>
     <h3 className="text-xl font-semibold text-black mt-4 mb-2 border-b pb-1">Datos del Evento</h3>
 
-  
-    
-    {/* Campos de texto específicos para Evento Particular */}
-    
     <label htmlFor="dni" className="block text-sm font-medium text-black">
       DNI del Peticionante
     </label>
@@ -305,15 +301,15 @@ const EventoParticularForm = ({
       placeholder="Teléfono de Contacto"
     />
 
-  {/* --- SECCIÓN REQUISITOS INTERACTIVOS --- */}
+  {/* --- SECCIÓN REQUISITOS INTERACTIVOS (USA existingFilesMap) --- */}
     <RequisitosEventosDisplay 
         register={register} 
         watch={watch} 
         errors={errors} 
-        // ⬇️ Props de gestión de archivos
-        existingFilesMap={existingFilesMap}
-        removeExistingFile={removeExistingFile}
-        apiUrl={apiUrl}
+        // ⬇️ Props de gestión de archivos
+        existingFilesMap={existingFilesMap}
+        removeExistingFile={removeExistingFile}
+        apiUrl={apiUrl}
     />
     {/* ------------------------------------------ */}
 

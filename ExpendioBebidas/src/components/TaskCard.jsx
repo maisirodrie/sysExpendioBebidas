@@ -25,6 +25,15 @@ import Swal from "sweetalert2";
 import { DateTime } from "luxon";
 
 
+// Función auxiliar para unificar el nroexpediente
+const getExpedienteString = (nroexpediente) => {
+    if (Array.isArray(nroexpediente)) {
+        return nroexpediente.join(' / '); // Une el array con un separador
+    }
+    return nroexpediente || ''; // Devuelve la cadena si es una cadena, o cadena vacía si es null/undefined
+}
+
+
 function Table() {
   const { tasks, deleteTask, getTasks, updateTaskStatus, updateTask } = useTasks();
   const { user } = useAuth(); // Suponiendo que 'user' contiene el rol del usuario
@@ -68,7 +77,9 @@ function Table() {
   const filteredTasks = !search
     ? reversedTasks
     : reversedTasks.filter((task) => {
-      const nroexpediente = task.nroexpediente ? task.nroexpediente.toLowerCase() : "";
+        // CORRECCIÓN 2: Uso de la función auxiliar para convertir el array a string para la búsqueda.
+        const nroexpediente = getExpedienteString(task.nroexpediente).toLowerCase();
+        
         const apellido = task.apellido ? task.apellido.toLowerCase() : "";
         const nombre = task.nombre ? task.nombre.toLowerCase() : "";
         const dni = task.dni ? task.dni.toLowerCase() : "";
@@ -133,8 +144,6 @@ function Table() {
     },
     juridicos: {
       controlado: ["controlado", "aprobado", "rechazado"],
-
-
     },
     admin: {
       any: ["pendiente", "controlado", "aprobado", "rechazado", "finalizado", "ingresado"] // Admin puede cambiar cualquier estado
@@ -150,7 +159,7 @@ function Table() {
     return availableOptions.length ? availableOptions : [];
   };
 
- const handleStatusChange = async (taskId, newStatus) => {
+  const handleStatusChange = async (taskId, newStatus) => {
     try {
         const currentTask = tasks.find(t => t._id === taskId);
 
@@ -233,7 +242,8 @@ function Table() {
   
         // Crear el contenido de la tabla
         const tableData = filteredTasks.map((task) => [
-          task.nroexpediente || "",
+          // CORRECCIÓN 3: Uso de la función auxiliar para PDF
+          getExpedienteString(task.nroexpediente),
           task.apellido || "",
           task.nombre || "",
           task.dni || "",
@@ -274,7 +284,8 @@ function Table() {
       if (result.isConfirmed) {
         // Crear una hoja de cálculo
         const worksheet = XLSX.utils.json_to_sheet(filteredTasks.map(task => ({
-          "N° Expediente": task.nroexpediente || "",
+          // CORRECCIÓN 4: Uso de la función auxiliar para Excel
+          "N° Expediente": getExpedienteString(task.nroexpediente),
           "Apellido": task.apellido || "",
           "Nombre": task.nombre || "",
           "DNI": task.dni || "",
@@ -342,13 +353,13 @@ function Table() {
                 <Link to="/pago" className="btn btn-success">
                     <FontAwesomeIcon icon={faDollar} />
                   </Link>
-               )}
+                )}
                 {/* Botón para generar el reporte PDF */}
                 {/* <button onClick={handleGenerateReport} className="btn btn-danger">
                   <FontAwesomeIcon icon={faFilePdf} />
                 </button> */}
-                 {/* Botón para generar el reporte en Excel */}
-                 <button onClick={handleGenerateExcel} className="btn btn-success">
+                  {/* Botón para generar el reporte en Excel */}
+                  <button onClick={handleGenerateExcel} className="btn btn-success">
                   <FontAwesomeIcon icon={faFileExcel} />
                 </button>
               </li>
@@ -366,8 +377,8 @@ function Table() {
                     <th>Apellido</th>
                     <th>Nombre</th>
                     <th>DNI/CUIT</th>
-                     <th className="border border-gray-400 px-4 py-2">Fecha de Creación</th>
-          
+                    <th className="border border-gray-400 px-4 py-2">Fecha de Creación</th>
+                
                     <th>Localidad</th>
                     <th>Tipo de Persona</th>
                     <th>Tipo de Expendio</th>
@@ -382,19 +393,21 @@ function Table() {
                 <tbody>
                   {currentTasks.map((task) => (
                     <tr key={task._id}>
-                      <td data-label="N° Expediente">{task.nroexpediente?.toUpperCase()}</td>
+                      {/* CORRECCIÓN 1: Unir el array antes de aplicar toUpperCase() */}
+                      <td data-label="N° Expediente">{getExpedienteString(task.nroexpediente).toUpperCase()}</td>
+                      
                       <td data-label="Apellido">{task.apellido?.toUpperCase()}</td>
                       <td data-label="Nombre">{task.nombre?.toUpperCase()}</td>
                       <td data-label="DNI/CUIT">{task.dni?.toUpperCase()}</td>
                       <td data-label="Fecha de Creación" className="border border-gray-400 px-4 py-2">
-                {formatFechaCreacion(task.createdAt)}
-              </td>
+                        {formatFechaCreacion(task.createdAt)}
+                      </td>
                       <td data-label="Localidad">{task.localidad?.toUpperCase()}</td>
                       <td data-label="Tipo de Persona">{task.persona?.toUpperCase()}</td>
                       <td data-label="Tipo de expendio">{task.expendio?.toUpperCase()}</td>
                       {permissions.canViewStatus && (
                         <td data-label="Estado">
-                           {permissions.canEditStatus && getStatusOptions(task).length > 0 ? (
+                            {permissions.canEditStatus && getStatusOptions(task).length > 0 ? (
                             <select
                               value={task.estado || "ingresado"}
                               onChange={(e) => handleStatusChange(task._id, e.target.value)}
@@ -412,15 +425,15 @@ function Table() {
                             </span>
                           )}
                           {/* AÑADE ESTE BOTÓN AQUÍ */}
-  {task.estado === "rechazado" && (user.role === "juridicos" || user.role === "admin" || user.role === "editor") && (
-    <button
-      onClick={() => handleStatusChange(task._id, "rechazado")}
-      className="btn-dark"
-      title="Editar motivo de rechazo"
-    >
-      <FontAwesomeIcon icon={faEdit} />Editar Motivo
-    </button>
-  )}
+                          {task.estado === "rechazado" && (user.role === "juridicos" || user.role === "admin" || user.role === "editor") && (
+                            <button
+                              onClick={() => handleStatusChange(task._id, "rechazado")}
+                              className="btn-dark"
+                              title="Editar motivo de rechazo"
+                            >
+                              <FontAwesomeIcon icon={faEdit} />Editar Motivo
+                            </button>
+                          )}
                         </td>
                       )}
                       {permissions.canPagado && (
@@ -434,7 +447,7 @@ function Table() {
                           <span className="slider"></span>
                         </label>
                       </td>
-                       )}
+                        )}
                       <td data-label="Ver">
                         <Link className="btn btn-success" to={`/view/task/${task._id}`}>
                           <FontAwesomeIcon icon={faEye} />
