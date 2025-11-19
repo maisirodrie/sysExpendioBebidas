@@ -377,14 +377,14 @@ export const updateTasks = async (req, res) => {
     try {
         const { id } = req.params;
         
-        // 🔑 Recibir los arrays del frontend: filesToRemove y existingFilesToKeep
+        // 🔑 1. Desestructuración de datos: El resto de campos va a 'updateData'
         let { filesToRemove, existingFilesToKeep, ...updateData } = req.body;
         const userRole = req.user.role.toLowerCase();
 
         const task = await Task.findById(id);
         if (!task) return res.status(404).json({ message: "Tarea no encontrada" });
 
-        // ... (Lógica de validación de estado y permisos - SE MANTIENE) ...
+        // --- Lógica de validación de estado y permisos (Se mantiene) ---
         const finalStates = ['aprobado', 'finalizado', 'rechazado'];
         if (finalStates.includes(task.estado) && userRole !== 'admin' && userRole !== 'juridicos' && userRole !== 'editor') {
             return res.status(403).json({
@@ -395,7 +395,7 @@ export const updateTasks = async (req, res) => {
             return res.status(403).json({ message: "No tienes permiso para actualizar el número de expediente." });
         }
         
-        // --- LÓGICA DE VALIDACIÓN DE nroexpediente (Se mantiene) ---
+        // --- LÓGICA de VALIDACIÓN de nroexpediente (Se mantiene) ---
         if (updateData.nroexpediente && updateData.nroexpediente !== task.nroexpediente) {
             const existingTask = await Task.findOne({
                 nroexpediente: updateData.nroexpediente,
@@ -409,95 +409,109 @@ export const updateTasks = async (req, res) => {
         }
         // --- FIN DE LA LÓGICA DE VALIDACIÓN ---
 
-        // 1. Deserializar los arrays del frontend
-        let idsToRemove = []; // Archivos a eliminar manualmente por el usuario
-        if (filesToRemove) {
-            try {
-                idsToRemove = JSON.parse(filesToRemove);
-            } catch (e) { /* Manejo de error si la data es inválida */ }
-        }
+        // 🎯 2. LÓGICA DE ARCHIVOS: Inicializar con los archivos existentes
+        let finalFiles = task.file; 
 
-        let filesToKeepFromFront = []; // Archivos existentes que el frontend quiere mantener
-        if (existingFilesToKeep) {
-            try {
-                filesToKeepFromFront = JSON.parse(existingFilesToKeep);
-            } catch (e) { /* Manejo de error si la data es inválida */ }
-        }
-        
-        // 2. Manejo de nuevos archivos subidos
-        const newFiles = req.files ? req.files.map(file => ({
-            filename: file.filename,
-            bucketName: file.bucketName,
-            mimetype: file.mimetype,
-            encoding: file.encoding,
-            id: file.id,
-            fieldname: file.fieldname, 
-            originalname: file.originalname 
-        })) : [];
-
-        // 3. Lógica de FILTRADO FINAL y SUSTITUCIÓN
-
-        // 3a. Archivos Antiguos para Eliminación Automática (Sustitución)
-        // Son los archivos originales de la tarea que NO están en la lista que el frontend quiere mantener
-        const filesToAutoRemove = task.file.filter(originalFile => {
-            return !filesToKeepFromFront.some(keptFile => keptFile.id.toString() === originalFile.id.toString());
-        });
-
-        // 3b. Obtener la data completa de los archivos a mantener
-        // Usamos la lista "limpia" que viene del frontend y filtramos los objetos completos de la tarea.
-        const keptFilesData = task.file.filter(originalFile => 
-             filesToKeepFromFront.some(keptFile => keptFile.id.toString() === originalFile.id.toString())
-        );
-        
-        // 3c. Combinar archivos a mantener con los nuevos archivos
-        const finalFiles = [...keptFilesData, ...newFiles];
-        
-        // 4. Eliminar archivos de GridFS (manual + automático)
-        const autoRemoveIds = filesToAutoRemove.map(f => f.id.toString());
-        const allFilesToRemove = [...idsToRemove, ...autoRemoveIds]; // Lista final de IDs a borrar
-        
-        // 🛑 LÍNEA CORREGIDA: Elimina el llamado a la función no definida
-        // const gfs = getGridFSBucket(); // <--- ¡ELIMINADA!
-        
-        // La variable 'gfs' ya está disponible gracias al 'import' inicial.
-        
-        for (const fileId of allFilesToRemove) {
-            if (mongoose.Types.ObjectId.isValid(fileId)) {
+        // Solo ejecutar la lógica compleja si el frontend envió datos de manejo de archivos o archivos nuevos
+        if (filesToRemove || existingFilesToKeep || (req.files && req.files.length > 0)) {
+            
+            // 2a. Deserializar los arrays del frontend
+            let idsToRemove = []; // Archivos a eliminar manualmente por el usuario
+            if (filesToRemove) {
                 try {
-                    // Usamos la variable 'gfs' importada
-                    await gfs.delete(new mongoose.Types.ObjectId(fileId));
-                } catch (deleteError) {
-                    console.error(`Error al eliminar archivo ${fileId} de GridFS:`, deleteError);
-                    // No detenemos el proceso si falla una eliminación, solo loggeamos el error.
-                }
-            } else {
-                console.warn(`ID inválido para eliminación: ${fileId}`);
+                    idsToRemove = JSON.parse(filesToRemove);
+                } catch (e) { /* Manejo de error si la data es inválida */ }
             }
-        }
 
-        // 5. Actualizar la tarea con todos los datos y la lista final de archivos
+            let filesToKeepFromFront = []; // Archivos existentes que el frontend quiere mantener
+            if (existingFilesToKeep) {
+                try {
+                    filesToKeepFromFront = JSON.parse(existingFilesToKeep);
+                } catch (e) { /* Manejo de error si la data es inválida */ }
+            }
+            
+            // 2b. Manejo de nuevos archivos subidos
+            const newFiles = req.files ? req.files.map(file => ({
+                filename: file.filename,
+                bucketName: file.bucketName,
+                mimetype: file.mimetype,
+                encoding: file.encoding,
+                id: file.id,
+                fieldname: file.fieldname, 
+                originalname: file.originalname 
+            })) : [];
+
+            // 2c. Filtrado de archivos: los que NO están en filesToKeepFromFront deben eliminarse (auto-remove)
+            const filesToAutoRemove = task.file.filter(originalFile => {
+                return !filesToKeepFromFront.some(keptFile => keptFile.id.toString() === originalFile.id.toString());
+            });
+
+            // 2d. Obtener la data completa de los archivos a mantener
+            const keptFilesData = task.file.filter(originalFile => 
+                 filesToKeepFromFront.some(keptFile => keptFile.id.toString() === originalFile.id.toString())
+            );
+            
+            // 2e. Combinar archivos a mantener con los nuevos archivos
+            finalFiles = [...keptFilesData, ...newFiles]; 
+
+            // 3. Eliminar archivos de GridFS (manual + automático)
+            const autoRemoveIds = filesToAutoRemove.map(f => f.id.toString());
+            const allFilesToRemove = [...idsToRemove, ...autoRemoveIds]; // Lista final de IDs a borrar
+            
+            for (const fileId of allFilesToRemove) {
+                if (mongoose.Types.ObjectId.isValid(fileId)) {
+                    try {
+                        // Se asume que 'gfs' está disponible en el scope
+                        await gfs.delete(new mongoose.Types.ObjectId(fileId)); 
+                    } catch (deleteError) {
+                        console.error(`Error al eliminar archivo ${fileId} de GridFS:`, deleteError);
+                    }
+                } else {
+                    console.warn(`ID inválido para eliminación: ${fileId}`);
+                }
+            }
+        } // FIN DEL BLOQUE DE LÓGICA DE ARCHIVOS
+        
+        // 4. 🚀 ACTUALIZACIÓN SEGURA DE MONGO
+        // Si solo se actualizó el estado (y no hubo manejo de archivos), finalFiles = task.file.
+        // Si hubo manejo de archivos, finalFiles contiene la lista nueva.
+        const updateObject = {
+            ...updateData, // Estado, motivoRechazo, nroexpediente, etc.
+            file: finalFiles // La lista de archivos (existente o nueva)
+        };
+
         const updatedTask = await Task.findByIdAndUpdate(
             id,
-            { ...updateData, file: finalFiles },
-            { new: true }
+            // 🔑 USAMOS $set para garantizar que solo se modifiquen los campos en updateObject
+            { $set: updateObject }, 
+            { new: true, runValidators: true } 
         );
 
-        // Asegúrate de que `logActivity` esté definido o importado (lo está en tu código)
-        await logActivity(req.user.id, "actualizó tarea", "tarea", updatedTask._id);
-        res.json(updatedTask);
+        if (!updatedTask) return res.status(404).json({ message: "Tarea no encontrada durante la actualización." });
 
+        // 5. ✅ Devolver la tarea final (poblada, si aplica)
+        const finalUpdatedTask = await Task.findById(id).populate("user");
+        
+        if (!finalUpdatedTask) return res.status(404).json({ message: "Tarea no encontrada después de la actualización." });
+
+        // 6. Registrar actividad y responder
+        await logActivity(req.user.id, 'actualizó tarea', "tarea", finalUpdatedTask._id);
+        res.json(finalUpdatedTask);
+        
     } catch (error) {
         console.error("Error al guardar la tarea:", error);
         const statusCode = error.name === 'ValidationError' ? 400 : 500;
         return res.status(statusCode).json({ message: error.message });
     }
 };
-
 // En tu archivo tasks.controller.js
+// tasks.controller.js
+
 export const taskEstados = async (req, res) => {
     try {
         const { id } = req.params;
-        const { newState } = req.body;
+        // Obtenemos los datos del body, incluyendo el nuevo estado y el motivo (si aplica)
+        const { newState, motivoRechazo } = req.body; 
 
         const userRole = req.user.role.toLowerCase();
 
@@ -506,11 +520,12 @@ export const taskEstados = async (req, res) => {
 
         const validStates = ['pendiente', 'controlado', 'aprobado', 'rechazado', 'finalizado', 'ingresado'];
         const newStateLower = newState.toLowerCase();
+        
         if (!validStates.includes(newStateLower)) {
             return res.status(400).json({ message: "Estado inválido" });
         }
 
-        // Lógica de transiciones de estado
+        // --- Lógica de Permisos y Transiciones (Se mantiene tu lógica) ---
         const canMesaChangeState = () => {
             return (
                 (task.estado === 'ingresado' && (newStateLower === 'pendiente' || newStateLower === 'controlado')) ||
@@ -523,31 +538,63 @@ export const taskEstados = async (req, res) => {
             return task.estado === 'controlado' && (newStateLower === 'aprobado' || newStateLower === 'rechazado');
         };
 
-        const canAdminChangeState = () => true;
-
-        // Verificación de permisos
+        let hasPermission = false;
         if (userRole === 'mesa' && canMesaChangeState()) {
-            task.estado = newStateLower;
+            hasPermission = true;
         } else if (userRole === 'juridicos' && canJuridicosChangeState()) {
-            task.estado = newStateLower;
+            hasPermission = true;
         } else if (userRole === 'admin' || userRole === 'editor') {
-    task.estado = newStateLower;
-        } else {
-            // Este es el mensaje de error que te ayudará a depurar
-            console.log(`Intento fallido de cambio de estado. Usuario: ${userRole}, Estado actual: ${task.estado}, Nuevo estado: ${newStateLower}`);
-            return res.status(403).json({ message: "No tienes permiso para cambiar el estado en este momento." });
+            hasPermission = true; 
         }
 
-        const updatedTask = await task.save();
-        await logActivity(req.user.id, "cambió estado de tarea", "tarea", updatedTask._id); // Añadir registro
-        res.json(updatedTask);
+        if (!hasPermission) {
+            return res.status(403).json({ message: "No tienes permiso para cambiar el estado en este momento." });
+        }
+        // --- Fin Lógica de Permisos ---
+
+        
+        // Definimos qué campos actualizar
+        const updateFields = {
+            estado: newStateLower,
+        };
+
+        // Manejo del Motivo de Rechazo (necesario para el estado RECHAZADO, como se ve en la captura)
+        if (newStateLower === 'rechazado') {
+            if (!motivoRechazo) {
+                 return res.status(400).json({ message: "Debe proporcionar un motivo de rechazo." });
+            }
+            updateFields.motivoRechazo = motivoRechazo;
+        } else {
+            // Limpiamos el motivoRechazo si el estado cambia a uno no rechazado.
+            if (task.motivoRechazo) {
+                 updateFields.motivoRechazo = null; 
+            }
+        }
+        
+        // 1. Ejecutar la actualización (SOLO estado y motivo, manteniendo 'file' intacto)
+        await Task.findByIdAndUpdate(
+            id,
+            { $set: updateFields },
+            { new: true, runValidators: true } 
+        );
+
+        // 2. 🔑 SOLUCIÓN CLAVE: Volver a buscar la tarea para obtener TODOS los campos (incluyendo 'file')
+        // Esto asegura que el objeto devuelto al frontend contenga la lista completa de archivos.
+        const finalUpdatedTask = await Task.findById(id).populate("user");
+        
+        if (!finalUpdatedTask) return res.status(404).json({ message: "Tarea no encontrada después de la actualización." });
+
+
+        await logActivity(req.user.id, `cambió estado de tarea a ${newStateLower}`, "tarea", finalUpdatedTask._id);
+        
+        // 3. Devolver la tarea COMPLETA al frontend
+        res.json(finalUpdatedTask); 
 
     } catch (error) {
         console.error("Error al cambiar el estado:", error);
         return res.status(500).json({ message: error.message });
     }
 };
-
 
 export const taskPagos = async (req, res) => {
 }

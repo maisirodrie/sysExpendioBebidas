@@ -1,5 +1,18 @@
 import { createContext, useContext, useState, useEffect } from "react";
-import { createTasksRequest, createTasksPublicRequest, deleteTasksRequest, getTaskRequest, getTasksRequest, updateTasksRequest, getPagoRequest, updatePagoRequest, getEstadoDniRequest, reporteExcelRequest, reportePDFRequest,updateTaskStatusRequest } from "../api/tasks";
+import { 
+    createTasksRequest, 
+    createTasksPublicRequest, 
+    deleteTasksRequest, 
+    getTaskRequest, 
+    getTasksRequest, 
+    updateTasksRequest, 
+    getPagoRequest, 
+    updatePagoRequest, 
+    getEstadoDniRequest, 
+    reporteExcelRequest, 
+    reportePDFRequest,
+    updateTaskStatusRequest 
+} from "../api/tasks";
 import { useAuth } from "../context/AuthContext";
 
 const TaskContext = createContext();
@@ -94,22 +107,40 @@ export function TaskProvider({ children }) {
         return res.data;
     };
 
+    // 🔑 FUNCIÓN MODIFICADA: Captura y devuelve la tarea actualizada
     const updateTask = async (id, task) => {
-        await updateTasksRequest(id, task);
+        try {
+            const res = await updateTasksRequest(id, task);
+            // 🎯 Devolvemos la tarea completa actualizada (incluyendo archivos)
+            return res.data; 
+        } catch (error) {
+            console.error("Error al actualizar la tarea:", error);
+            // Manejo de errores más robusto si es necesario
+            throw error; 
+        }
     };
+    // -----------------------------------------------------------
 
     const updateTaskStatus = async (taskId, newStatus) => {
         try {
             const res = await updateTaskStatusRequest(taskId, newStatus);
+            
+            // 🎯 CLAVE: Devolvemos la tarea completa actualizada para usarla en el frontend
+            return res.data;
+            
+            /* // ❌ ELIMINAMOS la actualización interna con setTasks aquí
+            // para que el frontend maneje la actualización de estado con el objeto completo.
             if (res.status === 200) {
-                setTasks((prevTasks) =>
-                    prevTasks.map((task) =>
-                        task._id === taskId ? { ...task, estado: newStatus } : task
-                    )
-                );
-            }
+                 setTasks((prevTasks) =>
+                     prevTasks.map((task) =>
+                         task._id === taskId ? { ...task, estado: newStatus } : task
+                     )
+                 );
+            } 
+            */
         } catch (error) {
             console.error("Error al actualizar el estado de la tarea:", error);
+            throw error;
         }
     };
 
@@ -173,13 +204,14 @@ export function TaskProvider({ children }) {
     return (
         <TaskContext.Provider value={{
             tasks,
+            setTasks, // 🔑 Añadido setTasks para que el componente pueda hacer la actualización instantánea
             createTask,
             createTasksPublic,
             getTasks,
             deleteTask,
             getTask,
-            updateTask,
-            updateTaskStatus,
+            updateTask, // Ahora devuelve el objeto actualizado
+            updateTaskStatus, // Ahora devuelve el objeto actualizado
             pago,
             getPago,
             getDni,
@@ -187,7 +219,7 @@ export function TaskProvider({ children }) {
             updatePago,
             generateReportpdf,
             generateReportxlsx,
-            errors, // Añadido para que los componentes puedan acceder a los errores
+            errors, 
         }}>
             {children}
         </TaskContext.Provider>

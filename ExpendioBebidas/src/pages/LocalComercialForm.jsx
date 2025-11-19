@@ -3,7 +3,7 @@ import { Municipios } from '../api/municipios';
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faCheckCircle, faUpload, faFilePdf, faTrashAlt } from "@fortawesome/free-solid-svg-icons"; 
 
-// --- Constantes de Requisitos Detallados ---
+// --- Constantes de Requisitos Detallados (CON HTML PARA NEGRITA) ---
 const RequisitosFisica = [
   { key: "notaSolicitud", label: "Nota de Solicitud dirigida al Subsecretario (a).",required: true },
   { key: "habilitacionMunicipal", label: "Copia de la Habilitación Municipal Definitiva (b).",required: true },
@@ -12,7 +12,11 @@ const RequisitosFisica = [
   { key: "ddjjHigiene", label: "Declaración Jurada sobre elementos de Higiene y Seguridad (e).",required: true},
   { key: "fotocopiaDni", label: "Fotocopia del Documento Nacional de Identidad (f).",required: true },
   { key: "informeSocioAmbiental", label: "Informe Socio Ambiental de la Comisaría (g).",required: true },
-  { key: "certificadoAntecedentes", label: "Informe de Certificado de Antecedentes (h).",required: true},
+  { 
+    key: "certificadoAntecedentes", 
+    label: "Informe de Certificado de Antecedentes <b>Provinciales</b> del peticionante (h).", // ⬅️ MODIFICADO
+    required: true
+  },
   { key: "propiedadInmueble", label: "Comprobantes que acrediten la propiedad del Inmueble (i).",required: true},
   { key: "planContingencia", label: "Plan de Contingencia y Constancia Bomberos (si aplica).",required: true },
   { key: "copiasCertificadas", label: "Todas las copias deben estar debidamente CERTIFICADAS.",required: false, isInfo: true },
@@ -26,14 +30,20 @@ const RequisitosJuridica = [
   { key: "actaComisionDirectiva", label: "Acta de Comisión Directiva autorizando la gestión del Permiso (e).",required: true},
   { key: "ddjjDistanciasJuridica", label: "Declaración sobre la distancia existente (f).",required: true },
   { key: "fotocopiaDniAutorizado", label: "Fotocopia del DNI de la persona autorizada (g).",required: true },
-  { key: "certificadoAntecedentesAutorizado", label: "Informe de certificado de antecedentes del peticionante (h).",required: true },
+  { 
+    key: "certificadoAntecedentesAutorizado", 
+    label: "Informe de certificado de antecedentes <b>Provinciales</b> del peticionante (h).", // ⬅️ MODIFICADO
+    required: true 
+  },
   { key: "medidasSeguridad", label: "Constancia Municipal sobre medidas de seguridad e higiene (i).",required: true },
   { key: "propiedadInmuebleJuridica", label: "Comprobantes que acrediten la propiedad del Inmueble.",required: true },
   { key: "planContingenciaJuridica", label: "Plan de Contingencia y Constancia Bomberos (si aplica).",required: true },
   { key: "copiasCertificadasJuridica", label: "Todas las copias deben estar debidamente CERTIFICADAS.",required: false, isInfo: true },
 ];
+// ----------------------------------------------------------------------
 
-// Componente para manejar la carga de un documento individual
+
+// Componente para manejar la carga de un documento individual (CON CORRECCIÓN HTML)
 const DocumentUploadField = ({ req, register, watch, errors, existingFile, removeExistingFile, apiUrl }) => {
   // 1. Monitoreamos el campo para archivos NUEVOS (React Hook Form)
   const file = watch(req.key); 
@@ -41,11 +51,9 @@ const DocumentUploadField = ({ req, register, watch, errors, existingFile, remov
   const hasError = errors[req.key] !== undefined;
 
   // 2. Verificamos si hay un archivo existente O un archivo nuevo seleccionado
-  // Esto es CLAVE para mostrar el estado de completado
   const isFilePresent = isNewFileSelected || existingFile; 
 
   return (
-    // 🔑 CLAVE: Añadir un ID al contenedor para un scroll más preciso desde el padre
     <div 
       id={`file-upload-container-${req.key}`} // ID para el scroll
       className={`flex flex-col p-2 rounded-md my-1 border transition-all duration-300 ${
@@ -58,10 +66,13 @@ const DocumentUploadField = ({ req, register, watch, errors, existingFile, remov
             className={`mr-3 ${isFilePresent ? "text-green-500" : "text-blue-500"}`}
           />
 
-          <span className={`text-sm flex-grow ${isFilePresent ? "text-gray-600" : "text-black"}`}>
-            {req.label}
-            {req.required && <span className="text-red-500 ml-1 font-bold">*</span>}
-          </span>
+          {/* 🔑 CORRECCIÓN: Usamos dangerouslySetInnerHTML para interpretar el <b> y manejar el asterisco */}
+          <span 
+                className={`text-sm flex-grow ${isFilePresent ? "text-gray-600" : "text-black"}`}
+                dangerouslySetInnerHTML={{
+                    __html: req.label + (req.required && !req.isInfo ? '<span class="text-red-500 ml-1 font-bold">*</span>' : '')
+                }}
+            />
         </div>
 
         {req.isInfo ? (
@@ -117,7 +128,6 @@ const DocumentUploadField = ({ req, register, watch, errors, existingFile, remov
                       id={req.key} // CLAVE: ID coincidente con req.key
                       type="file"
                       {...register(req.key, {
-                              // Validar solo si es requerido y NO hay un archivo existente
                               required: req.required && !existingFile ? `${req.label} es obligatorio.` : false,
                           })}
                       className="hidden"
@@ -137,7 +147,7 @@ const DocumentUploadField = ({ req, register, watch, errors, existingFile, remov
 };
 
 // RequisitosDisplay (Renderiza la lista de documentos)
-const RequisitosDisplay = ({ tipoPersona, register, watch, errors, existingFilesMap, removeExistingFile, apiUrl, setFocus }) => { // 🔑 setFocus aceptado
+const RequisitosDisplay = ({ tipoPersona, register, watch, errors, existingFilesMap, removeExistingFile, apiUrl, setFocus }) => { 
   let requisitos = tipoPersona === "Física" ? RequisitosFisica : RequisitosJuridica;
   let titulo = tipoPersona === "Física" ? "Documentación Requerida (Persona Física)" : "Documentación Requerida (Persona Jurídica)";
 
@@ -157,7 +167,6 @@ const RequisitosDisplay = ({ tipoPersona, register, watch, errors, existingFiles
             register={register}
             watch={watch}
             errors={errors}
-            // CLAVE: Pasa el archivo existente mapeado por su clave (req.key)
             existingFile={existingFilesMap ? existingFilesMap[req.key] : null} 
             removeExistingFile={removeExistingFile}
             apiUrl={apiUrl}
@@ -171,16 +180,16 @@ const RequisitosDisplay = ({ tipoPersona, register, watch, errors, existingFiles
 
 // LocalComercialForm (Exportado)
 const LocalComercialForm = ({ 
-    register, 
-    errors, 
-    tipoPersona, 
-    handleTipoPersonaChange, 
-    handleLocalidadChange, 
-    watch, 
-    existingFilesMap, 
-    removeExistingFile, 
-    apiUrl, 
-    setFocus // 🔑 Cambio 1: Aceptar setFocus
+    register, 
+    errors, 
+    tipoPersona, 
+    handleTipoPersonaChange, 
+    handleLocalidadChange, 
+    watch, 
+    existingFilesMap, 
+    removeExistingFile, 
+    apiUrl, 
+    setFocus 
 }) => (
   <>
     <h3 className="text-xl font-semibold text-black mt-4 mb-2 border-b pb-1">Datos del Local Comercial y Propietario</h3>
@@ -207,10 +216,6 @@ const LocalComercialForm = ({
     {tipoPersona && (
       <>
     
-    {/* --- SECCIÓN REQUISITOS INTERACTIVOS --- */}
-
-    {/* ------------------------------------------ */}
-
     {/* Resto de los campos de texto del formulario */}
     <label htmlFor="dni" className="block text-sm font-medium text-black">
       {tipoPersona === "Jurídica" ? "CUIT de la Empresa" : "DNI del Propietario"} 
@@ -268,6 +273,7 @@ const LocalComercialForm = ({
     {errors.contacto && <p className="text-red-500 text-sm mt-1">{errors.contacto.message}</p>}
     <input type="tel" {...register("contacto")} className="w-full bg-gray-100 text-black px-4 py-2 rounded-md my-2" placeholder="Teléfono de Contacto" />
 
+    {/* --- SECCIÓN REQUISITOS INTERACTIVOS (Ya corregido) --- */}
     <RequisitosDisplay 
         tipoPersona={tipoPersona} 
         register={register} 
@@ -276,7 +282,7 @@ const LocalComercialForm = ({
         existingFilesMap={existingFilesMap}
         removeExistingFile={removeExistingFile}
         apiUrl={apiUrl}
-        setFocus={setFocus} // 🔑 Cambio 2: Pasar setFocus a RequisitosDisplay
+        setFocus={setFocus} 
     />
       </>
     )}

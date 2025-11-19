@@ -35,7 +35,7 @@ const getExpedienteString = (nroexpediente) => {
 
 
 function Table() {
-  const { tasks, deleteTask, getTasks, updateTaskStatus, updateTask } = useTasks();
+  const { tasks, deleteTask, getTasks, updateTaskStatus, updateTask, setTasks } = useTasks();
   const { user } = useAuth(); // Suponiendo que 'user' contiene el rol del usuario
   const [search, setSearch] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
@@ -159,7 +159,8 @@ function Table() {
     return availableOptions.length ? availableOptions : [];
   };
 
-  const handleStatusChange = async (taskId, newStatus) => {
+
+const handleStatusChange = async (taskId, newStatus) => {
     try {
         const currentTask = tasks.find(t => t._id === taskId);
 
@@ -167,6 +168,8 @@ function Table() {
             Swal.fire("Error", "No se encontró el expediente.", "error");
             return;
         }
+
+        let updatedTask = null; // Variable para almacenar la tarea actualizada desde el backend
 
         if ((user.role === "juridicos" || user.role === "admin" || user.role === "editor") && newStatus === "rechazado") {
             const { value: motivoRechazo } = await Swal.fire({
@@ -186,18 +189,26 @@ function Table() {
             });
 
             if (motivoRechazo !== undefined) {
-                await updateTask(taskId, { estado: newStatus, motivoRechazo: motivoRechazo });
+                // 1. Llama a la función de contexto y CAPTURA la respuesta COMPLETA
+                updatedTask = await updateTask(taskId, { estado: newStatus, motivoRechazo: motivoRechazo });
                 Swal.fire("Expediente Actualizado", "El motivo de rechazo ha sido guardado.", "success");
-                await getTasks();
+                // ❌ Eliminado: await getTasks();
             } else {
                 Swal.fire("Cambio Cancelado", "El cambio de estado ha sido cancelado.", "info");
+                return; // Salir si se cancela
             }
         } else {
-            // 🚨 CAMBIO CLAVE AQUÍ: Usar updateTaskStatus
-            await updateTaskStatus(taskId, newStatus); 
+            // 2. Llama a la función de contexto (solo estado) y CAPTURA la respuesta COMPLETA
+            updatedTask = await updateTaskStatus(taskId, newStatus); 
             Swal.fire("Estado actualizado", "El estado se ha modificado correctamente", "success");
-            await getTasks();
+            // ❌ Eliminado: await getTasks();
         }
+        
+        // 3. 🚀 ACTUALIZACIÓN INSTANTÁNEA: Usar la respuesta del backend para actualizar el estado `tasks`
+        if (updatedTask) {
+            setTasks(tasks.map(t => (t._id === taskId ? updatedTask : t)));
+        }
+
     } catch (error) {
         console.error("Error al cambiar el estado:", error);
         Swal.fire("Error", "No se pudo actualizar el estado de la tarea.", "error");
