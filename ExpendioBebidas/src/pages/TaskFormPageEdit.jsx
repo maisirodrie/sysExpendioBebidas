@@ -51,6 +51,7 @@ const getFriendlyFileName = (filename) => {
 };
 
 
+
 // Función para obtener las claves de campo válidas (Mantenido)
 const getMappedFileKeys = (expendio, persona) => {
     if (expendio === "Local Comercial") {
@@ -132,20 +133,22 @@ function TaskFormPageEdit() {
         setValue("localidad", e.target.value);
     };
 
-    // Función de eliminación (Mantenido)
-    const removeExistingFileByKey = (fileId) => {
-        const fileIdString = fileId.toString();
+   const removeExistingFileByKey = (fileId, fieldKey) => { // ⬅️ Asegúrate de que acepta fieldKey
+    const fileIdString = fileId.toString();
 
-        setFilesToRemove((prev) =>
-            prev.includes(fileIdString) ? prev : [...prev, fileIdString]
-        );
-        
-        setSelectedFiles((prevFiles) =>
-            prevFiles.filter((file) => file.id.toString() !== fileIdString)
-        );
-    };
+    setFilesToRemove((prev) =>
+        prev.includes(fileIdString) ? prev : [...prev, fileIdString]
+    );
+    
+    setSelectedFiles((prevFiles) =>
+        prevFiles.filter((file) => file.id.toString() !== fileIdString)
+    );
 
-    // 🔑 Carga de tarea (MODIFICADO para priorizar campos clave y manejo de nroexpediente array)
+    // 🔑 LA CORRECCIÓN: Limpiar el valor del campo en React Hook Form (RHF).
+    // Esto es crucial. Le dice a RHF que el campo 'autorizacionPropietario' está vacío.
+    setValue(fieldKey, null, { shouldValidate: true }); 
+};
+    // 🔑 Carga de tarea (Mantenido)
     useEffect(() => {
         async function loadTask() {
             if (params.id) {
@@ -202,52 +205,23 @@ function TaskFormPageEdit() {
         loadTask();
     }, [params.id, setValue, getTask]);
 
-    // 🔑 VALIDACIÓN Y SUBMIT DEL FORMULARIO (Manejo de archivos robusto)
+    // 🔑 VALIDACIÓN Y SUBMIT DEL FORMULARIO (Modificado: Archivos son opcionales)
     const onSubmit = handleSubmit(async (data) => {
-        // Validación de archivos requeridos (si existen)
+        // --- ELIMINADO: Validación estricta de archivos faltantes. Ahora son opcionales ---
+        /*
         const missingFiles = currentMappedFieldnames.filter(fieldName => {
             const existingFile = existingFilesMap[fieldName];
             const isNewFile = data[fieldName] instanceof FileList && data[fieldName].length > 0;
-            
-            // Un archivo falta si NO existe uno previo Y NO se está subiendo uno nuevo
             return !existingFile && !isNewFile;
         });
 
-       if (missingFiles.length > 0) {
-            const firstMissingFile = missingFiles[0];
-            const friendlyName = getFriendlyFileName(firstMissingFile);
-            
-            // 1. Mostrar alerta y hacer scroll
-            Swal.fire({
-                title: "Archivos Faltantes",
-                html: `Debe subir el archivo requerido: <b>${friendlyName}</b>.`,
-                icon: "warning",
-                confirmButtonText: "Aceptar y ver",
-            }).then(() => {
-                
-                setTimeout(() => {
-                    const containerId = `file-upload-container-${firstMissingFile}`;
-                    const targetElement = document.getElementById(containerId);
-                    
-                    if (targetElement && scrollRef.current) {
-                        const offset = targetElement.offsetTop - scrollRef.current.offsetTop; 
-                        const scrollTo = offset -50; 
-
-                        scrollRef.current.scrollTo({ 
-                            top: scrollTo > 0 ? scrollTo : 0, 
-                            behavior: 'smooth' 
-                        });
-                        
-                        setFocus(firstMissingFile); 
-                    } else if (targetElement) {
-                        targetElement.scrollIntoView({ behavior: 'smooth', block: 'center' });
-                    }
-                }, 0);
-            });
+        if (missingFiles.length > 0) {
+            // ... (Bloque de alerta y scroll eliminado) ...
             return; // Detener el submit
         }
+        */
         
-        // --- CONTINÚA EL PROCESO DE SUBMIT SI NO HAY ARCHIVOS FALTANTES ---
+        // --- CONTINÚA EL PROCESO DE SUBMIT (Archivos opcionales) ---
         try {
             Swal.fire({
                 title: "Cargando...",
@@ -274,7 +248,7 @@ function TaskFormPageEdit() {
                         : "") +
                     (nroExpedienteParts.anio ? `/${nroExpedienteParts.anio}` : "");
 
-                if (fullNroExpediente.trim() !== "/") {
+                if (fullNroExpediente.trim() !== "/" && fullNroExpediente.trim() !== "-/") {
                     // nroexpediente es un único string para ser reemplazado en el backend
                     formData.append("nroexpediente", fullNroExpediente);
                 }

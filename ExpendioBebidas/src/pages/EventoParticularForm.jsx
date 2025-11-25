@@ -21,109 +21,112 @@ const RequisitosEventos = [
 
 
 // Componente para manejar la carga de un documento individual (CON CORRECCIÓN HTML)
+// Componente para manejar la carga de un documento individual (CON CORRECCIÓN HTML)
 const DocumentUploadField = ({ req, register, watch, errors, existingFile, removeExistingFile, apiUrl }) => {
-    
-    const file = watch(req.key); 
-    const isFileSelected = file instanceof FileList && file.length > 0;
-    const hasError = errors[req.key] !== undefined;
-    
-    const showExistingFile = existingFile && !isFileSelected;
-    
-    const downloadUrl = showExistingFile 
-        ? `${apiUrl}/tasks/file/${existingFile.filename}`
-        : null;
+    
+    const file = watch(req.key); 
+    const isFileSelected = file instanceof FileList && file.length > 0;
+    const hasError = errors[req.key] !== undefined;
+    
+    const showExistingFile = existingFile && !isFileSelected;
+    
+    const downloadUrl = showExistingFile 
+        ? `${apiUrl}/tasks/file/${existingFile.filename}`
+        : null;
 
-    const fileNameDisplay = isFileSelected 
-        ? file[0].name 
-        : showExistingFile ? existingFile.originalname : null;
+    const fileNameDisplay = isFileSelected 
+        ? file[0].name 
+        : showExistingFile ? existingFile.originalname : null;
 
-    return (
-        <div id={`file-upload-container-${req.key}`} 
-             className={`flex flex-col p-2 rounded-md my-1 border transition-all duration-300 ${
-                hasError ? "border-red-500 bg-red-50" : "border-gray-200 bg-white"
-            }`}>
-            <div className="flex items-center justify-between">
-                <div className="flex items-center flex-grow">
-                    <FontAwesomeIcon
-                        icon={isFileSelected || showExistingFile ? faCheckCircle : faUpload}
-                        className={`mr-3 ${isFileSelected || showExistingFile ? "text-green-500" : "text-blue-500"}`}
-                    />
-                    
-                    {/* 🔑 CORRECCIÓN: Usamos dangerouslySetInnerHTML para interpretar el <b> */}
-                    <span 
+    return (
+        <div id={`file-upload-container-${req.key}`} 
+             className={`flex flex-col p-2 rounded-md my-1 border transition-all duration-300 ${
+                 hasError ? "border-red-500 bg-red-50" : "border-gray-200 bg-white"
+               }`}>
+            <div className="flex items-center justify-between">
+                <div className="flex items-center flex-grow">
+                    <FontAwesomeIcon
+                        icon={isFileSelected || showExistingFile ? faCheckCircle : faUpload}
+                        className={`mr-3 ${isFileSelected || showExistingFile ? "text-green-500" : "text-blue-500"}`}
+                    />
+                    
+                    {/* 🔑 CORRECCIÓN: Usamos dangerouslySetInnerHTML para interpretar el <b> */}
+                    <span 
                         className={`text-sm flex-grow ${isFileSelected || showExistingFile ? "text-gray-600" : "text-black"}`}
                         dangerouslySetInnerHTML={{
                             // Combinamos el label con el asterisco de requerido incrustado en HTML
                             __html: req.label + (req.required && !req.isInfo ? '<span class="text-red-500 ml-1 font-bold">*</span>' : '')
                         }}
                     />
-                </div>
+                </div>
 
-                {req.isInfo ? (
-                    <span className="text-xs text-yellow-700 font-semibold italic">INFORMACIÓN IMPORTANTE</span>
-                ) : (
-                    <div className="ml-4 flex space-x-2 items-center">
+                {req.isInfo ? (
+                    <span className="text-xs text-yellow-700 font-semibold italic">INFORMACIÓN IMPORTANTE</span>
+                ) : (
+                    <div className="ml-4 flex space-x-2 items-center">
 
-                        {/* BLOQUE UNIFICADO: Muestra nombre (con "Existente:") y botones */}
-                        {showExistingFile && (
-                            <div className="flex space-x-1 items-center">
-                                {/* Nombre del archivo existente */}
-                                <span className="text-xs text-gray-700 italic max-w-[100px] truncate">
-                                    Existente: {fileNameDisplay}
-                                </span>
-                                {/* Botón Ver (PDF Icon) */}
-                                <a 
-                                    href={downloadUrl} 
-                                    target="_blank" 
-                                    rel="noopener noreferrer"
-                                    className="text-blue-500 hover:text-blue-700 p-1 transition-colors"
-                                >
-                                    <FontAwesomeIcon icon={faFilePdf} />
-                                </a>
-                                {/* Botón Eliminar */}
-                                <button
-                                    type="button"
-                                    onClick={() => removeExistingFile(existingFile.id)}
-                                    className="text-red-500 hover:text-red-700 p-1 transition-colors"
-                                >
-                                    <FontAwesomeIcon icon={faTrashAlt} />
-                                </button>
-                            </div>
-                        )}
-                        {/* ----------------------------------------------- */}
+                        {/* BLOQUE UNIFICADO: Muestra nombre (con "Existente:") y botones */}
+                        {showExistingFile && (
+                            <div className="flex space-x-1 items-center">
+                                {/* Nombre del archivo existente */}
+                                <span className="text-xs text-gray-700 italic max-w-[100px] truncate">
+                                    Existente: {fileNameDisplay}
+                                </span>
+                                {/* Botón Ver (PDF Icon) */}
+                                <a 
+                                    href={downloadUrl} 
+                                    target="_blank" 
+                                    rel="noopener noreferrer"
+                                    className="text-blue-500 hover:text-blue-700 p-1 transition-colors"
+                                >
+                                    <FontAwesomeIcon icon={faFilePdf} />
+                                </a>
+                                {/* Botón Eliminar */}
+                                <button
+                                    type="button"
+                                    // Cambiado para pasar la key del campo, crucial para el setValue externo
+                                    onClick={() => removeExistingFile(existingFile.id, req.key)} 
+                                    className="text-red-500 hover:text-red-700 p-1 transition-colors"
+                                >
+                                    <FontAwesomeIcon icon={faTrashAlt} />
+                                </button>
+                            </div>
+                        )}
+                        {/* ----------------------------------------------- */}
 
-                        {/* Muestra el nombre del archivo si hay uno NUEVO seleccionado */}
-                        {isFileSelected && !showExistingFile && (
-                            <span className="text-xs text-gray-700 italic max-w-[100px] truncate">
-                                Nuevo: {fileNameDisplay}
-                            </span>
-                        )}
-                        
-                        {/* Input de archivo (label) */}
-                        <label htmlFor={req.key} className={`cursor-pointer text-xs font-semibold px-3 py-1 rounded-md transition-all duration-200 ${
-                            isFileSelected || showExistingFile ? "bg-orange-500 hover:bg-orange-600 text-white" : "bg-blue-500 hover:bg-blue-600 text-white"
-                        }`}>
-                            {isFileSelected || showExistingFile ? "Reemplazar" : "Subir archivo"}
-                            <input
-                                id={req.key}
-                                type="file"
-                                {...register(req.key, {
-                                    required: req.required && !showExistingFile ? `${req.label} es obligatorio.` : false,
-                                })}
-                                className="hidden"
-                                onClick={(e) => { e.target.value = null; }}
-                            />
-                        </label>
-                    </div> 
-                )} 
-            </div>
-            {hasError && (
-                <span className="text-red-500 text-xs mt-1 ml-6 block">
-                    {errors[req.key].message}
-                </span>
-            )}
-        </div>
-    );
+                        {/* Muestra el nombre del archivo si hay uno NUEVO seleccionado */}
+                        {isFileSelected && !showExistingFile && (
+                            <span className="text-xs text-gray-700 italic max-w-[100px] truncate">
+                                Nuevo: {fileNameDisplay}
+                            </span>
+                        )}
+                        
+                        {/* Input de archivo (label) */}
+                        <label htmlFor={req.key} className={`cursor-pointer text-xs font-semibold px-3 py-1 rounded-md transition-all duration-200 ${
+                            isFileSelected || showExistingFile ? "bg-orange-500 hover:bg-orange-600 text-white" : "bg-blue-500 hover:bg-blue-600 text-white"
+                        }`}>
+                            {isFileSelected || showExistingFile ? "Reemplazar" : "Subir archivo"}
+                            <input
+                                id={req.key}
+                                type="file"
+                                {...register(req.key, {
+                                    // La lógica actual es correcta: Si es opcional (req.required es false), el required es false.
+                                    required: req.required && !showExistingFile ? `${req.label} es obligatorio.` : false,
+                                })}
+                                className="hidden"
+                                onClick={(e) => { e.target.value = null; }}
+                            />
+                        </label>
+                    </div> 
+                )} 
+            </div>
+            {hasError && (
+                <span className="text-red-500 text-xs mt-1 ml-6 block">
+                    {errors[req.key].message}
+                </span>
+            )}
+        </div>
+    );
 };
 // ----------------------------------------------------------------------
 
