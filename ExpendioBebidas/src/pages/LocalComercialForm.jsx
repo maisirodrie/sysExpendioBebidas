@@ -248,10 +248,11 @@ const DocumentUploadField = ({
                 id={req.key}
                 type="file"
                 {...register(req.key, {
-                  required:
-                    req.required && (!isEdit || (isEdit && !existingFile))
-                      ? `${req.label} es obligatorio.`
-                      : false,
+                  required: isEdit // Si estamos editando...
+                    ? false // ... el campo NUNCA es requerido por RHF, permitiendo guardar.
+                    : req.required // Si es creación, aplica la regla normal.
+                    ? `${req.label} es obligatorio.`
+                    : false,
                 })}
                 className="hidden"
                 onClick={(e) => {
