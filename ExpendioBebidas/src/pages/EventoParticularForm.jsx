@@ -22,7 +22,7 @@ const RequisitosEventos = [
 
 // Componente para manejar la carga de un documento individual (CON CORRECCIÓN HTML)
 // Componente para manejar la carga de un documento individual (CON CORRECCIÓN HTML)
-const DocumentUploadField = ({ req, register, watch, errors, existingFile, removeExistingFile, apiUrl }) => {
+const DocumentUploadField = ({ req, register, watch, errors, existingFile, removeExistingFile, apiUrl,isEdit }) => {
     
     const file = watch(req.key); 
     const isFileSelected = file instanceof FileList && file.length > 0;
@@ -107,15 +107,17 @@ const DocumentUploadField = ({ req, register, watch, errors, existingFile, remov
                         }`}>
                             {isFileSelected || showExistingFile ? "Reemplazar" : "Subir archivo"}
                             <input
-                                id={req.key}
-                                type="file"
-                                {...register(req.key, {
-                                    // La lógica actual es correcta: Si es opcional (req.required es false), el required es false.
-                                    required: req.required && !showExistingFile ? `${req.label} es obligatorio.` : false,
-                                })}
-                                className="hidden"
-                                onClick={(e) => { e.target.value = null; }}
-                            />
+            id={req.key}
+            type="file"
+            {...register(req.key, {
+                // 💥 CORRECCIÓN CRÍTICA DE LÓGICA:
+                required: req.required && (!isEdit || (isEdit && !showExistingFile))
+                    ? `${req.label} es obligatorio.` 
+                    : false,
+            })}
+            className="hidden"
+            onClick={(e) => { e.target.value = null; }}
+        />
                         </label>
                     </div> 
                 )} 
@@ -131,7 +133,7 @@ const DocumentUploadField = ({ req, register, watch, errors, existingFile, remov
 // ----------------------------------------------------------------------
 
 
-const RequisitosEventosDisplay = ({ register, watch, errors, existingFilesMap, removeExistingFile, apiUrl }) => {
+const RequisitosEventosDisplay = ({ register, watch, errors, existingFilesMap, removeExistingFile, apiUrl,isEdit }) => {
   return (
     <div className="bg-blue-100 p-4 rounded-md mt-4 mb-4 border border-blue-300">
       <h4 className="font-bold text-lg text-blue-800 mb-2">Documentación Requerida (Evento Particular)</h4>
@@ -149,6 +151,7 @@ const RequisitosEventosDisplay = ({ register, watch, errors, existingFilesMap, r
             existingFile={existingFilesMap ? existingFilesMap[req.key] : null} 
             removeExistingFile={removeExistingFile}
             apiUrl={apiUrl}
+            isEdit={isEdit}
           />
         ))}
         
@@ -166,6 +169,7 @@ const RequisitosEventosDisplay = ({ register, watch, errors, existingFilesMap, r
               existingFilesMap={existingFilesMap}
               removeExistingFile={removeExistingFile}
               apiUrl={apiUrl}
+              isEdit={isEdit}
             />
         ))}
       </div>
@@ -183,7 +187,8 @@ const EventoParticularForm = ({
     setFocus,
     existingFilesMap, 
     removeExistingFile, 
-    apiUrl 
+    apiUrl,
+isEdit
 }) => (
   <>
     <h3 className="text-xl font-semibold text-black mt-4 mb-2 border-b pb-1">Datos del Evento</h3>
@@ -342,6 +347,7 @@ const EventoParticularForm = ({
         existingFilesMap={existingFilesMap}
         removeExistingFile={removeExistingFile}
         apiUrl={apiUrl}
+isEdit={isEdit}
     />
     {/* ------------------------------------------ */}
 

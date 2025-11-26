@@ -140,6 +140,7 @@ const DocumentUploadField = ({
   existingFile,
   removeExistingFile,
   apiUrl,
+  isEdit,
 }) => {
   // 1. Monitoreamos el campo para archivos NUEVOS (React Hook Form)
   const file = watch(req.key);
@@ -244,11 +245,11 @@ const DocumentUploadField = ({
                                 {isFilePresent ? "Reemplazar" : "Subir archivo"}
                                {" "}
               <input
-                id={req.key} // CLAVE: ID coincidente con req.key
+                id={req.key}
                 type="file"
                 {...register(req.key, {
                   required:
-                    req.required && !existingFile
+                    req.required && (!isEdit || (isEdit && !existingFile))
                       ? `${req.label} es obligatorio.`
                       : false,
                 })}
@@ -285,6 +286,7 @@ const RequisitosDisplay = ({
   removeExistingFile,
   apiUrl,
   setFocus,
+  isEdit,
 }) => {
   let requisitos =
     tipoPersona === "Física" ? RequisitosFisica : RequisitosJuridica;
@@ -317,6 +319,7 @@ const RequisitosDisplay = ({
             existingFile={existingFilesMap ? existingFilesMap[req.key] : null}
             removeExistingFile={removeExistingFile}
             apiUrl={apiUrl}
+            isEdit={isEdit}
           />
         ))}
              {" "}
@@ -338,6 +341,7 @@ const LocalComercialForm = ({
   removeExistingFile,
   apiUrl,
   setFocus,
+  isEdit,
 }) => (
   <>
        {" "}
@@ -585,8 +589,7 @@ const LocalComercialForm = ({
           className="w-full bg-gray-100 text-black px-4 py-2 rounded-md my-2"
           placeholder="Teléfono de Contacto"
         />
-            {/* --- SECCIÓN REQUISITOS INTERACTIVOS (Ya corregido) --- */}
-           {" "}
+            {/* --- SECCIÓN REQUISITOS INTERACTIVOS (Ya corregido) --- */}   {" "}
         <RequisitosDisplay
           tipoPersona={tipoPersona}
           register={register}
@@ -596,6 +599,7 @@ const LocalComercialForm = ({
           removeExistingFile={removeExistingFile}
           apiUrl={apiUrl}
           setFocus={setFocus}
+          isEdit={isEdit}
         />
              {" "}
       </>

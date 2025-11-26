@@ -78,6 +78,7 @@ function TaskFormPageEdit() {
     const { getTask, updateTask } = useTasks();
     const navigate = useNavigate();
     const params = useParams();
+    const isEdit = !!params.id;
 
     const [taskData, setTaskData] = useState(null);
     const [filesToRemove, setFilesToRemove] = useState([]);
@@ -85,6 +86,7 @@ function TaskFormPageEdit() {
     const tipoExpendioWatch = formValues?.expendio;
     const tipoPersonaWatch = formValues?.persona;
     const [selectedFiles, setSelectedFiles] = useState([]);
+    
     
     // ... (nroExpedienteParts y apiUrl se mantienen) ...
     const [nroExpedienteParts, setNroExpedienteParts] = useState({
@@ -135,6 +137,7 @@ function TaskFormPageEdit() {
 
    const removeExistingFileByKey = (fileId, fieldKey) => { // ⬅️ Asegúrate de que acepta fieldKey
     const fileIdString = fileId.toString();
+    setValue(fieldKey, null, { shouldValidate: true });
 
     setFilesToRemove((prev) =>
         prev.includes(fileIdString) ? prev : [...prev, fileIdString]
@@ -348,7 +351,7 @@ function TaskFormPageEdit() {
                 paddingLeft: "20px",
             }}
         >
-            <div className="bg-gray-300 max-w-screen-md w-full p-10 rounded-md">
+            <div className="bg-gray-300 max-w-screen-lg w-full p-10 rounded-md">
                 <div className="flex justify-between items-center mb-4">
                     <h1 className="text-2xl font-bold text-black">
                         Editar Registro de Archivo
@@ -426,6 +429,7 @@ function TaskFormPageEdit() {
                             removeExistingFile={removeExistingFileByKey}
                             setFocus={setFocus} 
                             apiUrl={apiUrl}
+                            isEdit={isEdit}
                         />
                     )}
                     
@@ -443,6 +447,7 @@ function TaskFormPageEdit() {
                             removeExistingFile={removeExistingFileByKey}
                             setFocus={setFocus} 
                             apiUrl={apiUrl}
+                            isEdit={isEdit}
                         />
                     )}
                     

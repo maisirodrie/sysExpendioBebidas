@@ -287,7 +287,7 @@ function RegisterPage() {
         paddingLeft: "20px",
       }}
     >
-      <div className="bg-gray-300 max-w-screen-md w-full p-10 rounded-md">
+      <div className="bg-gray-300 max-w-screen-lg w-full p-10 rounded-md">
         <div className="flex justify-between items-center mb-4">
           <h1 className="text-2xl font-bold text-black">
             Registro de Expendio
