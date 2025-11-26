@@ -67,15 +67,15 @@ function RegisterPage() {
     loadTask();
   }, [params.id, setValue, getTask]);
 
-  // --- AVISO INICIAL ---
-  useEffect(() => {
+ // --- AVISO INICIAL ---
+useEffect(() => {
     Swal.fire({
       icon: "info",
       title: "Aviso Importante",
-      html: "Si posee antecedentes judiciales, el expendio será rechazado.<br/><br/>Se solicita que el trámite se realice con 72hs de antelación.",
+      html: "<strong>Horario de atención: De Lunes a Viernes de 7:00hs a 12:30hs.</strong><br/><br/>Si posee antecedentes judiciales, el expendio será rechazado.<br/><br/>Se solicita que el trámite se realice con 72hs de antelación.",
       confirmButtonText: "OK",
     });
-  }, []);
+}, []);
 
 // --- SUBMIT DEL FORMULARIO ---
   const onSubmit = handleSubmit(async (data) => {
