@@ -272,7 +272,7 @@ function TaskViewPage() {
                         .map((fileInfo) => (
                           <a
                             key={fileInfo.id.toString()} // Usar el ID como key
-                            href={`${apiUrl}/tasks/file/${fileInfo.filename}`}
+                            href={`${apiUrl.replace('/tasks/download', '')}/tasks/file/${fileInfo.filename}`}
                             target="_blank"
                             rel="noopener noreferrer"
                             className="bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 text-center rounded transition duration-200 break-words w-full"

@@ -31,7 +31,7 @@ const DocumentUploadField = ({ req, register, watch, errors, existingFile, remov
     const showExistingFile = existingFile && !isFileSelected;
     
     const downloadUrl = showExistingFile 
-        ? `${apiUrl}/tasks/file/${existingFile.filename}`
+        ? `${apiUrl.replace('/tasks/download', '')}/tasks/file/${existingFile.filename}`
         : null;
 
     const fileNameDisplay = isFileSelected 

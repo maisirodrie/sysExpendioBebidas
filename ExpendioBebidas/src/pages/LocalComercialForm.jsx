@@ -211,7 +211,7 @@ const DocumentUploadField = ({
               <div className="flex space-x-1">
                                   {/* Botón Ver */}                 {" "}
                 <a
-                  href={`${apiUrl}/tasks/file/${existingFile.filename}`}
+                  href={`${apiUrl.replace('/tasks/download', '')}/tasks/file/${existingFile.filename}`}
                   target="_blank"
                   rel="noopener noreferrer"
                   className="text-blue-500 hover:text-blue-700 px-2 py-1 rounded-full transition-colors"
