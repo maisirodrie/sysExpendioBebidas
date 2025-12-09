@@ -5,9 +5,9 @@
   "main": "index.js",
   "type": "module",
   "scripts": {
-    "dev": "nodemon src/index.js",
-    "produ:start": "NODE_ENV=production pm2 start src/index.js --name backsysexpendio",
-    "produ:restart": "NODE_ENV=production pm2 restart backsysexpendio"
+    "dev": "cross-env NODE_ENV=development nodemon src/index.js",
+    "produ:start": "cross-env NODE_ENV=production pm2 start src/index.js --name backsysexpendio",
+    "produ:restart": "cross-env NODE_ENV=production pm2 restart backsysexpendio --update-env"
   },
   "keywords": [],
   "author": "",
