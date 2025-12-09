@@ -6,8 +6,8 @@
   "type": "module",
   "scripts": {
     "dev": "nodemon src/index.js",
-    "produ:start": "pm2 start src/index.js --name backsysexpendio",
-    "produ:restart": "pm2 restart backsysexpendio"
+    "produ:start": "NODE_ENV=production pm2 start src/index.js --name backsysexpendio",
+    "produ:restart": "NODE_ENV=production pm2 restart backsysexpendio"
   },
   "keywords": [],
   "author": "",

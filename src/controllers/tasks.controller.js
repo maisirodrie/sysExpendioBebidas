@@ -530,6 +530,7 @@ export const taskEstados = async (req, res) => {
             return (
                 (task.estado === 'ingresado' && (newStateLower === 'pendiente' || newStateLower === 'controlado')) ||
                 (task.estado === 'pendiente' && newStateLower === 'controlado') ||
+                (task.estado === 'rechazado' && (newStateLower === 'pendiente' || newStateLower === 'controlado' || newStateLower === 'finalizado')) ||
                 ((task.estado === 'aprobado' || task.estado === 'rechazado') && newStateLower === 'finalizado')
             );
         };

@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useMemo, useRef } from "react";
+﻿import React, { useEffect, useState, useMemo, useRef } from "react";
 import { useForm, useWatch } from "react-hook-form";
 import { useTasks } from "../context/TasksContext";
 import { Link, useNavigate, useParams } from "react-router-dom";
@@ -123,6 +123,8 @@ function TaskFormPageEdit() {
         setValue("expendio", selectedExpendio);
         if (selectedExpendio === "Evento Particular") {
             setValue("persona", "Física");
+            // Clear codigoOrganismo when switching to Evento Particular
+            setNroExpedienteParts(prev => ({ ...prev, codigoOrganismo: "" }));
         } else if (selectedExpendio === "Local Comercial") {
             setValue("persona", "");
         }
@@ -381,15 +383,19 @@ function TaskFormPageEdit() {
                             className="w-1/3 bg-gray-100 text-black px-4 py-2 rounded-md my-2"
                             placeholder="Correlativo"
                         />
-                        <span className="text-black text-3xl my-2">-</span>
-                        <input
-                            type="text"
-                            name="nroexpediente-codigoOrganismo"
-                            value={nroExpedienteParts.codigoOrganismo || ""}
-                            onChange={(e) => handleNroExpedienteChange(e, "codigoOrganismo")}
-                            className="w-1/3 bg-gray-100 text-black px-4 py-2 rounded-md my-2"
-                            placeholder="Cod. Organismo"
-                        />
+                        {tipoExpendioWatch === "Local Comercial" && (
+                            <>
+                                <span className="text-black text-3xl my-2">-</span>
+                                <input
+                                    type="text"
+                                    name="nroexpediente-codigoOrganismo"
+                                    value={nroExpedienteParts.codigoOrganismo || ""}
+                                    onChange={(e) => handleNroExpedienteChange(e, "codigoOrganismo")}
+                                    className="w-1/3 bg-gray-100 text-black px-4 py-2 rounded-md my-2"
+                                    placeholder="Cod. Organismo"
+                                />
+                            </>
+                        )}
                         <span className="text-black text-3xl my-2">/</span>
                         <input
                             type="text"

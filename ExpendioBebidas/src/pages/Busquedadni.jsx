@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+﻿import React, { useState } from "react";
 import { Link } from "react-router-dom";
 import Swal from "sweetalert2";
 import { getEstadoDniRequest } from "../api/tasks"; // Asegúrate de importar correctamente
@@ -37,16 +37,20 @@ const handleSearch = async (e) => {
     }
 
     // Preparación de datos para el modal
-    const estadoMayusculas = estado.toUpperCase();
+    // Mapeo visual: mostrar "controlado" si el estado es "controlado"
+    const displayEstado = estado === 'controlado' ? 'en revisión' : estado;
+    const estadoMayusculas = displayEstado.toUpperCase();
     const estadoColores = {
       ingresado: "gray",
       pendiente: "orange",
       controlado: "blue",
+      revisado: "blue",
+      "en revisión": "blue",
       aprobado: "green",
       rechazado: "red",
       finalizado: "black",
     };
-    const colorEstado = estadoColores[estado.toLowerCase()] || "black";
+    const colorEstado = estadoColores[displayEstado.toLowerCase()] || "black";
     const nroExpedienteDisplay = nroexpediente === null ? "No asignado" : nroexpediente;
     const motivoRechazoConSaltos = motivoRechazo ? motivoRechazo.replace(/\n/g, '<br/>') : '';
 
@@ -140,3 +144,4 @@ const handleSearch = async (e) => {
 }
 
 export default Busquedadni;
+

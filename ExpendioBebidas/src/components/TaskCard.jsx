@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+﻿import React, { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import { jsPDF } from 'jspdf';
 import * as XLSX from "xlsx"; // Importa SheetJS
@@ -133,14 +133,26 @@ function Table() {
     canPagado: ["admin"].includes(user.role),
   };
 
+
+  // Función para determinar si un usuario puede editar una tarea específica
+  const canEditTask = (task) => {
+    // Admin, editor y mesa pueden editar en cualquier estado
+    if (["admin", "editor", "mesa"].includes(user.role)) {
+      return true;
+    }
+        
+    return false;
+  };
+
   const handleRefresh = async () => await getTasks();
+
 
   const statusOptions = {
     mesa: {
       ingresado: ["ingresado", "pendiente", "controlado"],
       pendiente: ["pendiente", "controlado"],
       aprobado: ["aprobado", "finalizado"],
-      rechazado: ["rechazado", "finalizado"]
+      rechazado: ["rechazado", "pendiente", "controlado", "finalizado"]
     },
     juridicos: {
       controlado: ["controlado", "aprobado", "rechazado"],
@@ -215,15 +227,22 @@ const handleStatusChange = async (taskId, newStatus) => {
     }
 };
 
+  // Función para mapear el estado de la BD al nombre visual
+  const getDisplayStatus = (status) => {
+    return status === 'controlado' ? 'en revisión' : status;
+  };
+
   const getStatusColor = (status) => {
+    const displayStatus = getDisplayStatus(status);
     return {
       ingresado: "gray",
       pendiente: "orange",
-      controlado: "blue",
+      revisado: "blue",
+      "en revisión": "blue",
       aprobado: "green",
       rechazado: "red",
       finalizado: "black",
-    }[status] || "gray";
+    }[displayStatus] || "gray";
   };
 
   const getStatusIcon = (status) => (
@@ -425,14 +444,14 @@ const handleStatusChange = async (taskId, newStatus) => {
                               style={{ color: getStatusColor(task.estado) }}
                             >
                               {getStatusOptions(task).map((state) => (
-                                <option key={state} value={state} style={{ color: getStatusColor(state) }}>
-                                  {state.charAt(0).toUpperCase() + state.slice(1)}
-                                </option>
+                                 <option key={state} value={state} style={{ color: getStatusColor(state) }}>
+                                   {(state === 'controlado' ? 'en revisión' : state).charAt(0).toUpperCase() + (state === 'controlado' ? 'en revisión' : state).slice(1)}
+                                 </option>
                               ))}
                             </select>
                           ) : (
                             <span style={{ color: getStatusColor(task.estado) }}>
-                              {task.estado?.charAt(0).toUpperCase() + task.estado?.slice(1)} {getStatusIcon(task.estado)}
+                              {(task.estado === 'controlado' ? 'en revisión' : task.estado)?.charAt(0).toUpperCase() + (task.estado === 'controlado' ? 'en revisión' : task.estado)?.slice(1)} {getStatusIcon(task.estado)}
                             </span>
                           )}
                           {/* AÑADE ESTE BOTÓN AQUÍ */}
@@ -464,7 +483,7 @@ const handleStatusChange = async (taskId, newStatus) => {
                           <FontAwesomeIcon icon={faEye} />
                         </Link>
                       </td>
-                      {permissions.canEdit && (
+                      {canEditTask(task) && (
                         <td data-label="Editar">
                           <Link className="btn btn-primary" to={`/edit-task/${task._id}`}>
                             <FontAwesomeIcon icon={faEdit} />
@@ -496,3 +515,4 @@ const handleStatusChange = async (taskId, newStatus) => {
 }
 
 export default Table;
+

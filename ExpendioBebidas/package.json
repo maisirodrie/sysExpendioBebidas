@@ -4,10 +4,10 @@
   "version": "0.0.0",
   "type": "module",
   "scripts": {
-    "dev": "vite",
-    "build": "vite build",
-    "build:restart": "vite build && cp -r logos/ build/ && cp -r fondos/ build/ && pm2 restart frontsysexpendio",
-    "build:start": "vite build && cp -r logos/ build/ && cp -r fondos/ build/ && pm2 serve build 3002 --spa --name frontsysexpendio",
+    "dev": "vite --mode development",
+    "build": "vite build --mode production",
+    "build:restart": "vite build --mode production && cp -r logos/ build/ && cp -r fondos/ build/ && pm2 restart frontsysexpendio",
+    "build:start": "vite build --mode production && cp -r logos/ build/ && cp -r fondos/ build/ && pm2 serve build 3002 --spa --name frontsysexpendio",
     "lint": "eslint . --ext js,jsx --report-unused-disable-directives --max-warnings 0",
     "preview": "vite preview"
   },

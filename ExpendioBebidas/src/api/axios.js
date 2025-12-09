@@ -1,9 +1,8 @@
 import axios from "axios";
 
 const instance = axios.create({
-    baseURL: 'https://www.apibebidas.misiones.gov.ar/api', 
-    // baseURL: 'http://localhost:3003/api',
-    withCredentials:true
+    baseURL: import.meta.env.VITE_API_URL || 'http://localhost:3003/api',
+    withCredentials: true
 })
 // Interceptor para agregar el token del localStorage a cada solicitud
 instance.interceptors.request.use(
