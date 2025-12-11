@@ -4,7 +4,7 @@ import { useTasks } from "../context/TasksContext";
 import { Link, useNavigate, useParams } from "react-router-dom";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import axios from "axios";
-import { Municipios } from "../api/municipios"; 
+import { Municipios } from "../api/municipios";
 import { faArrowLeft, faTimes } from "@fortawesome/free-solid-svg-icons";
 import Swal from "sweetalert2";
 import "./taskformpage.css";
@@ -30,9 +30,12 @@ function RegisterPage() {
   const [files, setFiles] = useState([]);
   const [tipoExpendio, setTipoExpendio] = useState("");
   const [tipoPersona, setTipoPersona] = useState("");
-  const [showRequisitos, setShowRequisitos] = useState(true); // Se mantiene pero no se usa en el renderizado
-  const [horarios, setHorarios] = useState([""]); // Estado para los horarios (no se usa en el código actual, se mantiene por si acaso)
-  const [LocalidadValue, setSelectedLocalidadValue] = useState(""); // Estado no usado, se puede eliminar
+  const [showRequisitos, setShowRequisitos] = useState(true);
+  const [horarios, setHorarios] = useState([""]);
+  const [LocalidadValue, setSelectedLocalidadValue] = useState("");
+
+  // 🔑 FIX: Definir apiUrl corregida y pasarla a los hijos
+  const apiUrl = import.meta.env.VITE_API_ARCHIVO.replace('/tasks/download', '');
 
   // --- CARGA DE DATOS EXISTENTES (UPDATE) ---
   useEffect(() => {
@@ -67,98 +70,96 @@ function RegisterPage() {
     loadTask();
   }, [params.id, setValue, getTask]);
 
- // --- AVISO INICIAL ---
-useEffect(() => {
+  // --- AVISO INICIAL ---
+  useEffect(() => {
     Swal.fire({
       icon: "info",
       title: "Aviso Importante",
       html: "<strong>Horario de atención: De Lunes a Viernes de 7:00hs a 12:30hs.</strong><br/><br/>Si posee antecedentes judiciales, el expendio será rechazado.<br/><br/>Se solicita que el trámite se realice con 72hs de antelación.",
       confirmButtonText: "OK",
     });
-}, []);
+  }, []);
 
-// --- SUBMIT DEL FORMULARIO ---
-  const onSubmit = handleSubmit(async (data) => {
-    try {
-      Swal.fire({
-        title: "Cargando...",
-        text: "Por favor, espere mientras se guarda el registro.",
-        allowOutsideClick: false,
-        didOpen: () => {
-          Swal.showLoading();
-        },
-      });
+  // --- SUBMIT DEL FORMULARIO ---
+  const onSubmit = handleSubmit(async (data) => {
+    try {
+      Swal.fire({
+        title: "Cargando...",
+        text: "Por favor, espere mientras se guarda el registro.",
+        allowOutsideClick: false,
+        didOpen: () => {
+          Swal.showLoading();
+        },
+      });
 
-      const formData = new FormData();
+      const formData = new FormData();
 
-      // 🚀 LÓGICA DE PROCESAMIENTO DE DATOS Y ARCHIVOS (MODIFICADA)
-      Object.keys(data).forEach((key) => {
-        const value = data[key];
+      // 🚀 LÓGICA DE PROCESAMIENTO DE DATOS Y ARCHIVOS (MODIFICADA)
+      Object.keys(data).forEach((key) => {
+        const value = data[key];
 
-        // 1. Manejo de ARCHIVOS (FileList)
-        if (value instanceof FileList && value.length > 0) {
-          // Si es un FileList, iteramos y adjuntamos cada archivo
-          // usando la 'key' (nombre de campo: ej. 'notaSolicitud') para Multer.fields().
-          Array.from(value).forEach((file) => {
-            formData.append(key, file); 
-          });
-        } 
-        // 2. Manejo de DATOS DE TEXTO/OTROS
-        else if (
-          value !== null &&
-          value !== undefined &&
-          !(value instanceof FileList) && // Asegurar que no sea un FileList vacío
-          (typeof value !== "object" || Object.keys(value).length > 0)
-        ) {
-          formData.append(key, value);
-        }
-      });
+        // 1. Manejo de ARCHIVOS (FileList)
+        if (value instanceof FileList && value.length > 0) {
+          // Si es un FileList, iteramos y adjuntamos cada archivo
+          // usando la 'key' (nombre de campo: ej. 'notaSolicitud') para Multer.fields().
+          Array.from(value).forEach((file) => {
+            formData.append(key, file);
+          });
+        }
+        // 2. Manejo de DATOS DE TEXTO/OTROS
+        else if (
+          value !== null &&
+          value !== undefined &&
+          !(value instanceof FileList) && // Asegurar que no sea un FileList vacío
+          (typeof value !== "object" || Object.keys(value).length > 0)
+        ) {
+          formData.append(key, value);
+        }
+      });
 
-      // ❌ Se eliminó la lógica obsoleta que usaba el estado 'files' y formData.append("files", ...)
-      // FIN DE LA LÓGICA DE PROCESAMIENTO
-      
-      let res;
-      if (params.id) {
-        res = await updateTask(params.id, formData);
-      } else {
-        res = await createTasksPublic(formData);
-      }
+      // ❌ Se eliminó la lógica obsoleta que usaba el estado 'files' y formData.append("files", ...)
+      // FIN DE LA LÓGICA DE PROCESAMIENTO
 
-      if (res && (res.nroexpediente || res.message)) {
-        Swal.fire({
-          icon: "success",
-          title: "¡Éxito!",
-          html: `<p>Su registro se ha ${
-            params.id ? "actualizado" : "generado"
-          } con éxito. ${
-            res.nroexpediente
-              ? `El número de trámite es: <strong>${res.nroexpediente}</strong>.`
-              : `El número de expediente será asignado por mesa de entrada.`
-          }</p><p>Para cualquier consulta, llame al: <strong>0376-4448963</strong>.</p>`,
-          confirmButtonText: "OK",
-          allowOutsideClick: false,
-          showCloseButton: false,
-        });
-        navigate("/");
-      } else {
-        console.error("Respuesta inesperada del servidor:", res);
-        throw new Error("La respuesta del servidor no fue la esperada");
-      }
-    } catch (error) {
-      console.error("Error:", error);
-      Swal.close();
+      let res;
+      if (params.id) {
+        res = await updateTask(params.id, formData);
+      } else {
+        res = await createTasksPublic(formData);
+      }
 
-      const serverMessage =
-        error.response?.data?.message ||
-        "Ocurrió un error al guardar el registro. Intente de nuevo más tarde.";
+      if (res && (res.nroexpediente || res.message)) {
+        Swal.fire({
+          icon: "success",
+          title: "¡Éxito!",
+          html: `<p>Su registro se ha ${params.id ? "actualizado" : "generado"
+            } con éxito. ${res.nroexpediente
+              ? `El número de trámite es: <strong>${res.nroexpediente}</strong>.`
+              : `El número de expediente será asignado por mesa de entrada.`
+            }</p><p>Para cualquier consulta, llame al: <strong>0376-4448963</strong>.</p>`,
+          confirmButtonText: "OK",
+          allowOutsideClick: false,
+          showCloseButton: false,
+        });
+        navigate("/");
+      } else {
+        console.error("Respuesta inesperada del servidor:", res);
+        throw new Error("La respuesta del servidor no fue la esperada");
+      }
+    } catch (error) {
+      console.error("Error:", error);
+      Swal.close();
 
-      Swal.fire({
-        icon: "error",
-        title: "Error",
-        text: serverMessage,
-      });
-    }
-  });
+      const serverMessage =
+        error.response?.data?.message ||
+        "Ocurrió un error al guardar el registro. Intente de nuevo más tarde.";
+
+      Swal.fire({
+        icon: "error",
+        title: "Error",
+        text: serverMessage,
+      });
+    }
+  });
 
   // --- HANDLERS ---
   const handleLocalidadChange = (event) => {
@@ -178,41 +179,41 @@ useEffect(() => {
     setFiles((prevFiles) => prevFiles.filter((_, i) => i !== index));
   };
 
-    const handleTipoExpendioChange = (e) => {
+  const handleTipoExpendioChange = (e) => {
     const selectedExpendio = e.target.value;
     setTipoExpendio(selectedExpendio);
     setValue("expendio", selectedExpendio);
 
     // --- Lógica CLAVE de Limpieza (Unregister) para evitar errores de validación cruzada ---
-    
+
     // Lista de campos del Local Comercial (Persona Física/Jurídica)
     const localComercialFields = [
-        "persona", "dni", "apellido", "nombre", "domicilio", 
-        "nroHabilitacion", "domicilioLocalComercial", "horarioAtencion", "rubro", 
-        "email", "contacto",
-        
-        // Requisitos de Local Comercial (Física)
-        "notaSolicitud", "habilitacionMunicipal", "actaInspeccion", "ddjjDistancias", 
-        "ddjjHigiene", "fotocopiaDni", "informeSocioAmbiental", "certificadoAntecedentes", 
-        "propiedadInmueble", "planContingencia", 
-        
-        // Requisitos de Local Comercial (Jurídica)
-        "notaSolicitudJuridica", "habilitacionMunicipalJuridica", "estatutoSocial", 
-        "actaAsamblea", "actaComisionDirectiva", "ddjjDistanciasJuridica", 
-        "fotocopiaDniAutorizado", "certificadoAntecedentesAutorizado", "medidasSeguridad", 
-        "propiedadInmuebleJuridica", "planContingenciaJuridica"
+      "persona", "dni", "apellido", "nombre", "domicilio",
+      "nroHabilitacion", "domicilioLocalComercial", "horarioAtencion", "rubro",
+      "email", "contacto",
+
+      // Requisitos de Local Comercial (Física)
+      "notaSolicitud", "habilitacionMunicipal", "actaInspeccion", "ddjjDistancias",
+      "ddjjHigiene", "fotocopiaDni", "informeSocioAmbiental", "certificadoAntecedentes",
+      "propiedadInmueble", "planContingencia",
+
+      // Requisitos de Local Comercial (Jurídica)
+      "notaSolicitudJuridica", "habilitacionMunicipalJuridica", "estatutoSocial",
+      "actaAsamblea", "actaComisionDirectiva", "ddjjDistanciasJuridica",
+      "fotocopiaDniAutorizado", "certificadoAntecedentesAutorizado", "medidasSeguridad",
+      "propiedadInmuebleJuridica", "planContingenciaJuridica"
     ];
 
     // Lista de campos del Evento Particular
     const eventoParticularFields = [
-        "dni", "apellido", "nombre", "lugar", "tipoevento", "dias", "horarios",
-        "email", "contacto", 
+      "dni", "apellido", "nombre", "lugar", "tipoevento", "dias", "horarios",
+      "email", "contacto",
 
-        // Requisitos de Evento
-        "paseElevacionIntendente", "autorizacionMunicipal", "fotocopiaDniEvento", 
-        "certificadoAntecedentesEvento", "autorizacionPropietario"
+      // Requisitos de Evento
+      "paseElevacionIntendente", "autorizacionMunicipal", "fotocopiaDniEvento",
+      "certificadoAntecedentesEvento", "autorizacionPropietario"
     ];
-    
+
     // Limpiar el estado de persona y sus errores
     setTipoPersona("");
     setValue("persona", "");
@@ -222,28 +223,28 @@ useEffect(() => {
     if (selectedExpendio === "Evento Particular") {
       // Si va a Evento, limpiamos todos los campos de Local Comercial
       localComercialFields.forEach(field => {
-          setValue(field, undefined); // Limpiar valor
-          unregister(field); // Desregistrar
+        setValue(field, undefined); // Limpiar valor
+        unregister(field); // Desregistrar
       });
       // Restauramos el tipo de persona para Evento 
-      setValue("persona", "Física"); 
+      setValue("persona", "Física");
       setTipoPersona("Física");
-      
+
     } else if (selectedExpendio === "Local Comercial") {
       // Si va a Local, limpiamos todos los campos de Evento
       eventoParticularFields.forEach(field => {
-          setValue(field, undefined); // Limpiar valor
-          unregister(field); // Desregistrar
+        setValue(field, undefined); // Limpiar valor
+        unregister(field); // Desregistrar
       });
       // Aseguramos que persona se mantenga vacío para forzar la selección inicial
-      
+
     } else {
       // Si se selecciona "Seleccione un tipo...", limpiamos ambos
       [...localComercialFields, ...eventoParticularFields].forEach(field => {
-          setValue(field, undefined);
-          unregister(field);
+        setValue(field, undefined);
+        unregister(field);
       });
-      
+
       setValue("persona", "");
       setTipoPersona("");
     }
@@ -302,19 +303,20 @@ useEffect(() => {
         </div>
 
         {/* Sección de Requisitos con documentos descargables */}
+        {/* Sección de Requisitos con documentos descargables */}
         <div className="relative mb-4 bg-yellow-200 p-4 rounded-md shadow-lg">
-          {/* ... (Botones de descarga y aranceles) ... */}
-           <h2 className="font-bold text-lg">Importante:</h2>
-           <p className="text-sm text-gray-700 mt-2">
-            Importante: Antes de proceder con el registro, es fundamental que leas y comprendas los requisitos necesarios para completar el proceso de manera efectiva. Por favor, asegúrate de tener los siguientes documentos listos:
-           </p>
+          <h2 className="font-bold text-lg">Importante:</h2>
+          <p className="text-sm text-black-700 mt-2 font-semibold">
+            Antes de proceder con el registro, es fundamental que leas y comprendas los requisitos necesarios para completar el proceso de manera efectiva. Por favor, asegúrate de tener los siguientes documentos listos:
+          </p>
 
-           <div className="flex space-x-2 justify-center mt-2">
+
+          {/* AJUSTE DE MARGEN AQUÍ: Cambié mt-2 por my-4 para añadir margen arriba y abajo */}
+          <div className="flex space-x-2 justify-center my-4">
             <button
               onClick={() =>
                 downloadFile(
-                  `${
-                    import.meta.env.VITE_API_ARCHIVO
+                  `${import.meta.env.VITE_API_ARCHIVO.replace('/tasks/download', '')
                   }/documentos/requisitos-local.pdf`
                 )
               }
@@ -325,8 +327,7 @@ useEffect(() => {
             <button
               onClick={() =>
                 downloadFile(
-                  `${
-                    import.meta.env.VITE_API_ARCHIVO
+                  `${import.meta.env.VITE_API_ARCHIVO.replace('/tasks/download', '')
                   }/documentos/requisitos-eventos.pdf`
                 )
               }
@@ -334,59 +335,55 @@ useEffect(() => {
             >
               Descargar para habilitación de eventos
             </button>
-           </div>
-           
-           <div
-            style={{
-              display: "flex",
-              justifyContent: "center",
-              alignItems: "center",
-              textAlign: "center",
-              marginTop: "20px",
-            }}
-          >
-            <p>
-              Para cualquier consulta, llame al: <strong>0376-4448963</strong>.
+          </div>
+
+          {/* Sección de Requisitos de Terceros y Contacto */}
+          <div>
+            <h3 className="font-bold text-l">Requisito para Trámites de Terceros:</h3>
+            <p className="text-sm text-black-700 mt-2 font-semibold">
+              <strong></strong> Si la gestión es realizada por una persona distinta al titular, es imprescindible adjuntar una nota de autorización <strong>firmada por el titular</strong> y <strong>certificada por Juez de Paz</strong>. Dicha nota debe detallar claramente: <strong>datos completos del titular</strong>, la <strong>identificación del tercero autorizado</strong> y el <strong>alcance específico del trámite</strong> a realizar.
             </p>
+            {/* Bloque de Contacto */}
+            <div className="flex justify-center items-center text-center mt-5">
+              <p>Para cualquier consulta, llame al: <strong>0376-4448963</strong>.</p>
+            </div>
           </div>
         </div>
-        
-        {/* Sección de Aranceles */}
-        {/* ... (Tabla de aranceles) ... */}
-        <div>
-           <div className="text-center mt-4">
-             <div className="flex justify-center items-center bg-gray-100">
-                <table className="table" style={{ textTransform: "uppercase" }}>
-                    <thead className="bg-blue-500 text-white">
-                        <tr>
-                            <th className="border border-gray-400 px-4 py-2">Categoría</th>
-                            <th className="border border-gray-400 px-4 py-2">Arancel</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                         <tr>
-                            <td data-label="Categoría" className="border border-gray-400 px-4 py-2">Eventos Temporarios</td>
-                            <td data-label="Arancel" className="border border-gray-400 px-4 py-2">S/Arancel</td>
-                         </tr>
-                         <tr>
-                            <td data-label="Categoría" className="border border-gray-400 px-4 py-2">Kioskos</td>
-                            <td data-label="Arancel" className="border border-gray-400 px-4 py-2">$1.100</td>
-                         </tr>
-                         <tr>
-                            <td data-label="Categoría" className="border border-gray-400 px-4 py-2">Supermercados</td>
-                            <td data-label="Arancel" className="border border-gray-400 px-4 py-2">$1.100</td>
-                         </tr>
-                         <tr>
-                            <td data-label="Categoría" className="border border-gray-400 px-4 py-2">Locales Bailables, Bares, Pub</td>
-                            <td data-label="Arancel" className="border border-gray-400 px-4 py-2">$1.100</td>
-                         </tr>
-                    </tbody>
-                </table>
-             </div>
-             <p className="text-sm mt-4">
-                El monto deberá ser depositado en la cuenta corriente Nº <strong>xxxxxxxxxx</strong> una vez terminado el procedimiento de verificación de documentación presentada.
-             </p>
-           </div>
+        <div className="text-center mt-4">
+          <div className="flex justify-center items-center bg-gray-100">
+            <table className="table" style={{ textTransform: "uppercase" }}>
+              <thead className="bg-blue-500 text-white">
+                <tr>
+                  <th className="border border-gray-400 px-4 py-2">Categoría</th>
+                  <th className="border border-gray-400 px-4 py-2">Arancel</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td data-label="Categoría" className="border border-gray-400 px-4 py-2">Eventos Temporarios</td>
+                  <td data-label="Arancel" className="border border-gray-400 px-4 py-2">S/Arancel</td>
+                </tr>
+                <tr>
+                  <td data-label="Categoría" className="border border-gray-400 px-4 py-2">Kioskos</td>
+                  <td data-label="Arancel" className="border border-gray-400 px-4 py-2">$1.100</td>
+                </tr>
+                <tr>
+                  <td data-label="Categoría" className="border border-gray-400 px-4 py-2">Supermercados</td>
+                  <td data-label="Arancel" className="border border-gray-400 px-4 py-2">$1.100</td>
+                </tr>
+                <tr>
+                  <td data-label="Categoría" className="border border-gray-400 px-4 py-2">Locales Bailables, Bares, Pub</td>
+                  <td data-label="Arancel" className="border border-gray-400 px-4 py-2">$1.100</td>
+                </tr>
+
+              </tbody>
+
+            </table>
+
+          </div>
+          <p className="text-sm mt-4">
+            El monto deberá ser depositado en la cuenta corriente Nº <strong>xxxxxxxxxx</strong> una vez terminado el procedimiento de verificación de documentación presentada.
+          </p>
         </div>
 
 
@@ -406,6 +403,7 @@ useEffect(() => {
             className="w-full bg-gray-100 text-black px-4 py-2 rounded-md my-2"
           >
             <option value="">Seleccione un tipo de Expendio de Bebidas</option>
+
             <option value="Evento Particular">Evento Particular</option>
             <option value="Local Comercial">
               Habilitación de Venta de Bebidas para Local Comercial
@@ -423,8 +421,9 @@ useEffect(() => {
               register={register}
               errors={errors}
               handleLocalidadChange={handleLocalidadChange}
-              watch={watch}    
-              setValue={setValue}  
+              watch={watch}
+              setValue={setValue}
+              apiUrl={apiUrl}
             />
           )}
 
@@ -435,8 +434,9 @@ useEffect(() => {
               tipoPersona={tipoPersona}
               handleTipoPersonaChange={handleTipoPersonaChange}
               handleLocalidadChange={handleLocalidadChange}
-              watch={watch}      
-              setValue={setValue}  
+              watch={watch}
+              setValue={setValue}
+              apiUrl={apiUrl}
             />
           )}
 
