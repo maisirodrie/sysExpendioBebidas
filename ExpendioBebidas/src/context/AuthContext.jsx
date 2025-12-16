@@ -57,7 +57,11 @@ export const AuthProvider = ({ children }) => {
             const res = await registerRequest(userData);
             return res;
         } catch (error) {
-            setErrors(error.response.data);
+            if (error.response && error.response.data) {
+                setErrors(error.response.data);
+            } else {
+                setErrors(["Error de conexión con el servidor"]);
+            }
             // 🚨 SOLUCIÓN: Volver a lanzar el error para que el componente que lo llama pueda capturarlo
             throw error;
         }
@@ -70,10 +74,14 @@ export const AuthProvider = ({ children }) => {
             setUser(res.data);
             return res;
         } catch (error) {
-            if (Array.isArray(error.response.data)) {
-                return setErrors(error.response.data);
+            if (error.response && error.response.data) {
+                if (Array.isArray(error.response.data)) {
+                    return setErrors(error.response.data);
+                }
+                setErrors([error.response.data.message]);
+            } else {
+                setErrors(["Error de conexión con el servidor"]);
             }
-            setErrors([error.response.data.message]);
         }
     };
 
@@ -91,7 +99,7 @@ export const AuthProvider = ({ children }) => {
             setIsAuthenticated(false);
             setErrors([]);
             setMessage("Contraseña cambiada con éxito.");
-            
+
             return { success: true, data: res.data };
         } catch (error) {
             const errorMessage = error.response?.data?.message || "Error al cambiar la contraseña.";
@@ -100,7 +108,7 @@ export const AuthProvider = ({ children }) => {
             return { success: false, error: errorMessage };
         }
     };
-    
+
     const resetPassword = async (token, newPassword) => {
         try {
             const res = await resetPasswordRequest(token, newPassword);
