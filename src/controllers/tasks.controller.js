@@ -8,6 +8,7 @@ import User from "../models/user.model.js";
 import { gfs } from "../multerConfig.js"; // Importa gfs desde multerConfig.js
 import Activity from "../models/activity.model.js"; // Asegúrate de que esta ruta es correcta
 import { PDFDocument } from 'pdf-lib';
+import { processFileMerge } from "../utils/pdfMerger.js"; // ⬅️ NUEVO: Importar utilidad de fusión
 
 
 
@@ -430,8 +431,20 @@ export const updateTasks = async (req, res) => {
                 } catch (e) { /* Manejo de error si la data es inválida */ }
             }
             
+            // ⮅️ NUEVO: Parsear lista de campos que necesitan fusión de PDFs
+            let fieldsToMerge = [];
+            if (req.body.fieldsToMerge) {
+                try {
+                    fieldsToMerge = JSON.parse(req.body.fieldsToMerge);
+                    console.log('🔀 Campos a fusionar:', fieldsToMerge);
+                } catch (e) {
+                    console.error('Error parseando fieldsToMerge:', e);
+                }
+            }
+            
             // 2b. Manejo de nuevos archivos subidos
-            const newFiles = req.files ? req.files.map(file => ({
+            // multerConfig.js siempre proporciona req.files como array con fieldname preservado
+            let newFiles = req.files ? req.files.map(file => ({
                 filename: file.filename,
                 bucketName: file.bucketName,
                 mimetype: file.mimetype,
@@ -440,6 +453,145 @@ export const updateTasks = async (req, res) => {
                 fieldname: file.fieldname, 
                 originalname: file.originalname 
             })) : [];
+            
+            // ⮅️ 2c. PROCESAR FUSIONES DE PDF
+            // Para cada campo en fieldsToMerge, fusionar el archivo existente con el nuevo
+            for (const fieldToMerge of fieldsToMerge) {
+                console.log(`\n🔀 Fusionando campo: ${fieldToMerge}`);
+                console.log(`  📋 task.file tiene ${task.file.length} archivos:`, task.file.map(f => `${f.fieldname || 'NO-FIELDNAME'}: ${f.filename}`));
+                
+                // ⬅️ CORRECCIÓN: Encontrar TODOS los archivos existentes de este campo
+                // IMPORTANTE: task.file puede no tener fieldname, debemos inferirlo del filename
+                const existingFilesForField = task.file.filter(f => {
+                    const inferredFieldname = f.fieldname || f.filename.split('-')[0];
+                    return inferredFieldname === fieldToMerge;
+                });
+                
+                if (existingFilesForField.length === 0) {
+                    console.log(`  ⚠️ No hay archivo existente para ${fieldToMerge}, saltando fusión`);
+                    continue;
+                }
+                
+                console.log(`  📚 Encontrados ${existingFilesForField.length} archivos existentes para fusionar`);
+                
+                // Encontrar archivos nuevos de este campo
+                const newFilesForField = newFiles.filter(f => f.fieldname === fieldToMerge);
+                
+                if (newFilesForField.length === 0) {
+                    console.log(`  ⚠️ No hay archivos nuevos para fusionar en ${fieldToMerge}`);
+                    continue;
+                }
+                
+                
+                try {
+                    // ⬅️ FUSIONAR TODOS LOS ARCHIVOS EXISTENTES PRIMERO
+                    let mergedBuffer = null;
+                    let mergedMimetype = null;
+                    
+                    // Fusionar todos los archivos existentes secuencialmente
+                    for (const [index, existingFile] of existingFilesForField.entries()) {
+                        console.log(`  📥 Descargando archivo existente ${index + 1}/${existingFilesForField.length}: ${existingFile.filename}`);
+                        
+                        const chunks = [];
+                        const downloadStream = gfs.openDownloadStreamByName(existingFile.filename);
+                        
+                        await new Promise((resolve, reject) => {
+                            downloadStream.on('data', (chunk) => chunks.push(chunk));
+                            downloadStream.on('end', () => resolve());
+                            downloadStream.on('error', reject);
+                        });
+                        
+                        const fileBuffer = Buffer.concat(chunks);
+                        
+                        if (index === 0) {
+                            // Primer archivo - inicializar merged buffer
+                            mergedBuffer = fileBuffer;
+                            mergedMimetype = existingFile.mimetype;
+                        } else {
+                            // Fusionar con el buffer acumulado
+                            console.log(`  🔗 Fusionando archivo ${index + 1} con los anteriores...`);
+                            mergedBuffer = await processFileMerge(
+                                { buffer: mergedBuffer, mimetype: mergedMimetype },
+                                { buffer: fileBuffer, mimetype: existingFile.mimetype }
+                            );
+                            mergedMimetype = 'application/pdf';
+                        }
+                    }
+                    
+                    // Ahora fusionar con cada archivo nuevo
+                    for (const newFile of newFilesForField) {
+                        console.log(`  ➕ Fusionando con archivo nuevo: ${newFile.filename}`);
+                        
+                        // Descargar nuevo archivo de GridFS (porque ya fue subido por multer)
+                        const newChunks = [];
+                        const newDownloadStream = gfs.openDownloadStreamByName(newFile.filename);
+                        
+                        await new Promise((resolve, reject) => {
+                            newDownloadStream.on('data', (chunk) => newChunks.push(chunk));
+                            newDownloadStream.on('end', () => resolve());
+                            newDownloadStream.on('error', reject);
+                        });
+                        
+                        const newFileBuffer = Buffer.concat(newChunks);
+                        
+                        // Fusionar archivos
+                        mergedBuffer = await processFileMerge(
+                            { buffer: mergedBuffer, mimetype: mergedMimetype },
+                            { buffer: newFileBuffer, mimetype: newFile.mimetype }
+                        );
+                        
+                        mergedMimetype = 'application/pdf'; // Después de fusionar siempre es PDF
+                        
+                        // Eliminar el archivo nuevo temporal de GridFS
+                        await gfs.delete(new mongoose.Types.ObjectId(newFile.id));
+                    }
+                    
+                    // Subir el PDF fusionado a GridFS
+                    const mergedFilename = `${fieldToMerge}-${Date.now()}-merged.pdf`;
+                    console.log(`  📤 Subiendo PDF fusionado: ${mergedFilename}`);
+                    
+                    const uploadStream = gfs.openUploadStream(mergedFilename, {
+                        contentType: 'application/pdf'
+                    });
+                    
+                    const mergedFileId = await new Promise((resolve, reject) => {
+                        uploadStream.write(mergedBuffer);
+                        uploadStream.end();
+                        uploadStream.on('finish', () => resolve(uploadStream.id));
+                        uploadStream.on('error', reject);
+                    });
+                    
+                    // Actualizar la lista de archivos nuevos para reemplazar el existente
+                    newFiles = newFiles.filter(f => f.fieldname !== fieldToMerge);
+                    newFiles.push({
+                        filename: mergedFilename,
+                        bucketName: 'uploads',
+                        mimetype: 'application/pdf',
+                        encoding: '7bit',
+                        id: mergedFileId,
+                        fieldname: fieldToMerge,
+                        originalname: `${fieldToMerge}_merged.pdf`
+                    });
+                    
+                    
+                    // ⬅️ Eliminar TODOS los archivos existentes de GridFS
+                    for (const existingFile of existingFilesForField) {
+                        console.log(`  🗑️ Eliminando archivo antiguo: ${existingFile.filename}`);
+                        await gfs.delete(new mongoose.Types.ObjectId(existingFile.id));
+                    }
+                    
+                    // Remover TODOS los archivos existentes de la lista de archivos a mantener
+                    filesToKeepFromFront = filesToKeepFromFront.filter(
+                        f => !existingFilesForField.some(ef => ef.id.toString() === f.id.toString())
+                    );
+                    
+                    console.log(`  ✅ Fusión completada para ${fieldToMerge}`);
+                    
+                } catch (error) {
+                    console.error(`  ❌ Error fusionando ${fieldToMerge}:`, error);
+                    // Continuar con otros campos aunque falle uno
+                }
+            }
 
             // 2c. Filtrado de archivos: los que NO están en filesToKeepFromFront deben eliminarse (auto-remove)
             const filesToAutoRemove = task.file.filter(originalFile => {
@@ -451,12 +603,22 @@ export const updateTasks = async (req, res) => {
                  filesToKeepFromFront.some(keptFile => keptFile.id.toString() === originalFile.id.toString())
             );
             
+            // ⮅️ DEBUG: Mostrar qué archivos se están procesando
+            console.log('📥 BACKEND - Procesando archivos:');
+            console.log('  task.file (todos los existentes):', task.file.length);
+            console.log('  filesToKeepFromFront:', filesToKeepFromFront.length);
+            console.log('  keptFilesData:', keptFilesData.length, keptFilesData.map(f => f.filename));
+            console.log('  newFiles:', newFiles.length, newFiles.map(f => f.filename));
+            
             // 2e. Combinar archivos a mantener con los nuevos archivos
-            finalFiles = [...keptFilesData, ...newFiles]; 
+            finalFiles = [...keptFilesData, ...newFiles];
+            
+            console.log('  finalFiles (resultado):', finalFiles.length, finalFiles.map(f => f.filename)); 
 
             // 3. Eliminar archivos de GridFS (manual + automático)
             const autoRemoveIds = filesToAutoRemove.map(f => f.id.toString());
             const allFilesToRemove = [...idsToRemove, ...autoRemoveIds]; // Lista final de IDs a borrar
+            
             
             for (const fileId of allFilesToRemove) {
                 if (mongoose.Types.ObjectId.isValid(fileId)) {
@@ -464,7 +626,12 @@ export const updateTasks = async (req, res) => {
                         // Se asume que 'gfs' está disponible en el scope
                         await gfs.delete(new mongoose.Types.ObjectId(fileId)); 
                     } catch (deleteError) {
-                        console.error(`Error al eliminar archivo ${fileId} de GridFS:`, deleteError);
+                        // ⬅️ Error esperado si el archivo ya fue eliminado en la fusión
+                        if (deleteError.message && deleteError.message.includes('File not found')) {
+                            console.log(`  ℹ️ Archivo ${fileId} ya fue eliminado (probablemente en fusión)`);
+                        } else {
+                            console.error(`Error al eliminar archivo ${fileId} de GridFS:`, deleteError);
+                        }
                     }
                 } else {
                     console.warn(`ID inválido para eliminación: ${fileId}`);
@@ -598,6 +765,12 @@ export const taskEstados = async (req, res) => {
 };
 
 export const taskPagos = async (req, res) => {
+  // TODO: Implement payment functionality
+  try {
+    res.status(501).json({ message: "Funcionalidad de pagos pendiente de implementación" });
+  } catch (error) {
+    return res.status(500).json({ message: error.message });
+  }
 }
 
 

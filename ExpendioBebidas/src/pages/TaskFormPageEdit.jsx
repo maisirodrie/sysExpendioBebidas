@@ -86,8 +86,12 @@ function TaskFormPageEdit() {
     const tipoExpendioWatch = formValues?.expendio;
     const tipoPersonaWatch = formValues?.persona;
     const [selectedFiles, setSelectedFiles] = useState([]);
-    
-    
+    const [filesToAdd, setFilesToAdd] = useState({}); // Nuevo estado para archivos a agregar
+
+    // ⬅️ useRef para rastrear si ya cargamos esta tarea
+    const loadedTaskId = useRef(null);
+    const isLoadingTask = useRef(false);
+
     // ... (nroExpedienteParts y apiUrl se mantienen) ...
     const [nroExpedienteParts, setNroExpedienteParts] = useState({
         correlativo: "",
@@ -96,7 +100,7 @@ function TaskFormPageEdit() {
     });
 
     const apiUrl = import.meta.env.VITE_API_ARCHIVO;
-    
+
     // Obtener los fieldnames válidos para el formulario actual (Mantenido)
     const currentMappedFieldnames = useMemo(() => {
         return getMappedFileKeys(tipoExpendioWatch, tipoPersonaWatch);
@@ -108,9 +112,9 @@ function TaskFormPageEdit() {
             const filename = file.filename || "";
             // Aseguramos que el fieldname se obtenga correctamente
             const inferredFieldname = file.fieldname || filename.split('_')[0].split('-')[0];
-            
+
             if (inferredFieldname) {
-                file.fieldname = inferredFieldname; 
+                file.fieldname = inferredFieldname;
                 map[inferredFieldname] = file;
             }
             return map;
@@ -137,49 +141,113 @@ function TaskFormPageEdit() {
         setValue("localidad", e.target.value);
     };
 
-   const removeExistingFileByKey = (fileId, fieldKey) => { // ⬅️ Asegúrate de que acepta fieldKey
-    const fileIdString = fileId.toString();
-    setValue(fieldKey, null, { shouldValidate: true });
+    // Nueva función para agregar archivos a un campo existente (fusionar)
+    const addFilesToField = (fieldKey, newFiles) => {
+        console.log('🟢 addFilesToField llamado:', { fieldKey, newFiles, length: newFiles?.length });
 
-    setFilesToRemove((prev) =>
-        prev.includes(fileIdString) ? prev : [...prev, fileIdString]
-    );
-    
-    setSelectedFiles((prevFiles) =>
-        prevFiles.filter((file) => file.id.toString() !== fileIdString)
-    );
+        if (newFiles && newFiles.length > 0) {
+            setFilesToAdd(prev => {
+                const existingFiles = prev[fieldKey] || [];
+                const combinedFiles = [...existingFiles, ...Array.from(newFiles)];
 
-    // 🔑 LA CORRECCIÓN: Limpiar el valor del campo en React Hook Form (RHF).
-    // Esto es crucial. Le dice a RHF que el campo 'autorizacionPropietario' está vacío.
-    setValue(fieldKey, null, { shouldValidate: true }); 
-};
+                console.log('📁 Archivos combinados:', {
+                    fieldKey,
+                    prevCount: existingFiles.length,
+                    newCount: newFiles.length,
+                    totalCount: combinedFiles.length,
+                    files: combinedFiles.map(f => f.name)
+                });
+
+                const newState = {
+                    ...prev,
+                    [fieldKey]: combinedFiles
+                };
+
+                console.log('✅ Nuevo estado filesToAdd:', newState);
+                return newState;
+            });
+        } else {
+            console.warn('⚠️ newFiles está vacío o es null');
+        }
+    };
+
+    // Función para remover un archivo de la lista de archivos a agregar
+    const removeFileToAdd = (fieldKey, fileIndex) => {
+        setFilesToAdd(prev => {
+            const files = prev[fieldKey] || [];
+            const newFiles = files.filter((_, index) => index !== fileIndex);
+            if (newFiles.length === 0) {
+                const { [fieldKey]: removed, ...rest } = prev;
+                return rest;
+            }
+            return {
+                ...prev,
+                [fieldKey]: newFiles
+            };
+        });
+    };
+
+    const removeExistingFileByKey = (fileId, fieldKey) => { // ⬅️ Asegúrate de que acepta fieldKey
+        const fileIdString = fileId.toString();
+        setValue(fieldKey, null, { shouldValidate: true });
+
+        setFilesToRemove((prev) =>
+            prev.includes(fileIdString) ? prev : [...prev, fileIdString]
+        );
+
+        setSelectedFiles((prevFiles) =>
+            prevFiles.filter((file) => file.id.toString() !== fileIdString)
+        );
+
+        // 🔑 LA CORRECCIÓN: Limpiar el valor del campo en React Hook Form (RHF).
+        // Esto es crucial. Le dice a RHF que el campo 'autorizacionPropietario' está vacío.
+        setValue(fieldKey, null, { shouldValidate: true });
+    };
     // 🔑 Carga de tarea (Mantenido)
     useEffect(() => {
         async function loadTask() {
+            console.log('🔄 useEffect ejecutado - params.id:', params.id);
+
             if (params.id) {
+                // ⮅️ PREVENIR RECARGA: Si ya cargamos esta tarea o estamos cargando, salir
+                if (loadedTaskId.current === params.id || isLoadingTask.current) {
+                    console.log('⏭️ Task ya cargada o cargando, saltando recarga');
+                    return;
+                }
+
+                console.log('📥 Cargando nueva tarea...');
+                isLoadingTask.current = true;
+                loadedTaskId.current = params.id;
+
+                // ⬅️ COMENTADO: NO limpiar filesToAdd/filesToRemove en cada carga
+                // Solo se limpian después de guardar exitosamente (ver onSubmit)
+                // setFilesToAdd({});
+                // setFilesToRemove([]);
+
                 const task = await getTask(params.id);
-                
-                setTaskData(task); 
+                isLoadingTask.current = false;
+
+                setTaskData(task);
 
                 // 🔑 1. Establecer los campos CLAVE PRIMERO para forzar la renderización
                 if (task.expendio) setValue("expendio", task.expendio);
                 if (task.persona) setValue("persona", task.persona);
-                
+
                 // 🔑 2. Carga de Número de Expediente (Manejo defensivo de array/string)
                 if (task.nroexpediente) {
                     // Si es un array (por el error anterior), toma la última entrada. Si es string, lo usa directo.
-                    const nroExpString = Array.isArray(task.nroexpediente) 
-                        ? task.nroexpediente[task.nroexpediente.length - 1] 
+                    const nroExpString = Array.isArray(task.nroexpediente)
+                        ? task.nroexpediente[task.nroexpediente.length - 1]
                         : task.nroexpediente;
 
                     // Manejo del caso donde el array es vacío o nulo
                     if (nroExpString) {
                         const parts = nroExpString.split("/");
-                        
+
                         if (parts.length === 2) {
                             const [correlativoYCod, anio] = parts;
                             const correlativoParts = correlativoYCod.split("-");
-                            
+
                             setNroExpedienteParts({
                                 correlativo: correlativoParts[0] || "",
                                 codigoOrganismo: correlativoParts[1] || "",
@@ -188,15 +256,22 @@ function TaskFormPageEdit() {
                         }
                     }
                 }
-                
+
                 // 🔑 3. Carga de archivos existentes (IDs como string)
-                if (task.file && task.file.length > 0) {
-                    setSelectedFiles(task.file.map(f => ({ 
-                        ...f, 
+                // ⬅️ CRÍTICO: Solo cargar archivos si aún no los hemos cargado para esta tarea
+                if (task.file && task.file.length > 0 && selectedFiles.length === 0) {
+                    const loadedFiles = task.file.map(f => ({
+                        ...f,
                         id: f.id.toString(),
                         // Aseguramos el fieldname para el mapeo si no viene del backend
-                        fieldname: f.fieldname || f.filename.split('_')[0].split('-')[0] 
-                    })));
+                        fieldname: f.fieldname || f.filename.split('_')[0].split('-')[0]
+                    }));
+                    setSelectedFiles(loadedFiles);
+                    console.log(' 📎 Archivos existentes cargados:', loadedFiles.length);
+                } else if (selectedFiles.length > 0) {
+                    console.log('ℹ️ Archivos ya cargados, manteniendo estado actual');
+                } else {
+                    console.log('ℹ️ No hay archivos existentes');
                 }
 
                 // 4. Mapeo del resto de valores de la tarea a los campos del formulario
@@ -208,7 +283,8 @@ function TaskFormPageEdit() {
             }
         }
         loadTask();
-    }, [params.id, setValue, getTask]);
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [params.id]); // ⬅️ CRÍTICO: Solo params.id como dependencia para evitar re-ejecución
 
     // 🔑 VALIDACIÓN Y SUBMIT DEL FORMULARIO (Modificado: Archivos son opcionales)
     const onSubmit = handleSubmit(async (data) => {
@@ -225,7 +301,7 @@ function TaskFormPageEdit() {
             return; // Detener el submit
         }
         */
-        
+
         // --- CONTINÚA EL PROCESO DE SUBMIT (Archivos opcionales) ---
         try {
             Swal.fire({
@@ -238,7 +314,7 @@ function TaskFormPageEdit() {
             });
 
             const formData = new FormData();
-            const existingFilesToKeep = []; 
+            const existingFilesToKeep = [];
 
             // 1. Añadir el número de expediente (ahora siempre como un único string)
             if (
@@ -266,12 +342,12 @@ function TaskFormPageEdit() {
                     const fileFieldname = file.fieldname || file.filename.split('_')[0].split('-')[0];
                     const isRelevantField = currentMappedFieldnames.includes(fileFieldname);
                     const isMarkedForRemoval = filesToRemove.includes(file.id.toString());
-                    
+
                     // Solo mantenemos archivos si son relevantes y no han sido eliminados manualmente
                     if (isRelevantField && !isMarkedForRemoval) {
-                        existingFilesToKeep.push({ 
-                            id: file.id.toString(), 
-                            fieldname: fileFieldname 
+                        existingFilesToKeep.push({
+                            id: file.id.toString(),
+                            fieldname: fileFieldname
                         });
                     }
                 });
@@ -287,13 +363,13 @@ function TaskFormPageEdit() {
                         formData.append(key, file);
                     });
 
-                    // Si se sube un nuevo archivo, eliminamos el archivo antiguo del mismo fieldname de la lista a mantener.
+                    // Si se sube un nuevo archivo para REEMPLAZAR, eliminamos el archivo antiguo del mismo fieldname de la lista a mantener.
                     const indexToRemove = existingFilesToKeep.findIndex(ef => ef.fieldname === key);
                     if (indexToRemove !== -1) {
                         existingFilesToKeep.splice(indexToRemove, 1);
                     }
-                } 
-                
+                }
+
                 // 3b. Manejo de DATOS DE TEXTO/OTROS
                 else if (
                     key !== "correlativo" &&
@@ -308,10 +384,47 @@ function TaskFormPageEdit() {
                 }
             });
 
+            // 3c. Manejo de ARCHIVOS A AGREGAR (Fusión - nuevos archivos que se suman a los existentes)
+            console.log('🔍 Procesando filesToAdd:', filesToAdd);
+            Object.keys(filesToAdd).forEach((fieldKey) => {
+                const filesToAddForField = filesToAdd[fieldKey];
+                console.log(`  Campo ${fieldKey}:`, filesToAddForField);
+                if (filesToAddForField && filesToAddForField.length > 0) {
+                    console.log(`    ✅ Agregando ${filesToAddForField.length} archivos`);
+                    filesToAddForField.forEach((file) => {
+                        console.log(`      - ${file.name}`);
+                        formData.append(fieldKey, file);
+                    });
+                    // NO eliminamos los archivos existentes de existingFilesToKeep
+                    // porque queremos fusionar, no reemplazar
+                } else {
+                    console.log(`    ⚠️ No hay archivos para agregar`);
+                }
+            });
+
             // 4. ADJUNTAR LAS LISTAS PARA EL BACKEND
             formData.append("existingFilesToKeep", JSON.stringify(existingFilesToKeep));
             formData.append("filesToRemove", JSON.stringify(filesToRemove));
-            
+
+            // ⬅️ NUEVO: Enviar lista de campos que necesitan fusión de PDFs
+            const fieldsToMerge = Object.keys(filesToAdd).filter(key => filesToAdd[key] && filesToAdd[key].length > 0);
+            formData.append("fieldsToMerge", JSON.stringify(fieldsToMerge));
+
+            // ⮅️ DEBUG: Mostrar qué se está enviando al backend
+            console.log('📤 ENVIANDO AL BACKEND:');
+            console.log('  existingFilesToKeep:', existingFilesToKeep);
+            console.log('  filesToRemove:', filesToRemove);
+            console.log('  filesToAdd:', filesToAdd);
+            console.log('  fieldsToMerge:', fieldsToMerge);
+
+            // Mostrar todos los archivos en formData
+            console.log('  Archivos en formData:');
+            for (let pair of formData.entries()) {
+                if (pair[1] instanceof File) {
+                    console.log(`    ${pair[0]}: ${pair[1].name}`);
+                }
+            }
+
             if (params.id) {
                 await updateTask(params.id, formData);
                 Swal.close();
@@ -325,6 +438,7 @@ function TaskFormPageEdit() {
             }
 
             setFilesToRemove([]);
+            setFilesToAdd({}); // Limpiar archivos a agregar
             navigate("/task");
         } catch (error) {
             Swal.close();
@@ -344,7 +458,7 @@ function TaskFormPageEdit() {
 
     return (
         <div
-        ref={scrollRef}
+            ref={scrollRef}
             className="flex items-center justify-center overflow-y-auto"
             style={{
                 marginTop: "20px",
@@ -430,15 +544,18 @@ function TaskFormPageEdit() {
                             register={register}
                             errors={errors}
                             handleLocalidadChange={handleLocalidadChange}
-                            watch={watch} 
+                            watch={watch}
                             existingFilesMap={existingFilesMap}
                             removeExistingFile={removeExistingFileByKey}
-                            setFocus={setFocus} 
+                            setFocus={setFocus}
                             apiUrl={apiUrl}
                             isEdit={isEdit}
+                            addFilesToField={addFilesToField}
+                            filesToAdd={filesToAdd}
+                            removeFileToAdd={removeFileToAdd}
                         />
                     )}
-                    
+
                     {/* Renderizado Condicional de Local Comercial */}
                     {tipoExpendioWatch === "Local Comercial" && (
                         <LocalComercialForm
@@ -447,16 +564,19 @@ function TaskFormPageEdit() {
                             tipoPersona={tipoPersonaWatch}
                             handleTipoPersonaChange={handleTipoPersonaChange}
                             handleLocalidadChange={handleLocalidadChange}
-                            watch={watch} 
-                            setValue={setValue} 
+                            watch={watch}
+                            setValue={setValue}
                             existingFilesMap={existingFilesMap}
                             removeExistingFile={removeExistingFileByKey}
-                            setFocus={setFocus} 
+                            setFocus={setFocus}
                             apiUrl={apiUrl}
                             isEdit={isEdit}
+                            addFilesToField={addFilesToField}
+                            filesToAdd={filesToAdd}
+                            removeFileToAdd={removeFileToAdd}
                         />
                     )}
-                    
+
                     <button
                         type="submit"
                         className="w-full bg-blue-500 text-white px-4 py-2 rounded-md mt-4"
