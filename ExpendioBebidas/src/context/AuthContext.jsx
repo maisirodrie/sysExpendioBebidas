@@ -57,13 +57,7 @@ export const AuthProvider = ({ children }) => {
             const res = await registerRequest(userData);
             return res;
         } catch (error) {
-            if (error.response?.data) {
-                setErrors(Array.isArray(error.response.data) ? error.response.data : [error.response.data]);
-            } else if (error.request) {
-                setErrors(["No se pudo conectar con el servidor. Verifique su conexión."]);
-            } else {
-                setErrors(["Error inesperado. Intente nuevamente."]);
-            }
+            setErrors(error.response.data);
             // 🚨 SOLUCIÓN: Volver a lanzar el error para que el componente que lo llama pueda capturarlo
             throw error;
         }
@@ -76,16 +70,10 @@ export const AuthProvider = ({ children }) => {
             setUser(res.data);
             return res;
         } catch (error) {
-            if (error.response?.data) {
-                if (Array.isArray(error.response.data)) {
-                    return setErrors(error.response.data);
-                }
-                setErrors([error.response.data.message || error.response.data]);
-            } else if (error.request) {
-                setErrors(["No se pudo conectar con el servidor. Verifique su conexión."]);
-            } else {
-                setErrors(["Error inesperado. Intente nuevamente."]);
+            if (Array.isArray(error.response.data)) {
+                return setErrors(error.response.data);
             }
+            setErrors([error.response.data.message]);
         }
     };
 
