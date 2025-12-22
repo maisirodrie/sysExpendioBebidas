@@ -17,7 +17,7 @@ import {
   faCircle,
   faDollar,
   faFilePdf,
-  faFileExcel 
+  faFileExcel
 } from "@fortawesome/free-solid-svg-icons";
 import "./Table.css";
 import Paginator from "./Paginator";
@@ -27,10 +27,10 @@ import { DateTime } from "luxon";
 
 // Función auxiliar para unificar el nroexpediente
 const getExpedienteString = (nroexpediente) => {
-    if (Array.isArray(nroexpediente)) {
-        return nroexpediente.join(' / '); // Une el array con un separador
-    }
-    return nroexpediente || ''; // Devuelve la cadena si es una cadena, o cadena vacía si es null/undefined
+  if (Array.isArray(nroexpediente)) {
+    return nroexpediente.join(' / '); // Une el array con un separador
+  }
+  return nroexpediente || ''; // Devuelve la cadena si es una cadena, o cadena vacía si es null/undefined
 }
 
 
@@ -60,13 +60,13 @@ function Table() {
     });
   }
 
-    // Función para cambiar el estado de "Pagado/No Pagado"
-    const handlePaidToggle = async (task) => {
-      const updatedStatus = !task.pago; // Cambia entre pagado y no pagado
-      // Supongamos que `updateTaskStatus` puede actualizar el estado de pago
-      await updateTask(task._id, { pago: updatedStatus });
-      await getTasks(); // Refresca la lista después de actualizar
-    };
+  // Función para cambiar el estado de "Pagado/No Pagado"
+  const handlePaidToggle = async (task) => {
+    const updatedStatus = !task.pago; // Cambia entre pagado y no pagado
+    // Supongamos que `updateTaskStatus` puede actualizar el estado de pago
+    await updateTask(task._id, { pago: updatedStatus });
+    await getTasks(); // Refresca la lista después de actualizar
+  };
 
   const searcher = (e) => {
     setSearch(e.target.value);
@@ -77,29 +77,29 @@ function Table() {
   const filteredTasks = !search
     ? reversedTasks
     : reversedTasks.filter((task) => {
-        // CORRECCIÓN 2: Uso de la función auxiliar para convertir el array a string para la búsqueda.
-        const nroexpediente = getExpedienteString(task.nroexpediente).toLowerCase();
-        
-        const apellido = task.apellido ? task.apellido.toLowerCase() : "";
-        const nombre = task.nombre ? task.nombre.toLowerCase() : "";
-        const dni = task.dni ? task.dni.toLowerCase() : "";
-        const localidad = task.localidad ? task.localidad.toLowerCase() : "";
-        const persona = task.persona ? task.persona.toLowerCase() : "";
-        const expendio = task.expendio ? task.expendio.toLowerCase() : "";
-        const estado = task.estado ? task.estado.toLowerCase() : "";
-        const searchLowerCase = search.toLowerCase();
+      // CORRECCIÓN 2: Uso de la función auxiliar para convertir el array a string para la búsqueda.
+      const nroexpediente = getExpedienteString(task.nroexpediente).toLowerCase();
 
-        return (
-          nroexpediente.includes(searchLowerCase) ||
-          apellido.includes(searchLowerCase) ||
-          nombre.includes(searchLowerCase) ||
-          dni.includes(searchLowerCase) ||
-          localidad.includes(searchLowerCase) ||
-          persona.includes(searchLowerCase) ||
-          expendio.includes(searchLowerCase) ||
-          estado.includes(searchLowerCase)
-        );
-      });
+      const apellido = task.apellido ? task.apellido.toLowerCase() : "";
+      const nombre = task.nombre ? task.nombre.toLowerCase() : "";
+      const dni = task.dni ? task.dni.toLowerCase() : "";
+      const localidad = task.localidad ? task.localidad.toLowerCase() : "";
+      const persona = task.persona ? task.persona.toLowerCase() : "";
+      const expendio = task.expendio ? task.expendio.toLowerCase() : "";
+      const estado = task.estado ? task.estado.toLowerCase() : "";
+      const searchLowerCase = search.toLowerCase();
+
+      return (
+        nroexpediente.includes(searchLowerCase) ||
+        apellido.includes(searchLowerCase) ||
+        nombre.includes(searchLowerCase) ||
+        dni.includes(searchLowerCase) ||
+        localidad.includes(searchLowerCase) ||
+        persona.includes(searchLowerCase) ||
+        expendio.includes(searchLowerCase) ||
+        estado.includes(searchLowerCase)
+      );
+    });
 
   const indexOfLastTask = currentPage * tasksPerPage;
   const indexOfFirstTask = indexOfLastTask - tasksPerPage;
@@ -127,8 +127,8 @@ function Table() {
     canDelete: ["admin", "editor"].includes(user.role),
     canAddUser: ["admin"].includes(user.role),
     canAddTask: ["admin", "editor"].includes(user.role),
-    canViewStatus: ["admin", "viewer", "juridicos", "mesa","editor"].includes(user.role),
-    canEditStatus: ["mesa", "juridicos","admin","editor"].includes(user.role),
+    canViewStatus: ["admin", "viewer", "juridicos", "mesa", "editor"].includes(user.role),
+    canEditStatus: ["mesa", "juridicos", "admin", "editor"].includes(user.role),
     canPagoEditStatus: ["admin"].includes(user.role),
     canPagado: ["admin"].includes(user.role),
   };
@@ -140,7 +140,7 @@ function Table() {
     if (["admin", "editor", "mesa"].includes(user.role)) {
       return true;
     }
-        
+
     return false;
   };
 
@@ -164,7 +164,7 @@ function Table() {
       any: ["pendiente", "controlado", "aprobado", "rechazado", "finalizado", "ingresado"] // Admin puede cambiar cualquier estado
     }
   };
-  
+
   const getStatusOptions = (task) => {
     const roleOptions = statusOptions[user.role] || {}; // Obtener opciones según el rol
     const availableOptions = roleOptions[task.estado] || roleOptions.any || []; // Si no tiene opciones específicas, tomar "any"
@@ -172,60 +172,60 @@ function Table() {
   };
 
 
-const handleStatusChange = async (taskId, newStatus) => {
+  const handleStatusChange = async (taskId, newStatus) => {
     try {
-        const currentTask = tasks.find(t => t._id === taskId);
+      const currentTask = tasks.find(t => t._id === taskId);
 
-        if (!currentTask) {
-            Swal.fire("Error", "No se encontró el expediente.", "error");
-            return;
-        }
+      if (!currentTask) {
+        Swal.fire("Error", "No se encontró el expediente.", "error");
+        return;
+      }
 
-        let updatedTask = null; // Variable para almacenar la tarea actualizada desde el backend
+      let updatedTask = null; // Variable para almacenar la tarea actualizada desde el backend
 
-        if ((user.role === "juridicos" || user.role === "admin" || user.role === "editor") && newStatus === "rechazado") {
-            const { value: motivoRechazo } = await Swal.fire({
-                title: "Motivo del Rechazo",
-                input: "textarea",
-                inputLabel: "Por favor, especifique la razón del rechazo.",
-                inputPlaceholder: "Escriba aquí...",
-                inputValue: currentTask.motivoRechazo || '',
-                showCancelButton: true,
-                confirmButtonText: "Guardar",
-                cancelButtonText: "Cancelar",
-                inputValidator: (value) => {
-                    if (!value) {
-                        return "Necesita escribir un motivo para rechazar el expediente.";
-                    }
-                },
-            });
-
-            if (motivoRechazo !== undefined) {
-                // 1. Llama a la función de contexto y CAPTURA la respuesta COMPLETA
-                updatedTask = await updateTask(taskId, { estado: newStatus, motivoRechazo: motivoRechazo });
-                Swal.fire("Expediente Actualizado", "El motivo de rechazo ha sido guardado.", "success");
-                // ❌ Eliminado: await getTasks();
-            } else {
-                Swal.fire("Cambio Cancelado", "El cambio de estado ha sido cancelado.", "info");
-                return; // Salir si se cancela
+      if ((user.role === "juridicos" || user.role === "admin" || user.role === "editor") && newStatus === "rechazado") {
+        const { value: motivoRechazo } = await Swal.fire({
+          title: "Motivo del Rechazo",
+          input: "textarea",
+          inputLabel: "Por favor, especifique la razón del rechazo.",
+          inputPlaceholder: "Escriba aquí...",
+          inputValue: currentTask.motivoRechazo || '',
+          showCancelButton: true,
+          confirmButtonText: "Guardar",
+          cancelButtonText: "Cancelar",
+          inputValidator: (value) => {
+            if (!value) {
+              return "Necesita escribir un motivo para rechazar el expediente.";
             }
+          },
+        });
+
+        if (motivoRechazo !== undefined) {
+          // 1. Llama a la función de contexto y CAPTURA la respuesta COMPLETA
+          updatedTask = await updateTask(taskId, { estado: newStatus, motivoRechazo: motivoRechazo });
+          Swal.fire("Expediente Actualizado", "El motivo de rechazo ha sido guardado.", "success");
+          // ❌ Eliminado: await getTasks();
         } else {
-            // 2. Llama a la función de contexto (solo estado) y CAPTURA la respuesta COMPLETA
-            updatedTask = await updateTaskStatus(taskId, newStatus); 
-            Swal.fire("Estado actualizado", "El estado se ha modificado correctamente", "success");
-            // ❌ Eliminado: await getTasks();
+          Swal.fire("Cambio Cancelado", "El cambio de estado ha sido cancelado.", "info");
+          return; // Salir si se cancela
         }
-        
-        // 3. 🚀 ACTUALIZACIÓN INSTANTÁNEA: Usar la respuesta del backend para actualizar el estado `tasks`
-        if (updatedTask) {
-            setTasks(tasks.map(t => (t._id === taskId ? updatedTask : t)));
-        }
+      } else {
+        // 2. Llama a la función de contexto (solo estado) y CAPTURA la respuesta COMPLETA
+        updatedTask = await updateTaskStatus(taskId, newStatus);
+        Swal.fire("Estado actualizado", "El estado se ha modificado correctamente", "success");
+        // ❌ Eliminado: await getTasks();
+      }
+
+      // 3. 🚀 ACTUALIZACIÓN INSTANTÁNEA: Usar la respuesta del backend para actualizar el estado `tasks`
+      if (updatedTask) {
+        setTasks(tasks.map(t => (t._id === taskId ? updatedTask : t)));
+      }
 
     } catch (error) {
-        console.error("Error al cambiar el estado:", error);
-        Swal.fire("Error", "No se pudo actualizar el estado de la tarea.", "error");
+      console.error("Error al cambiar el estado:", error);
+      Swal.fire("Error", "No se pudo actualizar el estado de la tarea.", "error");
     }
-};
+  };
 
   // Función para mapear el estado de la BD al nombre visual
   const getDisplayStatus = (status) => {
@@ -266,10 +266,10 @@ const handleStatusChange = async (taskId, newStatus) => {
         // Crear una nueva instancia de jsPDF
         const doc = new jsPDF();
         doc.setFontSize(12);
-  
+
         // Título del reporte
         doc.text("Reporte de Expendio", 10, 10);
-  
+
         // Crear el contenido de la tabla
         const tableData = filteredTasks.map((task) => [
           // CORRECCIÓN 3: Uso de la función auxiliar para PDF
@@ -282,7 +282,7 @@ const handleStatusChange = async (taskId, newStatus) => {
           task.expendio || "",
           task.estado || "",
         ]);
-  
+
         // Usar autoTable para crear la tabla en el PDF
         doc.autoTable({
           startY: 20,
@@ -293,10 +293,10 @@ const handleStatusChange = async (taskId, newStatus) => {
           margin: { top: 10 },
           styles: { fontSize: 10 }
         });
-  
+
         // Guardar el PDF
         doc.save("Reporte_expendio.pdf");
-  
+
         Swal.fire("Reporte Generado", "El reporte se ha generado exitosamente.", "success");
       }
     });
@@ -380,7 +380,7 @@ const handleStatusChange = async (taskId, newStatus) => {
                   <FontAwesomeIcon icon={faRotate} />
                 </button>
                 {permissions.canPagoEditStatus && (
-                <Link to="/pago" className="btn btn-success">
+                  <Link to="/pago" className="btn btn-success">
                     <FontAwesomeIcon icon={faDollar} />
                   </Link>
                 )}
@@ -388,8 +388,8 @@ const handleStatusChange = async (taskId, newStatus) => {
                 {/* <button onClick={handleGenerateReport} className="btn btn-danger">
                   <FontAwesomeIcon icon={faFilePdf} />
                 </button> */}
-                  {/* Botón para generar el reporte en Excel */}
-                  <button onClick={handleGenerateExcel} className="btn btn-success">
+                {/* Botón para generar el reporte en Excel */}
+                <button onClick={handleGenerateExcel} className="btn btn-success">
                   <FontAwesomeIcon icon={faFileExcel} />
                 </button>
               </li>
@@ -408,11 +408,11 @@ const handleStatusChange = async (taskId, newStatus) => {
                     <th>Nombre</th>
                     <th>DNI/CUIT</th>
                     <th className="border border-gray-400 px-4 py-2">Fecha de Creación</th>
-                
+
                     <th>Localidad</th>
                     <th>Tipo de Persona</th>
                     <th>Tipo de Expendio</th>
-                    
+
                     <th>Estado</th>
                     {permissions.canPagado && <th>Pagado</th>}
                     <th>Ver</th>
@@ -422,10 +422,19 @@ const handleStatusChange = async (taskId, newStatus) => {
                 </thead>
                 <tbody>
                   {currentTasks.map((task) => (
-                    <tr key={task._id}>
+                    <tr
+                      key={task._id}
+                      style={{
+                        backgroundColor: task.expendio === "Evento Particular"
+                          ? "#e8f5e9" // Verde claro para Evento Particular
+                          : task.expendio === "Local Comercial"
+                            ? "#e3f2fd" // Azul claro para Local Comercial
+                            : "transparent"
+                      }}
+                    >
                       {/* CORRECCIÓN 1: Unir el array antes de aplicar toUpperCase() */}
                       <td data-label="N° Expediente">{getExpedienteString(task.nroexpediente).toUpperCase()}</td>
-                      
+
                       <td data-label="Apellido">{task.apellido?.toUpperCase()}</td>
                       <td data-label="Nombre">{task.nombre?.toUpperCase()}</td>
                       <td data-label="DNI/CUIT">{task.dni?.toUpperCase()}</td>
@@ -434,19 +443,21 @@ const handleStatusChange = async (taskId, newStatus) => {
                       </td>
                       <td data-label="Localidad">{task.localidad?.toUpperCase()}</td>
                       <td data-label="Tipo de Persona">{task.persona?.toUpperCase()}</td>
-                      <td data-label="Tipo de expendio">{task.expendio?.toUpperCase()}</td>
+                      <td data-label="Tipo de expendio" style={{ fontWeight: "600" }}>
+                        {task.expendio?.toUpperCase()}
+                      </td>
                       {permissions.canViewStatus && (
                         <td data-label="Estado">
-                            {permissions.canEditStatus && getStatusOptions(task).length > 0 ? (
+                          {permissions.canEditStatus && getStatusOptions(task).length > 0 ? (
                             <select
                               value={task.estado || "ingresado"}
                               onChange={(e) => handleStatusChange(task._id, e.target.value)}
                               style={{ color: getStatusColor(task.estado) }}
                             >
                               {getStatusOptions(task).map((state) => (
-                                 <option key={state} value={state} style={{ color: getStatusColor(state) }}>
-                                   {(state === 'controlado' ? 'en revisión' : state).charAt(0).toUpperCase() + (state === 'controlado' ? 'en revisión' : state).slice(1)}
-                                 </option>
+                                <option key={state} value={state} style={{ color: getStatusColor(state) }}>
+                                  {(state === 'controlado' ? 'en revisión' : state).charAt(0).toUpperCase() + (state === 'controlado' ? 'en revisión' : state).slice(1)}
+                                </option>
                               ))}
                             </select>
                           ) : (
@@ -467,17 +478,17 @@ const handleStatusChange = async (taskId, newStatus) => {
                         </td>
                       )}
                       {permissions.canPagado && (
-                      <td data-label="Pagado">
-                        <label className="switch">
-                          <input
-                            type="checkbox"
-                            checked={task.pago || false}
-                            onChange={() => handlePaidToggle(task)}
-                          />
-                          <span className="slider"></span>
-                        </label>
-                      </td>
-                        )}
+                        <td data-label="Pagado">
+                          <label className="switch">
+                            <input
+                              type="checkbox"
+                              checked={task.pago || false}
+                              onChange={() => handlePaidToggle(task)}
+                            />
+                            <span className="slider"></span>
+                          </label>
+                        </td>
+                      )}
                       <td data-label="Ver">
                         <Link className="btn btn-success" to={`/view/task/${task._id}`}>
                           <FontAwesomeIcon icon={faEye} />
