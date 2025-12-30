@@ -198,11 +198,11 @@ export const createTasksPublic = async (req, res) => {
             ...documentFieldsFromForm 
         } = req.body;
 
-        // Verificar si ya existe una tarea con el mismo DNI
-        const existingTask = await Task.findOne({ dni });
-        if (existingTask) {
-            return res.status(400).json({ message: "El DNI ya ha sido registrado." });
-        }
+        // ⬅️ VALIDACIÓN DESHABILITADA: Permitir múltiples registros con el mismo DNI
+        // const existingTask = await Task.findOne({ dni });
+        // if (existingTask) {
+        //     return res.status(400).json({ message: "El DNI ya ha sido registrado." });
+        // }
         
         // 🚀 LÓGICA SIMPLIFICADA (Funciona si multerConfig.js reasigna req.files a un array limpio)
         // Mapea directamente el array de metadatos de archivos que viene de Multer/GridFS.
@@ -267,11 +267,11 @@ export const createTasks = async (req, res) => {
             ...documentFieldsFromForm // Captura el resto de campos (incluyendo nombres de archivos vacíos)
         } = req.body;
 
-        // Verificar si ya existe una tarea con el mismo DNI
-        const existingTask = await Task.findOne({ dni });
-        if (existingTask) {
-            return res.status(400).json({ message: "El DNI ya ha sido cargado en un expediente." });
-        }
+        // ⬅️ VALIDACIÓN DESHABILITADA: Permitir múltiples registros con el mismo DNI
+        // const existingTask = await Task.findOne({ dni });
+        // if (existingTask) {
+        //     return res.status(400).json({ message: "El DNI ya ha sido cargado en un expediente." });
+        // }
 
         let finalNroExpediente = nroexpediente;
 
