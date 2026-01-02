@@ -70,10 +70,16 @@ export const AuthProvider = ({ children }) => {
             setUser(res.data);
             return res;
         } catch (error) {
-            if (Array.isArray(error.response.data)) {
-                return setErrors(error.response.data);
+            // Manejo defensivo de errores
+            if (error.response) {
+                if (Array.isArray(error.response.data)) {
+                    return setErrors(error.response.data);
+                }
+                setErrors([error.response.data.message]);
+            } else {
+                // Error de red u otro error sin response
+                setErrors(["Error de conexión. Verifica tu conexión a internet."]);
             }
-            setErrors([error.response.data.message]);
         }
     };
 

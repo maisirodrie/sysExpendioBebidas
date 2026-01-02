@@ -7,7 +7,8 @@ const taskSchema = new mongoose.Schema(
     dni: {
       type: String,
       trim: true,
-      unique: true, // El DNI debe ser único, ya que es un identificador
+      // ⬅️ UNIQUE REMOVIDO: Permitir múltiples registros con el mismo DNI
+      // unique: true,
     },
     apellido: { type: String, trim: true },
     nombre: { type: String, trim: true },
