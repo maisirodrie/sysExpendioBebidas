@@ -207,7 +207,7 @@ const RequisitosEventosDisplay = ({ register, watch, errors, existingFilesMap, r
         <div className="bg-blue-100 p-4 rounded-md mt-4 mb-4 border border-blue-300">
             <h4 className="font-bold text-lg text-blue-800 mb-2">Documentación Requerida (Evento Particular)</h4>
             <p className="text-sm text-blue-700 mb-3">
-                ⚠️ **Debe subir cada archivo individualmente.** La falta de documentos obligatorios será causal de rechazo.
+                ⚠️ **Debe subir cada archivo individualmente.** La falta de documentos obligatorios será causa de rechazo.
             </p>
             <div className="space-y-2">
                 {RequisitosEventos.map((req) => (

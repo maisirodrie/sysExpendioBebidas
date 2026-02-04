@@ -5,7 +5,7 @@ import { faCheckCircle, faUpload, faFilePdf, faTrashAlt } from "@fortawesome/fre
 
 // Requisito único para Intendencia
 const RequisitosIntendencia = [
-    { key: "paseElevacionIntendente", label: "Pase a Elevación al Intendente", required: true },
+    { key: "paseElevacionIntendente", label: "Pase a Elevación del Intendente", required: true },
 ];
 
 // Componente para manejar la carga del documento
@@ -232,7 +232,7 @@ function IntendenciaForm({
             <div className="bg-blue-100 p-4 rounded-md mt-4 mb-4 border border-blue-300">
                 <h4 className="font-bold text-lg text-blue-800 mb-2">Documentación Requerida (Intendencia)</h4>
                 <p className="text-sm text-blue-700 mb-3">
-                    ⚠️ **Debe subir cada archivo individualmente.** La falta de documentos obligatorios será causal de rechazo.
+                    ⚠️ **Debe subir el archivo individualmente.** La falta del documentos obligatorio será causa de rechazo.
                 </p>
                 <div className="space-y-2">
                     {RequisitosIntendencia.map((req) => (
