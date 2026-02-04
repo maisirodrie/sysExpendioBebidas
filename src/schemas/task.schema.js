@@ -9,9 +9,7 @@ export const creatTaskSchema = z.object({
   expendio: z.string({
     required_error: "El expendio es requerido",
   }),
-  persona: z.string({
-    required_error: "La persona es requerida",
-  }),
+  persona: z.string().optional(),
   // Se valida que el DNI sea una cadena de texto que contenga solo dígitos y tenga al menos 8 caracteres.
   dni: z
     .string({
@@ -35,10 +33,9 @@ export const creatTaskSchema = z.object({
   tipoevento: z.string().optional(),
   // Se usa z.string().email() para una validación de correo electrónico.
   email: z
-    .string({
-      required_error: "El email es requerido",
-    })
-    .email("El email debe ser una dirección de correo válida."),
+    .string()
+    .email("El email debe ser una dirección de correo válida.")
+    .optional(),
   // Se valida que el contacto sea una cadena de texto que contenga solo dígitos.
   contacto: z
     .string({

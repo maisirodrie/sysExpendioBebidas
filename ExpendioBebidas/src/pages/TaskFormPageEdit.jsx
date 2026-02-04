@@ -10,6 +10,7 @@ import Swal from "sweetalert2";
 // Importar los componentes de formulario modulares
 import LocalComercialForm from "./LocalComercialForm";
 import EventoParticularForm from "./EventoParticularForm";
+import IntendenciaForm from "./IntendenciaForm";
 
 // Mapeo de Nombres de Archivos (Mantenido)
 const FILE_NAME_MAP = {
@@ -59,6 +60,7 @@ const getMappedFileKeys = (expendio, persona) => {
         if (persona === "Jurídica") return ["notaSolicitudJuridica", "habilitacionMunicipalJuridica", "estatutoSocial", "actaAsamblea", "actaComisionDirectiva", "ddjjDistanciasJuridica", "fotocopiaDniAutorizado", "certificadoAntecedentesAutorizado", "medidasSeguridad", "propiedadInmuebleJuridica", "planContingenciaJuridica"];
     }
     if (expendio === "Evento Particular") return ["paseElevacionIntendente", "autorizacionMunicipal", "fotocopiaDniEvento", "certificadoAntecedentesEvento", "autorizacionPropietario"];
+    if (expendio === "Intendencia") return ["paseElevacionIntendente"];
     return [];
 };
 
@@ -131,6 +133,8 @@ function TaskFormPageEdit() {
             setNroExpedienteParts(prev => ({ ...prev, codigoOrganismo: "" }));
         } else if (selectedExpendio === "Local Comercial") {
             setValue("persona", "");
+        } else if (selectedExpendio === "Intendencia") {
+            setValue("persona", "Física");
         }
     };
     const handleTipoPersonaChange = (e) => {
@@ -537,6 +541,7 @@ function TaskFormPageEdit() {
                         <option value="Local Comercial">
                             Habilitación de Venta de Bebidas para Local Comercial
                         </option>
+                        <option value="Intendencia">Intendencia</option>
                     </select>
                     {/* Renderizado Condicional de Evento Particular */}
                     {tipoExpendioWatch === "Evento Particular" && (
@@ -563,6 +568,25 @@ function TaskFormPageEdit() {
                             errors={errors}
                             tipoPersona={tipoPersonaWatch}
                             handleTipoPersonaChange={handleTipoPersonaChange}
+                            handleLocalidadChange={handleLocalidadChange}
+                            watch={watch}
+                            setValue={setValue}
+                            existingFilesMap={existingFilesMap}
+                            removeExistingFile={removeExistingFileByKey}
+                            setFocus={setFocus}
+                            apiUrl={apiUrl}
+                            isEdit={isEdit}
+                            addFilesToField={addFilesToField}
+                            filesToAdd={filesToAdd}
+                            removeFileToAdd={removeFileToAdd}
+                        />
+                    )}
+
+                    {/* Renderizado Condicional de Intendencia */}
+                    {tipoExpendioWatch === "Intendencia" && (
+                        <IntendenciaForm
+                            register={register}
+                            errors={errors}
                             handleLocalidadChange={handleLocalidadChange}
                             watch={watch}
                             setValue={setValue}

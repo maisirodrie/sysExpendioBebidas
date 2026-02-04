@@ -59,10 +59,10 @@ const FILE_DISPLAY_ORDER = [
   'paseElevacionIntendente',
   'autorizacionMunicipal',
   // Usamos el mapeo común para DNI si es un archivo compartido, o específico
-  'fotocopiaDniEvento', 
+  'fotocopiaDniEvento',
   'certificadoAntecedentesEvento',
   'autorizacionPropietario',
-  
+
   /* --- Local Comercial (Persona Física) --- */
   'notaSolicitud',
   'habilitacionMunicipal',
@@ -70,7 +70,7 @@ const FILE_DISPLAY_ORDER = [
   'ddjjDistancias',
   'ddjjHigiene',
   // Usamos el mapeo común para DNI si es un archivo compartido, o específico
-  'fotocopiaDni', 
+  'fotocopiaDni',
   'informeSocioAmbiental',
   'certificadoAntecedentes',
   'propiedadInmueble',
@@ -104,8 +104,8 @@ const getFriendlyFileName = (filename) => {
 
 // Función auxiliar para obtener la clave del campo (ej: 'notaSolicitud') a partir del nombre de archivo
 const getFileKey = (filename) => {
-    const match = filename.match(/^([a-zA-Z]+)/);
-    return match ? match[1] : ''; 
+  const match = filename.match(/^([a-zA-Z]+)/);
+  return match ? match[1] : '';
 };
 
 
@@ -136,31 +136,31 @@ function TaskViewPage() {
     }
     return `${format(date, "dd/MM/yyyy", { locale: esLocale })} a las ${format(date, "HH:mm:ss")}`;
   };
-  
+
 
   const renderTaskDetails = () => {
     if (!task) return null;
 
     // Desestructuración de campos
-    const { 
+    const {
       nroexpediente,
-      expendio, 
-      persona, 
-      dni, 
-      apellido, 
-      nombre, 
-      localidad, 
+      expendio,
+      persona,
+      dni,
+      apellido,
+      nombre,
+      localidad,
       domicilio,
-      horarios, 
-      lugar, 
-      dias, 
-      rubro, 
-      tipoevento, 
-      email, 
-      contacto, 
-      nroHabilitacion, 
-      domicilioLocalComercial, 
-      horarioAtencion, 
+      horarios,
+      lugar,
+      dias,
+      rubro,
+      tipoevento,
+      email,
+      contacto,
+      nroHabilitacion,
+      domicilioLocalComercial,
+      horarioAtencion,
       createdAt,
       estado,
       motivoRechazo
@@ -170,19 +170,20 @@ function TaskViewPage() {
     const isRechazado = estado?.toLowerCase() === "rechazado";
     const isEventoParticular = expendio === "Evento Particular";
     const isLocalComercial = expendio === "Local Comercial";
-    const isPersonaJuridica = persona?.toLowerCase() === "jurídica"; 
+    const isIntendencia = expendio === "Intendencia";
+    const isPersonaJuridica = persona?.toLowerCase() === "jurídica";
 
     return (
       <>
-        
+
         <p className="my-4">
           <strong>Fecha de Creación:</strong> {formatDate(createdAt)}
           <p className="my-4"><strong>Nro Expediente:</strong> {nroexpediente || 'No asignado'}</p>
         </p>
         {/* Aplicación dinámica del color al estado */}
         <p className="my-4">
-          <strong className="text-xl mr-2">Estado:</strong> 
-          <strong className={`text-${statusColorName}-600`}> 
+          <strong className="text-xl mr-2">Estado:</strong>
+          <strong className={`text-${statusColorName}-600`}>
             {estado ? estado.toUpperCase() : 'DESCONOCIDO'}
           </strong>
         </p>
@@ -196,7 +197,7 @@ function TaskViewPage() {
         )}
         {isEventoParticular && (
           <>
-          
+
             <p className="my-4"><strong>Tipo de Persona:</strong> {persona}</p>
             <p className="my-4"><strong>Tipo de Expendio:</strong> {expendio}</p>
             <p className="my-4"><strong>DNI:</strong> {dni}</p>
@@ -230,6 +231,17 @@ function TaskViewPage() {
             <p className="my-4"><strong>Nro de WhatsApp:</strong> {contacto}</p>
           </>
         )}
+
+        {isIntendencia && (
+          <>
+            <p className="my-4"><strong>Tipo de Expendio:</strong> {expendio}</p>
+            <p className="my-4"><strong>DNI:</strong> {dni}</p>
+            <p className="my-4"><strong>Apellido:</strong> {apellido}</p>
+            <p className="my-4"><strong>Nombre:</strong> {nombre}</p>
+            <p className="my-4"><strong>Localidad:</strong> {localidad}</p>
+            <p className="my-4"><strong>Nro de WhatsApp:</strong> {contacto}</p>
+          </>
+        )}
       </>
     );
   };
@@ -251,37 +263,37 @@ function TaskViewPage() {
               {/* Mostrar todos los archivos adjuntos usando el mapeo de nombres */}
               {task.file && task.file.length > 0 && (
                 <div className="mt-6 pt-4 border-t border-gray-400">
-                    <h3 className="text-xl font-bold mb-3">Archivos Adjuntos</h3>
-                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                      {task.file
-                        // 🔑 ORDENAMIENTO IMPLEMENTADO AQUÍ
-                        .sort((fileA, fileB) => {
-                            const keyA = getFileKey(fileA.filename);
-                            const keyB = getFileKey(fileB.filename);
+                  <h3 className="text-xl font-bold mb-3">Archivos Adjuntos</h3>
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    {task.file
+                      // 🔑 ORDENAMIENTO IMPLEMENTADO AQUÍ
+                      .sort((fileA, fileB) => {
+                        const keyA = getFileKey(fileA.filename);
+                        const keyB = getFileKey(fileB.filename);
 
-                            // Obtener el índice de prioridad. Si no existe en la lista, le asignamos un índice alto (9999)
-                            const indexA = FILE_DISPLAY_ORDER.indexOf(keyA);
-                            const indexB = FILE_DISPLAY_ORDER.indexOf(keyB);
+                        // Obtener el índice de prioridad. Si no existe en la lista, le asignamos un índice alto (9999)
+                        const indexA = FILE_DISPLAY_ORDER.indexOf(keyA);
+                        const indexB = FILE_DISPLAY_ORDER.indexOf(keyB);
 
-                            // Ordena por los índices. Los no mapeados van al final.
-                            const finalIndexA = indexA === -1 ? 9999 : indexA;
-                            const finalIndexB = indexB === -1 ? 9999 : indexB;
+                        // Ordena por los índices. Los no mapeados van al final.
+                        const finalIndexA = indexA === -1 ? 9999 : indexA;
+                        const finalIndexB = indexB === -1 ? 9999 : indexB;
 
-                            return finalIndexA - finalIndexB;
-                        })
-                        .map((fileInfo) => (
-                          <a
-                            key={fileInfo.id.toString()} // Usar el ID como key
-                            href={`${apiUrl.replace('/tasks/download', '')}/tasks/file/${fileInfo.filename}`}
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            className="bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 text-center rounded transition duration-200 break-words w-full"
-                          >
-                            {/* Usa la función de mapeo aquí */}
-                            📂 {getFriendlyFileName(fileInfo.filename)}
-                          </a>
+                        return finalIndexA - finalIndexB;
+                      })
+                      .map((fileInfo) => (
+                        <a
+                          key={fileInfo.id.toString()} // Usar el ID como key
+                          href={`${apiUrl.replace('/tasks/download', '')}/tasks/file/${fileInfo.filename}`}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 text-center rounded transition duration-200 break-words w-full"
+                        >
+                          {/* Usa la función de mapeo aquí */}
+                          📂 {getFriendlyFileName(fileInfo.filename)}
+                        </a>
                       ))}
-                    </div>
+                  </div>
                 </div>
               )}
             </>

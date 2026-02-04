@@ -13,6 +13,7 @@ import "./RegisterPage.css";
 // IMPORTACIÓN DE COMPONENTES MODULARES
 import EventoParticularForm from "./EventoParticularForm";
 import LocalComercialForm from "./LocalComercialForm";
+import IntendenciaForm from "./IntendenciaForm";
 
 function RegisterPage() {
   const {
@@ -214,6 +215,12 @@ function RegisterPage() {
       "certificadoAntecedentesEvento", "autorizacionPropietario"
     ];
 
+    // Lista de campos de Intendencia
+    const intendenciaFields = [
+      "dni", "apellido", "nombre", "localidad", "contacto",
+      "paseElevacionIntendente"
+    ];
+
     // Limpiar el estado de persona y sus errores
     setTipoPersona("");
     setValue("persona", "");
@@ -221,26 +228,48 @@ function RegisterPage() {
 
 
     if (selectedExpendio === "Evento Particular") {
-      // Si va a Evento, limpiamos todos los campos de Local Comercial
+      // Si va a Evento, limpiamos todos los campos de Local Comercial e Intendencia
       localComercialFields.forEach(field => {
-        setValue(field, undefined); // Limpiar valor
-        unregister(field); // Desregistrar
+        setValue(field, undefined);
+        unregister(field);
+      });
+      intendenciaFields.forEach(field => {
+        setValue(field, undefined);
+        unregister(field);
       });
       // Restauramos el tipo de persona para Evento 
       setValue("persona", "Física");
       setTipoPersona("Física");
 
     } else if (selectedExpendio === "Local Comercial") {
-      // Si va a Local, limpiamos todos los campos de Evento
+      // Si va a Local, limpiamos todos los campos de Evento e Intendencia
       eventoParticularFields.forEach(field => {
-        setValue(field, undefined); // Limpiar valor
-        unregister(field); // Desregistrar
+        setValue(field, undefined);
+        unregister(field);
+      });
+      intendenciaFields.forEach(field => {
+        setValue(field, undefined);
+        unregister(field);
       });
       // Aseguramos que persona se mantenga vacío para forzar la selección inicial
 
+    } else if (selectedExpendio === "Intendencia") {
+      // Si va a Intendencia, limpiamos campos de Evento y Local Comercial
+      eventoParticularFields.forEach(field => {
+        setValue(field, undefined);
+        unregister(field);
+      });
+      localComercialFields.forEach(field => {
+        setValue(field, undefined);
+        unregister(field);
+      });
+      // Ahora si necesita tipo de persona - Por defecto Persona Física
+      setValue("persona", "Física");
+      setTipoPersona("Física");
+
     } else {
-      // Si se selecciona "Seleccione un tipo...", limpiamos ambos
-      [...localComercialFields, ...eventoParticularFields].forEach(field => {
+      // Si se selecciona "Seleccione un tipo...", limpiamos todos
+      [...localComercialFields, ...eventoParticularFields, ...intendenciaFields].forEach(field => {
         setValue(field, undefined);
         unregister(field);
       });
@@ -408,6 +437,7 @@ function RegisterPage() {
             <option value="Local Comercial">
               Habilitación de Venta de Bebidas para Local Comercial
             </option>
+            <option value="Intendencia">Intendencia</option>
           </select>
           {errors.expendio && (
             <p className="text-red-500 text-sm mt-1">
@@ -433,6 +463,17 @@ function RegisterPage() {
               errors={errors}
               tipoPersona={tipoPersona}
               handleTipoPersonaChange={handleTipoPersonaChange}
+              handleLocalidadChange={handleLocalidadChange}
+              watch={watch}
+              setValue={setValue}
+              apiUrl={apiUrl}
+            />
+          )}
+
+          {tipoExpendio === "Intendencia" && (
+            <IntendenciaForm
+              register={register}
+              errors={errors}
               handleLocalidadChange={handleLocalidadChange}
               watch={watch}
               setValue={setValue}

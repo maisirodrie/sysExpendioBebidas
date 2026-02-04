@@ -429,7 +429,9 @@ function Table() {
                           ? "#e8f5e9" // Verde claro para Evento Particular
                           : task.expendio === "Local Comercial"
                             ? "#e3f2fd" // Azul claro para Local Comercial
-                            : "transparent"
+                            : task.expendio === "Intendencia"
+                              ? "#fff9c4" // Amarillo claro para Intendencia
+                              : "transparent"
                       }}
                     >
                       {/* CORRECCIÓN 1: Unir el array antes de aplicar toUpperCase() */}
