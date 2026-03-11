@@ -128,14 +128,16 @@ function RegisterPage() {
         res = await createTasksPublic(formData);
       }
 
-      if (res && (res.nroexpediente || res.message)) {
+      if (res && (res.nroexpediente || res.message || res._id)) {
         Swal.fire({
           icon: "success",
           title: "¡Éxito!",
           html: `<p>Su registro se ha ${params.id ? "actualizado" : "generado"
             } con éxito. ${res.nroexpediente
               ? `El número de trámite es: <strong>${res.nroexpediente}</strong>.`
-              : `El número de expediente será asignado por mesa de entrada.`
+              : params.id
+                ? ""
+                : `El número de expediente será asignado por mesa de entrada.`
             }</p><p>Para cualquier consulta, llame al: <strong>0376-4448963</strong>.</p>`,
           confirmButtonText: "OK",
           allowOutsideClick: false,
@@ -147,17 +149,25 @@ function RegisterPage() {
         throw new Error("La respuesta del servidor no fue la esperada");
       }
     } catch (error) {
-      console.error("Error:", error);
+      console.error("Error completo:", error);
       Swal.close();
 
-      const serverMessage =
-        error.response?.data?.message ||
-        "Ocurrió un error al guardar el registro. Intente de nuevo más tarde.";
+      let errorMessage = "Ocurrió un error al guardar el registro. Intente de nuevo más tarde.";
+
+      if (error.response?.data?.message) {
+        const message = error.response.data.message;
+        if (Array.isArray(message)) {
+          // Si es un array de errores (Zod), los listamos
+          errorMessage = `<div style="text-align: left;"><strong>Por favor, corrija los siguientes campos:</strong><ul style="margin-top: 10px; list-style-type: disc; margin-left: 20px;">${message.map(msg => `<li>${msg}</li>`).join('')}</ul></div>`;
+        } else {
+          errorMessage = message;
+        }
+      }
 
       Swal.fire({
         icon: "error",
-        title: "Error",
-        text: serverMessage,
+        title: "No se pudo guardar",
+        html: errorMessage,
       });
     }
   });

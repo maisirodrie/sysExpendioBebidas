@@ -663,7 +663,11 @@ export const updateTasks = async (req, res) => {
 
         // 6. Registrar actividad y responder
         await logActivity(req.user.id, 'actualizó tarea', "tarea", finalUpdatedTask._id);
-        res.json(finalUpdatedTask);
+        res.json({
+            success: true,
+            message: "Registro actualizado con éxito.",
+            task: finalUpdatedTask
+        });
         
     } catch (error) {
         console.error("Error al guardar la tarea:", error);
@@ -782,19 +786,18 @@ export const deleteTasks = async (req, res) => {
     const task = await Task.findById(req.params.id);
     if (!task) return res.status(404).json({ message: "Tarea no encontrada" });
 
-    if (task.file && task.file.length > 0) {
-      for (const file of task.file) {
-        if (file.id) {
-          try {
-            await gfs.delete(new mongoose.Types.ObjectId(file.id));
-          } catch (error) {
-            return res
-              .status(500)
-              .json({ message: "Error eliminando el archivo." });
-          }
-        }
-      }
-    }
+     if (task.file && task.file.length > 0) {
+      for (const file of task.file) {
+        if (file.id) {
+          try {
+            await gfs.delete(new mongoose.Types.ObjectId(file.id));
+          } catch (error) {
+            console.error(`Error eliminando archivo ${file.id} de GridFS:`, error.message);
+            // No retornamos error para permitir borrar la metadata de la tarea aunque falte el archivo físico
+          }
+        }
+      }
+    }
 
     await Task.findByIdAndDelete(req.params.id);
     await logActivity(req.user.id, "eliminó tarea", "tarea", task._id);
@@ -838,29 +841,31 @@ export const getUserProfileWithTask = async (req, res) => {
       "username email nombre apellido"
     );
 
-    res.json({
-      user: {
-        _id: user._id,
-        username: user.username,
-        email: user.email,
-        nombre: user.nombre,
-        apellido: user.apellido,
-        role: user.role,
-        createdAt: user.createdAt,
-        updatedAt: user.updatedAt,
-      },
-      tasks: tasks.map((task) => ({
-        _id: task._id,
-        expe: task.expe,
-        correlativo: task.correlativo,
-        anio: task.anio,
-        cuerpo: task.cuerpo,
-        fecha: task.fecha,
-        iniciador: task.iniciador,
-        asunto: task.asunto,
-        file: task.file,
-      })),
-    });
+     res.json({
+      user: {
+        _id: user._id,
+        username: user.username,
+        email: user.email,
+        nombre: user.nombre,
+        apellido: user.apellido,
+        role: user.role,
+        createdAt: user.createdAt,
+        updatedAt: user.updatedAt,
+      },
+      tasks: tasks.map((task) => ({
+        _id: task._id,
+        nroexpediente: task.nroexpediente,
+        expendio: task.expendio,
+        persona: task.persona,
+        dni: task.dni,
+        nombre: task.nombre,
+        apellido: task.apellido,
+        localidad: task.localidad,
+        createdAt: task.createdAt,
+        estado: task.estado,
+        file: task.file,
+      })),
+    });
   } catch (error) {
     return res.status(500).json({ message: error.message });
   }
@@ -875,22 +880,32 @@ export const getTaskWithUser = async (req, res) => {
       return res.status(404).json({ message: "Tarea no encontrada." });
     }
 
-    res.json({
-      task: {
-        expe: task.expe,
-        correlativo: task.correlativo,
-        anio: task.anio,
-        cuerpo: task.cuerpo,
-        fecha: task.fecha,
-        iniciador: task.iniciador,
-        asunto: task.asunto,
-        file: task.file,
-      },
-      user: {
-        _id: task.user._id,
-        username: task.user.username,
-      },
-    });
+     res.json({
+      task: {
+        _id: task._id,
+        nroexpediente: task.nroexpediente,
+        expendio: task.expendio,
+        persona: task.persona,
+        dni: task.dni,
+        nombre: task.nombre,
+        apellido: task.apellido,
+        localidad: task.localidad,
+        domicilio: task.domicilio,
+        lugar: task.lugar,
+        dias: task.dias,
+        horarios: task.horarios,
+        tipoevento: task.tipoevento,
+        email: task.email,
+        contacto: task.contacto,
+        estado: task.estado,
+        createdAt: task.createdAt,
+        file: task.file,
+      },
+      user: {
+        _id: task.user._id,
+        username: task.user.username,
+      },
+    });
   } catch (error) {
     return res.status(500).json({ message: error.message });
   }

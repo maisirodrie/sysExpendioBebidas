@@ -280,7 +280,17 @@ const EventoParticularForm = ({
         )}
         <input
             type="text"
-            {...register("dni", { required: "El DNI es requerido" })}
+            {...register("dni", {
+                required: "El DNI es requerido",
+                pattern: {
+                    value: /^\d+$/,
+                    message: "El DNI debe contener solo dígitos (sin puntos ni guiones)"
+                },
+                minLength: {
+                    value: 8,
+                    message: "El DNI debe tener al menos 8 dígitos"
+                }
+            })}
             className="w-full bg-gray-100 text-black px-4 py-2 rounded-md my-2"
             placeholder="DNI del Peticionante"
         />
@@ -412,9 +422,15 @@ const EventoParticularForm = ({
         )}
         <input
             type="tel"
-            {...register("contacto")}
+            {...register("contacto", {
+                required: "El número de WhatsApp es requerido",
+                pattern: {
+                    value: /^\d+$/,
+                    message: "El número debe contener solo dígitos"
+                }
+            })}
             className="w-full bg-gray-100 text-black px-4 py-2 rounded-md my-2"
-            placeholder="Teléfono de Contacto"
+            placeholder="Ej: 3764123456"
         />
 
         {/* --- SECCIÓN REQUISITOS INTERACTIVOS --- */}
