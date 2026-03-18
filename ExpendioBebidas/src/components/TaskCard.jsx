@@ -1,4 +1,4 @@
-﻿import React, { useState, useEffect } from "react";
+import React, { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import { jsPDF } from 'jspdf';
 import * as XLSX from "xlsx"; // Importa SheetJS
@@ -202,7 +202,8 @@ function Table() {
 
         if (motivoRechazo !== undefined) {
           // 1. Llama a la función de contexto y CAPTURA la respuesta COMPLETA
-          updatedTask = await updateTask(taskId, { estado: newStatus, motivoRechazo: motivoRechazo });
+          const res = await updateTask(taskId, { estado: newStatus, motivoRechazo: motivoRechazo });
+          updatedTask = res.task || res; // Extrae el objeto tarea si viene envuelto
           Swal.fire("Expediente Actualizado", "El motivo de rechazo ha sido guardado.", "success");
           // ❌ Eliminado: await getTasks();
         } else {
@@ -218,7 +219,7 @@ function Table() {
 
       // 3. 🚀 ACTUALIZACIÓN INSTANTÁNEA: Usar la respuesta del backend para actualizar el estado `tasks`
       if (updatedTask) {
-        setTasks(tasks.map(t => (t._id === taskId ? updatedTask : t)));
+        setTasks(tasks.map(t => (t._id === taskId ? { ...t, ...updatedTask } : t)));
       }
 
     } catch (error) {

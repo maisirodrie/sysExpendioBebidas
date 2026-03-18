@@ -130,24 +130,28 @@ export const getTaskByDni = async (req, res) => {
   const { dni } = req.params;
 
   try {
-    // Busca la tarea asociada al DNI proporcionado
-    const task = await Task.findOne({ dni }).select("estado dni nroexpediente nombre apellido motivoRechazo");
-    if (!task) {
+    // Busca todas las tareas asociadas al DNI proporcionado, ordenadas por fecha (más reciente primero)
+    const tasks = await Task.find({ dni })
+      .select("estado dni nroexpediente nombre apellido motivoRechazo expendio createdAt")
+      .sort({ createdAt: -1 });
+
+    if (!tasks || tasks.length === 0) {
       return res.status(404).json({ message: "No se encontraron datos para este DNI." });
     }
 
-    // Si el número de expediente no está asignado, lo reemplaza con "No asignado"
-    const nroExpedienteFinal = task.nroexpediente || "No asignado";
-
-    // Devuelve el estado y otros detalles de la tarea
+    // Devuelve la lista de tareas
     res.json({
       success: true,
-      dni: task.dni,
-      nombre: task.nombre,
-      apellido: task.apellido,
-      nroexpediente: nroExpedienteFinal, // Usa el valor final aquí
-      estado: task.estado,
-      motivoRechazo: task.motivoRechazo,
+      tasks: tasks.map(task => ({
+        dni: task.dni,
+        nombre: task.nombre,
+        apellido: task.apellido,
+        nroexpediente: task.nroexpediente || "No asignado",
+        estado: task.estado,
+        motivoRechazo: task.motivoRechazo,
+        expendio: task.expendio,
+        createdAt: task.createdAt,
+      }))
     });
   } catch (error) {
     console.error("Error al buscar el estado de la tarea:", error);
