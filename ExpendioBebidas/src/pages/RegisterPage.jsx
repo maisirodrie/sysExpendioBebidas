@@ -400,19 +400,27 @@ function RegisterPage() {
               <tbody>
                 <tr>
                   <td data-label="Categoría" className="border border-gray-400 px-4 py-2">Eventos Temporarios</td>
-                  <td data-label="Arancel" className="border border-gray-400 px-4 py-2">S/Arancel</td>
+                  <td data-label="Arancel" className="border border-gray-400 px-4 py-2">$ 26.389,0</td>
                 </tr>
                 <tr>
                   <td data-label="Categoría" className="border border-gray-400 px-4 py-2">Kioskos</td>
-                  <td data-label="Arancel" className="border border-gray-400 px-4 py-2">$1.100</td>
+                  <td data-label="Arancel" className="border border-gray-400 px-4 py-2">$ 71.970,0</td>
+                </tr>
+                <tr>
+                  <td data-label="Categoría" className="border border-gray-400 px-4 py-2">MiniMercados</td>
+                  <td data-label="Arancel" className="border border-gray-400 px-4 py-2">$ 79.167,0</td>
                 </tr>
                 <tr>
                   <td data-label="Categoría" className="border border-gray-400 px-4 py-2">Supermercados</td>
-                  <td data-label="Arancel" className="border border-gray-400 px-4 py-2">$1.100</td>
+                  <td data-label="Arancel" className="border border-gray-400 px-4 py-2">$ 88.763,0</td>
                 </tr>
                 <tr>
                   <td data-label="Categoría" className="border border-gray-400 px-4 py-2">Locales Bailables, Bares, Pub</td>
-                  <td data-label="Arancel" className="border border-gray-400 px-4 py-2">$1.100</td>
+                  <td data-label="Arancel" className="border border-gray-400 px-4 py-2">$ 95.960,0</td>
+                </tr>
+                <tr>
+                  <td data-label="Categoría" className="border border-gray-400 px-4 py-2">Otros (No definidos anteriormente)</td>
+                  <td data-label="Arancel" className="border border-gray-400 px-4 py-2">$ 79.167,0</td>
                 </tr>
 
               </tbody>
