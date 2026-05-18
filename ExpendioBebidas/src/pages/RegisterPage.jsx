@@ -429,7 +429,7 @@ function RegisterPage() {
 
           </div>
           <p className="text-sm mt-4">
-            El monto deberá ser depositado en la cuenta corriente Nº <strong>xxxxxxxxxx</strong> una vez terminado el procedimiento de verificación de documentación presentada.
+            El monto deberá ser depositado en la cuenta corriente bancaria Nº <strong>300109425540524</strong> y alias <strong>SITUADAS.FOSA.SALINO</strong> una vez terminado el procedimiento de verificación de documentación presentada.
           </p>
         </div>
 
