@@ -428,8 +428,8 @@ function RegisterPage() {
             </table>
 
           </div>
-          <p className="text-sm mt-4">
-            El monto deberá ser depositado en la cuenta corriente bancaria Nº <strong>300109425540524</strong> y alias <strong>SITUADAS.FOSA.SALINO</strong> una vez terminado el procedimiento de verificación de documentación presentada.
+          <p className="text-sm mt-4 bg-blue-100 text-blue-800 p-3 rounded-md border border-blue-200">
+            <strong>Aviso Informativo:</strong> Próximamente se procederá a publicar la cuenta bancaria y el alias para realizar el depósito correspondiente, el cual deberá efectuarse una vez terminado el procedimiento de verificación de la documentación presentada.
           </p>
         </div>
 
