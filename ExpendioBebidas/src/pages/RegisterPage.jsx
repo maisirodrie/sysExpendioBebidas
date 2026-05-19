@@ -435,7 +435,7 @@ function RegisterPage() {
             <p className="text-sm text-blue-800 mt-2">
               El depósito/transferencia correspondiente deberá efectuarse una vez terminado el procedimiento de verificación de la documentación presentada, utilizando los siguientes datos:
             </p>
-            <div className="mt-3 text-sm text-blue-950 bg-blue-100/60 p-3 rounded border border-blue-200">
+            <div className="mt-3 text-sm text-blue-950 bg-blue-100/60 p-3 rounded border border-blue-200 text-center">
               <div><strong>Cuenta:</strong> CUENTA CORRIENTE BANCARIA Nro. 300109425540524</div>
               <div className="mt-1"><strong>Alias:</strong> EXPENDIOBEBIDAS</div>
             </div>
