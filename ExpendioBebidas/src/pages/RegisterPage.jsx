@@ -429,15 +429,23 @@ function RegisterPage() {
 
           </div>
           <div className="bg-blue-50 border-l-4 border-blue-500 p-4 rounded-r-md text-left mt-4 shadow-sm">
-            <p className="text-sm font-bold text-blue-900">
+            <p className="text-sm font-bold text-blue-900 text-center">
               ⚠️ IMPORTANTE: Solamente se reciben TRANSFERENCIAS bancarias.
             </p>
-            <p className="text-sm text-blue-800 mt-2">
-              El depósito/transferencia correspondiente deberá efectuarse una vez terminado el procedimiento de verificación de la documentación presentada, utilizando los siguientes datos:
+            <p className="text-sm text-blue-800 mt-2 text-center">
+              La transferencia bancaria es el <strong>único medio de pago aceptado</strong> y deberá efectuarse una vez terminado el procedimiento de verificación de la documentación presentada, utilizando los siguientes datos:
             </p>
-            <div className="mt-3 text-sm text-blue-950 bg-blue-100/60 p-3 rounded border border-blue-200 text-center">
-              <div><strong>Cuenta:</strong> CUENTA CORRIENTE BANCARIA Nro. 300109425540524</div>
-              <div className="mt-1"><strong>Alias:</strong> EXPENDIOBEBIDAS</div>
+            <div className="mt-3 text-sm text-blue-950 bg-blue-100/60 p-4 rounded border border-blue-200 text-center space-y-2 max-w-2xl mx-auto shadow-inner">
+              <div><strong>Banco:</strong> Banco Macro S.A.</div>
+              <div><strong>Cuenta Corriente Nro:</strong> 300109425540524</div>
+              <div><strong>CBU:</strong> 2850001030094255405241</div>
+              <div><strong>Alias:</strong> EXPENDIOBEBIDAS</div>
+              <div className="border-t border-blue-200/60 my-2 max-w-md mx-auto"></div>
+              <div><strong>Razón Social:</strong> MINISTERIO DE GOBIERNO</div>
+              <div><strong>CUIT:</strong> 30-70812883-6</div>
+              <div className="text-xs text-blue-800">
+                <strong>Denominación:</strong> FONDO ESPECIAL PROVINCIAL PARA EL EXPENDIO DE BEBIDAS ALCOHÓLICAS
+              </div>
             </div>
           </div>
         </div>
