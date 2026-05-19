@@ -428,54 +428,23 @@ function RegisterPage() {
             </table>
 
           </div>
-          <div className="bg-blue-50 border-l-4 border-blue-500 p-6 rounded-r-md mt-4 shadow-sm">
-            <p className="text-sm font-bold text-blue-900 text-center">
+          <div className="bg-blue-50 border-l-4 border-blue-500 p-5 rounded-r-md mt-4 shadow-sm text-center">
+            <p className="text-sm font-bold text-blue-900">
               ⚠️ IMPORTANTE: Solamente se reciben TRANSFERENCIAS bancarias.
             </p>
-            <p className="text-sm text-blue-800 mt-2 text-center">
-              La transferencia bancaria es el <strong>único medio de pago aceptado</strong> y deberá efectuarse una vez terminado el procedimiento de verificación de la documentación presentada.
+            <p className="text-sm text-blue-800 mt-2">
+              La transferencia bancaria es el <strong>único medio de pago aceptado</strong> y deberá efectuarse una vez terminado el procedimiento de verificación de la documentación presentada, utilizando los siguientes datos:
             </p>
 
-            <div className="mt-4 grid grid-cols-1 md:grid-cols-2 gap-4 text-left">
-              {/* Columna 1: Datos Esenciales */}
-              <div className="bg-white p-4 rounded-md border border-blue-100 shadow-sm flex flex-col justify-between">
-                <div>
-                  <h4 className="text-sm font-bold text-blue-900 border-b border-blue-100 pb-2 mb-3">
-                    📌 Datos esenciales para transferir
-                  </h4>
-                  <p className="text-xs text-gray-600 mb-3">
-                    Puede transferir desde cualquier home banking o billetera virtual usando cualquiera de estos dos datos:
-                  </p>
-                  <div className="space-y-3 text-sm text-blue-950">
-                    <div>
-                      <span className="block text-xs font-semibold text-blue-600 uppercase">Alias (Más sencillo)</span>
-                      <strong className="text-base font-mono bg-blue-50 px-2 py-1 rounded inline-block mt-1">EXPENDIOBEBIDAS</strong>
-                    </div>
-                    <div>
-                      <span className="block text-xs font-semibold text-blue-600 uppercase">CBU</span>
-                      <strong className="text-sm font-mono bg-blue-50 px-2 py-1 rounded inline-block mt-1 break-all select-all">2850001030094255405241</strong>
-                    </div>
-                  </div>
-                </div>
-              </div>
-
-              {/* Columna 2: Datos de Verificación */}
-              <div className="bg-white p-4 rounded-md border border-blue-100 shadow-sm">
-                <h4 className="text-sm font-bold text-blue-900 border-b border-blue-100 pb-2 mb-3">
-                  🔍 Datos de verificación (Control)
-                </h4>
-                <p className="text-xs text-gray-600 mb-3">
-                  Antes de confirmar la transferencia, verifique que los datos de destino coincidan con los siguientes:
-                </p>
-                <div className="space-y-2 text-xs text-blue-900">
-                  <div><strong>Banco:</strong> Banco Macro S.A.</div>
-                  <div><strong>Razón Social / Titular:</strong> MINISTERIO DE GOBIERNO</div>
-                  <div><strong>CUIT:</strong> 30-70812883-6</div>
-                  <div className="pt-1 border-t border-gray-100 text-[11px] text-gray-500 leading-relaxed">
-                    <strong>Denominación de Cuenta:</strong><br/>
-                    FONDO ESPECIAL PROVINCIAL PARA EL EXPENDIO DE BEBIDAS ALCOHÓLICAS
-                  </div>
-                </div>
+            <div className="mt-3 text-sm text-blue-950 bg-blue-100/60 p-4 rounded border border-blue-200 text-center space-y-2 max-w-xl mx-auto shadow-inner">
+              <div><strong>Alias:</strong> EXPENDIOBEBIDAS</div>
+              <div><strong>CBU:</strong> 2850001030094255405241</div>
+              <div className="border-t border-blue-200/60 my-2 max-w-md mx-auto"></div>
+              <div><strong>Banco:</strong> Banco Macro S.A.</div>
+              <div><strong>Razón Social / Titular:</strong> MINISTERIO DE GOBIERNO</div>
+              <div><strong>CUIT:</strong> 30-70812883-6</div>
+              <div className="text-xs text-blue-800 leading-relaxed max-w-md mx-auto">
+                <strong>Denominación:</strong> FONDO ESPECIAL PROVINCIAL PARA EL EXPENDIO DE BEBIDAS ALCOHÓLICAS
               </div>
             </div>
           </div>
