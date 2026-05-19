@@ -428,9 +428,18 @@ function RegisterPage() {
             </table>
 
           </div>
-          <p className="text-sm mt-4 bg-blue-100 text-blue-800 p-3 rounded-md border border-blue-200">
-            <strong>Aviso Informativo:</strong> Próximamente se procederá a publicar la cuenta bancaria y el alias para realizar el depósito correspondiente, el cual deberá efectuarse una vez terminado el procedimiento de verificación de la documentación presentada.
-          </p>
+          <div className="bg-blue-50 border-l-4 border-blue-500 p-4 rounded-r-md text-left mt-4 max-w-xl mx-auto shadow-sm">
+            <p className="text-sm font-bold text-blue-900">
+              ⚠️ IMPORTANTE: Solamente se reciben TRANSFERENCIAS bancarias.
+            </p>
+            <p className="text-sm text-blue-800 mt-2">
+              El depósito/transferencia correspondiente deberá efectuarse una vez terminado el procedimiento de verificación de la documentación presentada, utilizando los siguientes datos:
+            </p>
+            <div className="mt-3 text-sm text-blue-950 font-mono bg-blue-100/60 p-3 rounded border border-blue-200">
+              <div><strong>Cuenta:</strong> CUENTA CORRIENTE BANCARIA Nro. 300109425540524</div>
+              <div className="mt-1"><strong>Alias:</strong> EXPENDIOBEBIDAS</div>
+            </div>
+          </div>
         </div>
 
 
