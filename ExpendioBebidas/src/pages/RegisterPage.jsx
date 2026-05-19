@@ -430,10 +430,10 @@ function RegisterPage() {
           </div>
           <div className="bg-blue-50 border-l-4 border-blue-500 p-5 rounded-r-md mt-4 shadow-sm text-center">
             <p className="text-sm font-bold text-blue-900">
-              ⚠️ IMPORTANTE: Solamente se reciben TRANSFERENCIAS bancarias.
+              ⚠️ IMPORTANTE: Solamente se reciben TRANSFERENCIAS.
             </p>
             <p className="text-sm text-blue-800 mt-2">
-              La transferencia bancaria es el <strong>único medio de pago aceptado</strong> y deberá efectuarse una vez terminado el procedimiento de verificación de la documentación presentada, utilizando los siguientes datos:
+              La misma deberá efectuarse una vez terminado el procedimiento de verificación de la documentación presentada, utilizando los siguientes datos:
             </p>
 
             <div className="mt-3 text-sm text-blue-950 bg-blue-100/60 p-4 rounded border border-blue-200 text-center space-y-2 max-w-xl mx-auto shadow-inner">
