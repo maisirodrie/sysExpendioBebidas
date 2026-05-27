@@ -91,7 +91,11 @@ export const register = async (req, res) => {
         console.log("Correo de credenciales enviado a: ", email);
 
         const token = await createAccessToke({ id: userSaved._id, role: userSaved.role });
-        res.cookie('token', token);
+        res.cookie('token', token, {
+            httpOnly: true,
+            secure: process.env.NODE_ENV === 'production',
+            sameSite: 'lax'
+        });
         res.status(201).json({
             id: userSaved._id,
             username: userSaved.username,
@@ -124,7 +128,7 @@ export const login = async (req, res) => {
         res.cookie('token', token, {
             httpOnly: true,
             secure: process.env.NODE_ENV === 'production',
-            sameSite: 'strict'
+            sameSite: 'lax'
         });
 
         if (userFound.mustChangePassword) {
@@ -157,6 +161,9 @@ export const login = async (req, res) => {
 // Cerrar sesión
 export const logout = async (req, res) => {
     res.cookie('token', "", {
+        httpOnly: true,
+        secure: process.env.NODE_ENV === 'production',
+        sameSite: 'lax',
         expires: new Date(0)
     });
     return res.sendStatus(200);
@@ -287,7 +294,12 @@ export const changePassword = async (req, res) => {
 
         await userFound.save();
 
-        res.cookie('token', '', { expires: new Date(0) });
+        res.cookie('token', '', {
+            httpOnly: true,
+            secure: process.env.NODE_ENV === 'production',
+            sameSite: 'lax',
+            expires: new Date(0)
+        });
 
         res.json({ message: "Contraseña cambiada con éxito" });
 

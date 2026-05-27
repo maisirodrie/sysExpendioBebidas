@@ -41,6 +41,7 @@ const FILE_NAME_MAP = {
   ddjjDistanciasJuridica: "Declaración Distancias", // Mapea a 'Declaración sobre la distancia existente'
   fotocopiaDniAutorizado: "Fotocopia DNI Autorizado", // Mapea a 'Fotocopia del DNI de la persona autorizada'
   certificadoAntecedentesAutorizado: "Certificado Antecedentes Autorizado", // Mapea a 'Informe de certificado de antecedentes del peticionante'
+  informeSocioAmbientalJuridica: "Informe Socio Ambiental",
   medidasSeguridad: "Constancia de Medidas de Seguridad/Higiene", // Mapea a 'Constancia Municipal sobre medidas de seguridad e higiene'
   propiedadInmuebleJuridica: "Comprobante Propiedad Inmueble", // Mapea a 'Comprobantes que acrediten la propiedad del Inmueble'
   planContingenciaJuridica: "Plan de Contingencia / Bomberos", // Mapea a 'Plan de Contingencia y Constancia Bomberos'
@@ -85,6 +86,7 @@ const FILE_DISPLAY_ORDER = [
   'ddjjDistanciasJuridica',
   'fotocopiaDniAutorizado',
   'certificadoAntecedentesAutorizado',
+  'informeSocioAmbientalJuridica',
   'medidasSeguridad',
   'propiedadInmuebleJuridica',
   'planContingenciaJuridica',
@@ -163,7 +165,8 @@ function TaskViewPage() {
       horarioAtencion,
       createdAt,
       estado,
-      motivoRechazo
+      motivoRechazo,
+      motivoAprobacion
     } = task;
 
     const statusColorName = getStatusColorName(estado || 'ingresado');
@@ -193,6 +196,14 @@ function TaskViewPage() {
           <div className="my-4 p-4 border-l-4 border-red-500 bg-red-100 rounded">
             <h3 className="text-xl font-bold text-red-700 mb-2">Motivo de Rechazo</h3>
             <p className="text-lg text-red-600">{motivoRechazo}</p>
+          </div>
+        )}
+
+        {/* Bloque condicional para mostrar la información de pago al estar aprobado */}
+        {estado?.toLowerCase() === "aprobado" && motivoAprobacion && (
+          <div className="my-4 p-4 border-l-4 border-green-500 bg-green-100 rounded">
+            <h3 className="text-xl font-bold text-green-700 mb-2">Información de Pago / Aprobación</h3>
+            <p className="text-lg text-green-600 whitespace-pre-line">{motivoAprobacion}</p>
           </div>
         )}
         {isEventoParticular && (

@@ -210,6 +210,32 @@ function Table() {
           Swal.fire("Cambio Cancelado", "El cambio de estado ha sido cancelado.", "info");
           return; // Salir si se cancela
         }
+      } else if ((user.role === "juridicos" || user.role === "admin" || user.role === "editor") && newStatus === "aprobado") {
+        const { value: motivoAprobacion } = await Swal.fire({
+          title: "Información de Pago / Aprobación",
+          input: "textarea",
+          inputLabel: "Por favor, especifique el arancel o información necesaria para el pago.",
+          inputPlaceholder: "Escriba aquí...",
+          inputValue: currentTask.motivoAprobacion || '',
+          showCancelButton: true,
+          confirmButtonText: "Guardar",
+          cancelButtonText: "Cancelar",
+          inputValidator: (value) => {
+            if (!value) {
+              return "Necesita escribir las observaciones o arancel de pago para aprobar el expediente.";
+            }
+          },
+        });
+
+        if (motivoAprobacion !== undefined) {
+          // Llama a la función de contexto y CAPTURA la respuesta COMPLETA
+          const res = await updateTask(taskId, { estado: newStatus, motivoAprobacion: motivoAprobacion });
+          updatedTask = res.task || res;
+          Swal.fire("Expediente Actualizado", "La información de pago ha sido guardada.", "success");
+        } else {
+          Swal.fire("Cambio Cancelado", "El cambio de estado ha sido cancelado.", "info");
+          return; // Salir si se cancela
+        }
       } else {
         // 2. Llama a la función de contexto (solo estado) y CAPTURA la respuesta COMPLETA
         updatedTask = await updateTaskStatus(taskId, newStatus);
@@ -476,6 +502,16 @@ function Table() {
                               title="Editar motivo de rechazo"
                             >
                               <FontAwesomeIcon icon={faEdit} />Editar Motivo
+                            </button>
+                          )}
+                          {task.estado === "aprobado" && (user.role === "juridicos" || user.role === "admin" || user.role === "editor") && (
+                            <button
+                              onClick={() => handleStatusChange(task._id, "aprobado")}
+                              className="btn-dark"
+                              style={{ marginLeft: "5px" }}
+                              title="Editar información de pago"
+                            >
+                              <FontAwesomeIcon icon={faEdit} />Editar Info Pago
                             </button>
                           )}
                         </td>

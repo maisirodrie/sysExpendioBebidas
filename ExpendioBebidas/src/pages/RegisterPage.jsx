@@ -211,8 +211,8 @@ function RegisterPage() {
       // Requisitos de Local Comercial (Jurídica)
       "notaSolicitudJuridica", "habilitacionMunicipalJuridica", "estatutoSocial",
       "actaAsamblea", "actaComisionDirectiva", "ddjjDistanciasJuridica",
-      "fotocopiaDniAutorizado", "certificadoAntecedentesAutorizado", "medidasSeguridad",
-      "propiedadInmuebleJuridica", "planContingenciaJuridica"
+      "fotocopiaDniAutorizado", "certificadoAntecedentesAutorizado", "informeSocioAmbientalJuridica",
+      "medidasSeguridad", "propiedadInmuebleJuridica", "planContingenciaJuridica"
     ];
 
     // Lista de campos del Evento Particular

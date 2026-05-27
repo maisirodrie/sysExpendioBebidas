@@ -1,5 +1,4 @@
 import React, { createContext, useContext, useState, useEffect } from "react";
-import axios from "axios";
 import { registerRequest, loginRequest, verifyTokenRequest, changePasswordRequest, resetPasswordRequest } from '../api/auth';
 import Cookies from "js-cookie";
 
@@ -13,19 +12,6 @@ export const useAuth = () => {
     return context;
 };
 
-// Interceptor de Axios para incluir el token en cada solicitud
-axios.interceptors.request.use(
-    (config) => {
-        const token = Cookies.get("token");
-        if (token) {
-            config.headers.Authorization = `Bearer ${token}`;
-        }
-        return config;
-    },
-    (error) => {
-        return Promise.reject(error);
-    }
-);
 
 export const AuthProvider = ({ children }) => {
     const [user, setUser] = useState(null);
@@ -85,10 +71,11 @@ export const AuthProvider = ({ children }) => {
 
     const logout = () => {
         Cookies.remove("token");
+        localStorage.removeItem("token");
         setUser(null);
         setIsAuthenticated(false);
-        delete axios.defaults.headers.common['Authorization'];
     };
+
 
     const changePassword = async (userData) => {
         try {

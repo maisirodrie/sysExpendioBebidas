@@ -108,8 +108,13 @@ const RequisitosJuridica = [
     required: true,
   },
   {
+    key: "informeSocioAmbientalJuridica",
+    label: "Informe Socio Ambiental de la Comisaría (i).",
+    required: true,
+  },
+  {
     key: "medidasSeguridad",
-    label: "Constancia Municipal sobre medidas de seguridad e higiene (i).",
+    label: "Constancia Municipal sobre medidas de seguridad e higiene (j).",
     required: true,
   },
   {

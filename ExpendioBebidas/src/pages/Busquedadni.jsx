@@ -138,6 +138,13 @@ function Busquedadni() {
                           <p className="whitespace-pre-line">{task.motivoRechazo}</p>
                         </div>
                       )}
+
+                      {task.estado.toLowerCase() === 'aprobado' && task.motivoAprobacion && (
+                        <div className="mt-4 p-3 bg-green-50 border border-green-200 text-green-800 rounded-lg text-sm">
+                          <strong className="block mb-1">Información de Pago / Aprobación:</strong>
+                          <p className="whitespace-pre-line">{task.motivoAprobacion}</p>
+                        </div>
+                      )}
                     </div>
                   );
                 })}

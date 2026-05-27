@@ -4,7 +4,7 @@ import { TOKEN_SECRET } from "../config.js";
 export function createAccessToke(payload) {
     return new Promise((resolve, reject) => {
         jwt.sign(
-            payload, // Usa el objeto completo como payload
+            payload,
             TOKEN_SECRET,
             {
                 expiresIn: "1d",
@@ -15,4 +15,4 @@ export function createAccessToke(payload) {
             }
         );
     });
-}
+}

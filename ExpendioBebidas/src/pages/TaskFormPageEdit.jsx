@@ -1,4 +1,4 @@
-﻿import React, { useEffect, useState, useMemo, useRef } from "react";
+import React, { useEffect, useState, useMemo, useRef } from "react";
 import { useForm, useWatch } from "react-hook-form";
 import { useTasks } from "../context/TasksContext";
 import { Link, useNavigate, useParams } from "react-router-dom";
@@ -32,6 +32,7 @@ const FILE_NAME_MAP = {
     ddjjDistanciasJuridica: "Declaración Distancias (Jurídica)",
     fotocopiaDniAutorizado: "Fotocopia DNI Autorizado",
     certificadoAntecedentesAutorizado: "Certificado Antecedentes Autorizado",
+    informeSocioAmbientalJuridica: "Informe Socio Ambiental (Jurídica)",
     medidasSeguridad: "Constancia de Medidas de Seguridad/Higiene",
     propiedadInmuebleJuridica: "Comprobante Propiedad Inmueble (Jurídica)",
     planContingenciaJuridica: "Plan de Contingencia / Bomberos (Jurídica)",
@@ -57,7 +58,7 @@ const getFriendlyFileName = (filename) => {
 const getMappedFileKeys = (expendio, persona) => {
     if (expendio === "Local Comercial") {
         if (persona === "Física") return ["notaSolicitud", "habilitacionMunicipal", "actaInspeccion", "ddjjDistancias", "ddjjHigiene", "fotocopiaDni", "informeSocioAmbiental", "certificadoAntecedentes", "propiedadInmueble", "planContingencia"];
-        if (persona === "Jurídica") return ["notaSolicitudJuridica", "habilitacionMunicipalJuridica", "estatutoSocial", "actaAsamblea", "actaComisionDirectiva", "ddjjDistanciasJuridica", "fotocopiaDniAutorizado", "certificadoAntecedentesAutorizado", "medidasSeguridad", "propiedadInmuebleJuridica", "planContingenciaJuridica"];
+        if (persona === "Jurídica") return ["notaSolicitudJuridica", "habilitacionMunicipalJuridica", "estatutoSocial", "actaAsamblea", "actaComisionDirectiva", "ddjjDistanciasJuridica", "fotocopiaDniAutorizado", "certificadoAntecedentesAutorizado", "informeSocioAmbientalJuridica", "medidasSeguridad", "propiedadInmuebleJuridica", "planContingenciaJuridica"];
     }
     if (expendio === "Evento Particular") return ["paseElevacionIntendente", "autorizacionMunicipal", "fotocopiaDniEvento", "certificadoAntecedentesEvento", "autorizacionPropietario"];
     if (expendio === "Intendencia") return ["paseElevacionIntendente"];

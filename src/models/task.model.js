@@ -50,6 +50,9 @@ const taskSchema = new mongoose.Schema(
     motivoRechazo: {
       type: String,
     },
+    motivoAprobacion: {
+      type: String,
+    },
     pago: {
       type: Boolean,
       default: false,

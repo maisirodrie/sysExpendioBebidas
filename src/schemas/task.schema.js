@@ -52,6 +52,7 @@ export const creatTaskSchema = z.object({
   habilitacionComercial: z.string().optional(),
   estado: z.string().optional().default("Ingresado"),
   motivoRechazo: z.string().optional(),
+  motivoAprobacion: z.string().optional(),
   pago: z.boolean().optional().default(false),
   file: z.any().optional(),
   user: z.string().optional(),

@@ -132,7 +132,7 @@ export const getTaskByDni = async (req, res) => {
   try {
     // Busca todas las tareas asociadas al DNI proporcionado, ordenadas por fecha (más reciente primero)
     const tasks = await Task.find({ dni })
-      .select("estado dni nroexpediente nombre apellido motivoRechazo expendio createdAt")
+      .select("estado dni nroexpediente nombre apellido motivoRechazo motivoAprobacion expendio createdAt")
       .sort({ createdAt: -1 });
 
     if (!tasks || tasks.length === 0) {
@@ -149,6 +149,7 @@ export const getTaskByDni = async (req, res) => {
         nroexpediente: task.nroexpediente || "No asignado",
         estado: task.estado,
         motivoRechazo: task.motivoRechazo,
+        motivoAprobacion: task.motivoAprobacion,
         expendio: task.expendio,
         createdAt: task.createdAt,
       }))
@@ -643,6 +644,19 @@ export const updateTasks = async (req, res) => {
             }
         } // FIN DEL BLOQUE DE LÓGICA DE ARCHIVOS
         
+        // Limpieza cruzada de motivos según el estado actualizado
+        if (updateData.estado) {
+            const estadoLower = updateData.estado.toLowerCase();
+            if (estadoLower === 'rechazado') {
+                updateData.motivoAprobacion = null;
+            } else if (estadoLower === 'aprobado') {
+                updateData.motivoRechazo = null;
+            } else if (['ingresado', 'pendiente', 'controlado', 'finalizado'].includes(estadoLower)) {
+                updateData.motivoRechazo = null;
+                updateData.motivoAprobacion = null;
+            }
+        }
+
         // 4. 🚀 ACTUALIZACIÓN SEGURA DE MONGO
         // Si solo se actualizó el estado (y no hubo manejo de archivos), finalFiles = task.file.
         // Si hubo manejo de archivos, finalFiles contiene la lista nueva.
@@ -686,7 +700,7 @@ export const taskEstados = async (req, res) => {
     try {
         const { id } = req.params;
         // Obtenemos los datos del body, incluyendo el nuevo estado y el motivo (si aplica)
-        const { newState, motivoRechazo } = req.body; 
+        const { newState, motivoRechazo, motivoAprobacion } = req.body; 
 
         const userRole = req.user.role.toLowerCase();
 
@@ -734,16 +748,26 @@ export const taskEstados = async (req, res) => {
             estado: newStateLower,
         };
 
-        // Manejo del Motivo de Rechazo (necesario para el estado RECHAZADO, como se ve en la captura)
+        // Manejo del Motivo de Rechazo / Aprobación con limpieza cruzada
         if (newStateLower === 'rechazado') {
             if (!motivoRechazo) {
                  return res.status(400).json({ message: "Debe proporcionar un motivo de rechazo." });
             }
             updateFields.motivoRechazo = motivoRechazo;
+            updateFields.motivoAprobacion = null;
+        } else if (newStateLower === 'aprobado') {
+            if (!motivoAprobacion) {
+                 return res.status(400).json({ message: "Debe proporcionar la información de pago / aprobación." });
+            }
+            updateFields.motivoAprobacion = motivoAprobacion;
+            updateFields.motivoRechazo = null;
         } else {
-            // Limpiamos el motivoRechazo si el estado cambia a uno no rechazado.
+            // Limpiamos ambos si el estado cambia a otro que no sea rechazado ni aprobado
             if (task.motivoRechazo) {
                  updateFields.motivoRechazo = null; 
+            }
+            if (task.motivoAprobacion) {
+                 updateFields.motivoAprobacion = null; 
             }
         }
         
