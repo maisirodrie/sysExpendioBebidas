@@ -447,6 +447,13 @@ function RegisterPage() {
                 <strong>Denominación:</strong> FONDO ESPECIAL PROVINCIAL PARA EL EXPENDIO DE BEBIDAS ALCOHÓLICAS
               </div>
             </div>
+
+            <p className="text-sm text-blue-900 mt-3 font-semibold">
+              📧 Una vez efectuada la transferencia, se deberá enviar el comprobante de pago al correo:{' '}
+              <a href="mailto:expendio.aranceles@misiones.gov.ar" className="underline font-bold hover:text-blue-700 transition-colors">
+                expendio.aranceles@misiones.gov.ar
+              </a>
+            </p>
           </div>
         </div>
 
