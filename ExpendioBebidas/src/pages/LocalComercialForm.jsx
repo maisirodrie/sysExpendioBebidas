@@ -118,11 +118,6 @@ const RequisitosJuridica = [
     required: true,
   },
   {
-    key: "propiedadInmuebleJuridica",
-    label: "Comprobantes que acrediten la propiedad del Inmueble.",
-    required: true,
-  },
-  {
     key: "planContingenciaJuridica",
     label: "Plan de Contingencia y Constancia Bomberos (si aplica).",
     required: true,

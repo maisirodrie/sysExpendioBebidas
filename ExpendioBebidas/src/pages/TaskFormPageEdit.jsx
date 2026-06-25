@@ -34,7 +34,6 @@ const FILE_NAME_MAP = {
     certificadoAntecedentesAutorizado: "Certificado Antecedentes Autorizado",
     informeSocioAmbientalJuridica: "Informe Socio Ambiental (Jurídica)",
     medidasSeguridad: "Constancia de Medidas de Seguridad/Higiene",
-    propiedadInmuebleJuridica: "Comprobante Propiedad Inmueble (Jurídica)",
     planContingenciaJuridica: "Plan de Contingencia / Bomberos (Jurídica)",
     paseElevacionIntendente: "Pase de Elevación",
     autorizacionMunicipal: "Autorización Municipal",
@@ -58,7 +57,7 @@ const getFriendlyFileName = (filename) => {
 const getMappedFileKeys = (expendio, persona) => {
     if (expendio === "Local Comercial") {
         if (persona === "Física") return ["notaSolicitud", "habilitacionMunicipal", "actaInspeccion", "ddjjDistancias", "ddjjHigiene", "fotocopiaDni", "informeSocioAmbiental", "certificadoAntecedentes", "propiedadInmueble", "planContingencia"];
-        if (persona === "Jurídica") return ["notaSolicitudJuridica", "habilitacionMunicipalJuridica", "estatutoSocial", "actaAsamblea", "actaComisionDirectiva", "ddjjDistanciasJuridica", "fotocopiaDniAutorizado", "certificadoAntecedentesAutorizado", "informeSocioAmbientalJuridica", "medidasSeguridad", "propiedadInmuebleJuridica", "planContingenciaJuridica"];
+        if (persona === "Jurídica") return ["notaSolicitudJuridica", "habilitacionMunicipalJuridica", "estatutoSocial", "actaAsamblea", "actaComisionDirectiva", "ddjjDistanciasJuridica", "fotocopiaDniAutorizado", "certificadoAntecedentesAutorizado", "informeSocioAmbientalJuridica", "medidasSeguridad", "planContingenciaJuridica"];
     }
     if (expendio === "Evento Particular") return ["paseElevacionIntendente", "autorizacionMunicipal", "fotocopiaDniEvento", "certificadoAntecedentesEvento", "autorizacionPropietario"];
     if (expendio === "Intendencia") return ["paseElevacionIntendente"];

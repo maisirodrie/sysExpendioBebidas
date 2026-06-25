@@ -212,7 +212,7 @@ function RegisterPage() {
       "notaSolicitudJuridica", "habilitacionMunicipalJuridica", "estatutoSocial",
       "actaAsamblea", "actaComisionDirectiva", "ddjjDistanciasJuridica",
       "fotocopiaDniAutorizado", "certificadoAntecedentesAutorizado", "informeSocioAmbientalJuridica",
-      "medidasSeguridad", "propiedadInmuebleJuridica", "planContingenciaJuridica"
+      "medidasSeguridad", "planContingenciaJuridica"
     ];
 
     // Lista de campos del Evento Particular

@@ -43,7 +43,6 @@ const FILE_NAME_MAP = {
   certificadoAntecedentesAutorizado: "Certificado Antecedentes Autorizado", // Mapea a 'Informe de certificado de antecedentes del peticionante'
   informeSocioAmbientalJuridica: "Informe Socio Ambiental",
   medidasSeguridad: "Constancia de Medidas de Seguridad/Higiene", // Mapea a 'Constancia Municipal sobre medidas de seguridad e higiene'
-  propiedadInmuebleJuridica: "Comprobante Propiedad Inmueble", // Mapea a 'Comprobantes que acrediten la propiedad del Inmueble'
   planContingenciaJuridica: "Plan de Contingencia / Bomberos", // Mapea a 'Plan de Contingencia y Constancia Bomberos'
 
   // Evento Particular
@@ -88,7 +87,6 @@ const FILE_DISPLAY_ORDER = [
   'certificadoAntecedentesAutorizado',
   'informeSocioAmbientalJuridica',
   'medidasSeguridad',
-  'propiedadInmuebleJuridica',
   'planContingenciaJuridica',
 ];
 
