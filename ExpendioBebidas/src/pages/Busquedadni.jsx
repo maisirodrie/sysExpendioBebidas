@@ -139,9 +139,12 @@ function Busquedadni() {
                             <p className="whitespace-pre-line">{task.motivoRechazo}</p>
                           </div>
                         ) : (
-                          <div className="mt-4 p-3 bg-yellow-50 border border-yellow-200 text-yellow-800 rounded-lg text-sm">
-                            <strong className="block mb-1">Observaciones previas a corregir:</strong>
-                            <p className="whitespace-pre-line">{task.motivoRechazo}</p>
+                          <div className="mt-4 p-4 bg-blue-50 border border-blue-200 text-blue-800 rounded-lg text-sm flex items-start gap-3">
+                            <span className="text-xl">⏳</span>
+                            <div>
+                              <strong className="block mb-1">Documentación en Verificación:</strong>
+                              <p className="text-xs text-blue-600"><strong>Motivos previos:</strong> {task.motivoRechazo}</p>
+                            </div>
                           </div>
                         )
                       )}

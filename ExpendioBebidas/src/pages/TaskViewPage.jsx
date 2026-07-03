@@ -3,6 +3,7 @@ import { Link, useParams } from "react-router-dom";
 import { format } from "date-fns";
 import esLocale from "date-fns/locale/es";
 import { useTasks } from "../context/TasksContext";
+import { useAuth } from "../context/AuthContext";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faArrowLeft } from "@fortawesome/free-solid-svg-icons";
 
@@ -109,9 +110,56 @@ const getFileKey = (filename) => {
 };
 
 
+// Helper de auditoría inteligente para relacionar palabras clave del motivo con archivos
+const getMatchingFilesForAudit = (motivo) => {
+  if (!motivo) return [];
+  const motivoLower = motivo.toLowerCase();
+  const matches = [];
+
+  const keywords = {
+    notaSolicitud: ["nota de solicitud", "nota solicitud", "solicitud"],
+    notaSolicitudJuridica: ["solicitud (jurídica)", "solicitud juridica"],
+    habilitacionMunicipal: ["habilitación municipal", "habilitacion municipal", "copia habilitación", "copia habilitacion"],
+    habilitacionMunicipalJuridica: ["habilitación municipal (jurídica)", "habilitacion municipal juridica", "constancia habilitación municipal"],
+    actaInspeccion: ["acta de inspección", "acta inspeccion", "bromatología", "bromatologia", "inspección", "inspeccion"],
+    ddjjDistancias: ["distancias", "declaración jurada de distancias", "ddjj distancias"],
+    ddjjDistanciasJuridica: ["declaración distancias", "ddjj distancias juridica"],
+    ddjjHigiene: ["higiene y seguridad", "ddjj higiene"],
+    fotocopiaDni: ["fotocopia de dni", "dni", "cuit"],
+    fotocopiaDniAutorizado: ["dni autorizado", "cuit autorizado"],
+    fotocopiaDniEvento: ["dni (evento)", "dni evento"],
+    informeSocioAmbiental: ["informe socio ambiental", "socio ambiental", "socioambiental"],
+    informeSocioAmbientalJuridica: ["socio ambiental (jurídica)", "socioambiental juridica"],
+    certificadoAntecedentes: ["antecedentes", "policía", "policia", "informe judicial", "judicial"],
+    certificadoAntecedentesAutorizado: ["antecedentes autorizado", "policía autorizado", "policia autorizado", "antecedentes penal"],
+    certificadoAntecedentesEvento: ["antecedentes (evento)", "policia evento", "antecedentes evento"],
+    propiedadInmueble: ["propiedad", "inmueble", "título", "titulo", "comprobante de propiedad"],
+    planContingencia: ["contingencia", "bomberos"],
+    planContingenciaJuridica: ["contingencia (jurídica)", "contingencia juridica", "bomberos (jurídica)"],
+    estatutoSocial: ["estatuto", "estatuto social"],
+    actaAsamblea: ["asamblea", "acta de asamblea"],
+    actaComisionDirectiva: ["comisión directiva", "comision directiva"],
+    medidasSeguridad: ["medidas de seguridad", "constancia de medidas"],
+    paseElevacionIntendente: ["pase", "elevación", "intendente", "pase de elevacion"],
+    autorizacionMunicipal: ["autorización municipal", "autorizacion municipal"],
+    autorizacionPropietario: ["autorización del propietario", "autorizacion propietario"]
+  };
+
+  Object.keys(keywords).forEach(key => {
+    const hasMatch = keywords[key].some(kw => motivoLower.includes(kw));
+    if (hasMatch) {
+      matches.push(key);
+    }
+  });
+
+  return matches;
+};
+
+
 // --- 2. Componente TaskViewPage ---
 function TaskViewPage() {
   const { getTask } = useTasks();
+  const { user } = useAuth();
   const params = useParams();
   const [task, setTask] = useState(null);
 
@@ -197,10 +245,16 @@ function TaskViewPage() {
               <p className="text-lg text-red-600 whitespace-pre-line">{motivoRechazo}</p>
             </div>
           ) : (
-            <div className="my-4 p-4 border-l-4 border-yellow-500 bg-yellow-50 rounded">
-              <h3 className="text-xl font-bold text-yellow-800 mb-2">Observaciones previas a corregir</h3>
-              <p className="text-lg text-yellow-700 whitespace-pre-line">{motivoRechazo}</p>
-            </div>
+            // Si el estado es de reevaluación (pendiente/controlado/ingresado) y no es staff, mostramos el diálogo formal de espera activa
+            !(user?.role === "juridicos" || user?.role === "admin" || user?.role === "editor") && (
+              <div className="my-4 p-4 border-l-4 border-blue-500 bg-blue-50 rounded text-blue-900 flex items-start gap-3">
+                <span style={{ fontSize: "24px" }}>⏳</span>
+                <div>
+                  <h3 className="text-xl font-bold text-blue-900 mb-1">Documentación en Verificación:</h3>
+                  <p className="text-sm text-blue-700"><strong>Motivos previos:</strong> {motivoRechazo}</p>
+                </div>
+              </div>
+            )
           )
         )}
 
@@ -262,8 +316,27 @@ function TaskViewPage() {
     );
   };
 
+  const matchingAuditKeys = task?.motivoRechazo ? getMatchingFilesForAudit(task.motivoRechazo) : [];
+
   return (
     <div className="flex items-center justify-center overflow-y-auto" style={{ marginTop: "20px", marginBottom: "20px", paddingRight: "20px", paddingLeft: "20px" }}>
+      {/* Estilos inline para la animación de auditoría */}
+      <style>{`
+        @keyframes auditPulse {
+          0%, 100% {
+            transform: scale(1);
+            box-shadow: 0 0 0 0 rgba(220, 38, 38, 0.7);
+          }
+          50% {
+            transform: scale(1.02);
+            box-shadow: 0 0 0 10px rgba(220, 38, 38, 0);
+          }
+        }
+        .audit-pulse-target {
+          animation: auditPulse 2s infinite !important;
+          border: 4px solid #dc2626 !important;
+        }
+      `}</style>
       <div className="bg-gray-300 max-w-screen-lg w-full p-10 rounded-md">
         <div className="flex justify-between items-center mb-4">
           <h1 className="text-2xl font-bold text-black">Detalles del Registro</h1>
@@ -275,6 +348,19 @@ function TaskViewPage() {
           {task ? (
             <>
               {renderTaskDetails()}
+
+              {/* Panel de Auditoría para Jurídicos/Admin/Editor */}
+              {(user?.role === "juridicos" || user?.role === "admin" || user?.role === "editor") && task.motivoRechazo && (
+                <div className="mt-6 p-4 border-l-4 border-amber-500 bg-amber-100 rounded text-amber-900 mb-4" style={{ textAlign: "left" }}>
+                  <h4 className="font-bold text-lg mb-1">🔍 Motivo de Rechazo previo</h4>
+                  <p className="text-md whitespace-pre-line mb-3">{task.motivoRechazo}</p>
+                  {matchingAuditKeys.length > 0 && (
+                    <div className="text-sm font-semibold bg-amber-200/50 p-2 rounded border border-amber-300">
+                      ⚠️ Documentos observados a verificar con prioridad: {matchingAuditKeys.map(k => FILE_NAME_MAP[k] || k).join(", ").toUpperCase()}
+                    </div>
+                  )}
+                </div>
+              )}
 
               {/* Mostrar todos los archivos adjuntos usando el mapeo de nombres */}
               {task.file && task.file.length > 0 && (
@@ -297,18 +383,30 @@ function TaskViewPage() {
 
                         return finalIndexA - finalIndexB;
                       })
-                      .map((fileInfo) => (
-                        <a
-                          key={fileInfo.id.toString()} // Usar el ID como key
-                          href={`${apiUrl.replace('/tasks/download', '')}/tasks/file/${fileInfo.filename}`}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          className="bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 text-center rounded transition duration-200 break-words w-full"
-                        >
-                          {/* Usa la función de mapeo aquí */}
-                          📂 {getFriendlyFileName(fileInfo.filename)}
-                        </a>
-                      ))}
+                      .map((fileInfo) => {
+                        const fileKey = getFileKey(fileInfo.filename);
+                        const isAuditTarget = (user?.role === "juridicos" || user?.role === "admin" || user?.role === "editor") && matchingAuditKeys.includes(fileKey);
+                        return (
+                          <a
+                            key={fileInfo.id.toString()} // Usar el ID como key
+                            href={`${apiUrl.replace('/tasks/download', '')}/tasks/file/${fileInfo.filename}`}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className={`font-bold py-3 px-4 text-center rounded transition duration-200 break-words w-full flex flex-col items-center justify-center gap-1 ${
+                              isAuditTarget 
+                                ? "bg-amber-600 hover:bg-amber-700 text-white audit-pulse-target shadow-lg" 
+                                : "bg-blue-500 hover:bg-blue-600 text-white"
+                            }`}
+                          >
+                            <span>📂 {getFriendlyFileName(fileInfo.filename)}</span>
+                            {isAuditTarget && (
+                              <span className="bg-red-600 text-white text-xs px-2 py-0.5 rounded-full font-extrabold uppercase mt-1">
+                                ⚠️ VERIFICAR PRIORITARIO
+                              </span>
+                            )}
+                          </a>
+                        );
+                      })}
                   </div>
                 </div>
               )}

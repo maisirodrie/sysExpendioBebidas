@@ -41,6 +41,13 @@ function Table() {
   const [currentPage, setCurrentPage] = useState(1);
   const tasksPerPage = 10;
 
+  // Estados para búsqueda avanzada
+  const [showAdvanced, setShowAdvanced] = useState(false);
+  const [filterEstado, setFilterEstado] = useState("");
+  const [filterLocalidad, setFilterLocalidad] = useState("");
+  const [filterExpendio, setFilterExpendio] = useState("");
+  const [filterRubro, setFilterRubro] = useState("");
+
   async function handleDelete(id) {
     Swal.fire({
       title: "¿Está seguro que desea eliminar este archivo?",
@@ -70,16 +77,19 @@ function Table() {
 
   const searcher = (e) => {
     setSearch(e.target.value);
+    setCurrentPage(1); // Reiniciar paginación al buscar
   };
+
+  const uniqueLocalidades = [...new Set(tasks.map(t => t.localidad).filter(Boolean))].sort();
 
   const reversedTasks = [...tasks].reverse();
 
-  const filteredTasks = !search
-    ? reversedTasks
-    : reversedTasks.filter((task) => {
-      // CORRECCIÓN 2: Uso de la función auxiliar para convertir el array a string para la búsqueda.
-      const nroexpediente = getExpedienteString(task.nroexpediente).toLowerCase();
+  const filteredTasks = reversedTasks.filter((task) => {
+    // 1. Filtro de búsqueda global (si hay texto en el buscador)
+    if (search) {
+      const searchLowerCase = search.toLowerCase();
 
+      const nroexpediente = getExpedienteString(task.nroexpediente).toLowerCase();
       const apellido = task.apellido ? task.apellido.toLowerCase() : "";
       const nombre = task.nombre ? task.nombre.toLowerCase() : "";
       const dni = task.dni ? task.dni.toLowerCase() : "";
@@ -87,9 +97,22 @@ function Table() {
       const persona = task.persona ? task.persona.toLowerCase() : "";
       const expendio = task.expendio ? task.expendio.toLowerCase() : "";
       const estado = task.estado ? task.estado.toLowerCase() : "";
-      const searchLowerCase = search.toLowerCase();
+      
+      // Campos avanzados adicionales para búsqueda total
+      const domicilio = task.domicilio ? task.domicilio.toLowerCase() : "";
+      const lugar = task.lugar ? task.lugar.toLowerCase() : "";
+      const dias = task.dias ? task.dias.toLowerCase() : "";
+      const horarios = task.horarios ? task.horarios.toLowerCase() : "";
+      const tipoevento = task.tipoevento ? task.tipoevento.toLowerCase() : "";
+      const email = task.email ? task.email.toLowerCase() : "";
+      const contacto = task.contacto ? task.contacto.toLowerCase() : "";
+      const nroHabilitacion = task.nroHabilitacion ? task.nroHabilitacion.toLowerCase() : "";
+      const domicilioLocalComercial = task.domicilioLocalComercial ? task.domicilioLocalComercial.toLowerCase() : "";
+      const rubro = task.rubro ? task.rubro.toLowerCase() : "";
+      const horarioAtencion = task.horarioAtencion ? task.horarioAtencion.toLowerCase() : "";
+      const habilitacionComercial = task.habilitacionComercial ? task.habilitacionComercial.toLowerCase() : "";
 
-      return (
+      const matchesGlobal = (
         nroexpediente.includes(searchLowerCase) ||
         apellido.includes(searchLowerCase) ||
         nombre.includes(searchLowerCase) ||
@@ -97,9 +120,49 @@ function Table() {
         localidad.includes(searchLowerCase) ||
         persona.includes(searchLowerCase) ||
         expendio.includes(searchLowerCase) ||
-        estado.includes(searchLowerCase)
+        estado.includes(searchLowerCase) ||
+        domicilio.includes(searchLowerCase) ||
+        lugar.includes(searchLowerCase) ||
+        dias.includes(searchLowerCase) ||
+        horarios.includes(searchLowerCase) ||
+        tipoevento.includes(searchLowerCase) ||
+        email.includes(searchLowerCase) ||
+        contacto.includes(searchLowerCase) ||
+        nroHabilitacion.includes(searchLowerCase) ||
+        domicilioLocalComercial.includes(searchLowerCase) ||
+        rubro.includes(searchLowerCase) ||
+        horarioAtencion.includes(searchLowerCase) ||
+        habilitacionComercial.includes(searchLowerCase)
       );
-    });
+
+      if (!matchesGlobal) return false;
+    }
+
+    // 2. Filtro avanzado por Estado
+    if (filterEstado && task.estado?.toLowerCase() !== filterEstado.toLowerCase()) {
+      return false;
+    }
+
+    // 3. Filtro avanzado por Localidad
+    if (filterLocalidad && task.localidad?.toLowerCase() !== filterLocalidad.toLowerCase()) {
+      return false;
+    }
+
+    // 4. Filtro avanzado por Tipo de Expendio
+    if (filterExpendio && task.expendio?.toLowerCase() !== filterExpendio.toLowerCase()) {
+      return false;
+    }
+
+    // 5. Filtro avanzado por Rubro
+    if (filterRubro) {
+      const taskRubro = task.rubro ? task.rubro.toLowerCase() : "";
+      if (!taskRubro.includes(filterRubro.toLowerCase())) {
+        return false;
+      }
+    }
+
+    return true;
+  });
 
   const indexOfLastTask = currentPage * tasksPerPage;
   const indexOfFirstTask = indexOfLastTask - tasksPerPage;
@@ -304,6 +367,7 @@ function Table() {
           task.apellido || "",
           task.nombre || "",
           task.dni || "",
+          formatFechaCreacion(task.createdAt),
           task.localidad || "",
           task.persona || "",
           task.expendio || "",
@@ -314,7 +378,7 @@ function Table() {
         doc.autoTable({
           startY: 20,
           head: [
-            ["N° Expediente", "Apellido", "Nombre", "DNI", "Localidad", "Tipo de Persona", "Tipo de Expendio", "Estado"]
+            ["N° Expediente", "Apellido", "Nombre", "DNI", "Fecha de Creación", "Localidad", "Tipo de Persona", "Tipo de Expendio", "Estado"]
           ],
           body: tableData,
           margin: { top: 10 },
@@ -346,6 +410,7 @@ function Table() {
           "Apellido": task.apellido || "",
           "Nombre": task.nombre || "",
           "DNI": task.dni || "",
+          "Fecha de Creación": formatFechaCreacion(task.createdAt),
           "Localidad": task.localidad || "",
           "Tipo de Persona": task.persona || "",
           "Tipo de Expendio": task.expendio || "",
@@ -390,6 +455,97 @@ function Table() {
                 <FontAwesomeIcon icon={faSearch} className="ml-2" />
               </span>
             </div>
+
+            {/* Botón de Búsqueda Avanzada */}
+            <div className="mb-3 d-flex justify-content-start">
+              <button
+                onClick={() => setShowAdvanced(!showAdvanced)}
+                className="btn btn-primary btn-sm"
+                style={{ backgroundColor: '#4186dc', borderColor: '#4186dc' }}
+              >
+                <FontAwesomeIcon icon={faSearch} className="mr-1" style={{ marginRight: '5px' }} />
+                {showAdvanced ? "Ocultar Búsqueda Avanzada" : "Mostrar Búsqueda Avanzada"}
+              </button>
+            </div>
+
+            {/* Panel de Búsqueda Avanzada */}
+            {showAdvanced && (
+              <div className="bg-light p-3 rounded mb-3 border text-left" style={{ textTransform: "uppercase", textAlign: "left", width: "100%" }}>
+                <div className="row" style={{ display: "flex", flexWrap: "wrap", gap: "15px" }}>
+                  <div className="flex-fill" style={{ flex: "1 1 200px" }}>
+                    <label className="form-label font-weight-bold" style={{ fontSize: '11px', fontWeight: 'bold', color: '#555', display: 'block', marginBottom: '5px' }}>Estado</label>
+                    <select
+                      value={filterEstado}
+                      onChange={(e) => { setFilterEstado(e.target.value); setCurrentPage(1); }}
+                      className="form-select form-control"
+                      style={{ height: '38px', width: '100%' }}
+                    >
+                      <option value="">Todos</option>
+                      <option value="ingresado">Ingresado</option>
+                      <option value="pendiente">Pendiente</option>
+                      <option value="controlado">En revisión</option>
+                      <option value="aprobado">Aprobado</option>
+                      <option value="rechazado">Rechazado</option>
+                      <option value="finalizado">Finalizado</option>
+                    </select>
+                  </div>
+                  <div className="flex-fill" style={{ flex: "1 1 200px" }}>
+                    <label className="form-label font-weight-bold" style={{ fontSize: '11px', fontWeight: 'bold', color: '#555', display: 'block', marginBottom: '5px' }}>Localidad</label>
+                    <select
+                      value={filterLocalidad}
+                      onChange={(e) => { setFilterLocalidad(e.target.value); setCurrentPage(1); }}
+                      className="form-select form-control"
+                      style={{ height: '38px', width: '100%' }}
+                    >
+                      <option value="">Todas</option>
+                      {uniqueLocalidades.map(loc => (
+                        <option key={loc} value={loc}>{loc.toUpperCase()}</option>
+                      ))}
+                    </select>
+                  </div>
+                  <div className="flex-fill" style={{ flex: "1 1 200px" }}>
+                    <label className="form-label font-weight-bold" style={{ fontSize: '11px', fontWeight: 'bold', color: '#555', display: 'block', marginBottom: '5px' }}>Tipo de Expendio</label>
+                    <select
+                      value={filterExpendio}
+                      onChange={(e) => { setFilterExpendio(e.target.value); setCurrentPage(1); }}
+                      className="form-select form-control"
+                      style={{ height: '38px', width: '100%' }}
+                    >
+                      <option value="">Todos</option>
+                      <option value="Local Comercial">Local Comercial</option>
+                      <option value="Evento Particular">Evento Particular</option>
+                      <option value="Intendencia">Intendencia</option>
+                    </select>
+                  </div>
+                  <div className="flex-fill" style={{ flex: "1 1 200px" }}>
+                    <label className="form-label font-weight-bold" style={{ fontSize: '11px', fontWeight: 'bold', color: '#555', display: 'block', marginBottom: '5px' }}>Rubro</label>
+                    <input
+                      type="text"
+                      value={filterRubro}
+                      onChange={(e) => { setFilterRubro(e.target.value); setCurrentPage(1); }}
+                      placeholder="Ej: Kiosco, Bar..."
+                      className="form-control"
+                      style={{ height: '38px', width: '100%' }}
+                    />
+                  </div>
+                </div>
+                <div className="d-flex justify-content-end mt-3" style={{ display: 'flex', justifyContent: 'flex-end', marginTop: '15px' }}>
+                  <button
+                    onClick={() => {
+                      setFilterEstado("");
+                      setFilterLocalidad("");
+                      setFilterExpendio("");
+                      setFilterRubro("");
+                      setSearch("");
+                      setCurrentPage(1);
+                    }}
+                    className="btn btn-danger btn-sm"
+                  >
+                    Limpiar Filtros
+                  </button>
+                </div>
+              </div>
+            )}
 
             <ul className="button-container">
               <li className="d-flex gap-2">
