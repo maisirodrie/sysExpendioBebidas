@@ -132,11 +132,18 @@ function Busquedadni() {
                         </div>
                       </div>
 
-                      {task.estado.toLowerCase() === 'rechazado' && task.motivoRechazo && (
-                        <div className="mt-4 p-3 bg-red-50 border border-red-200 text-red-800 rounded-lg text-sm">
-                          <strong className="block mb-1">Motivo de Rechazo:</strong>
-                          <p className="whitespace-pre-line">{task.motivoRechazo}</p>
-                        </div>
+                      {task.motivoRechazo && task.estado.toLowerCase() !== 'aprobado' && task.estado.toLowerCase() !== 'finalizado' && (
+                        task.estado.toLowerCase() === 'rechazado' ? (
+                          <div className="mt-4 p-3 bg-red-50 border border-red-200 text-red-800 rounded-lg text-sm">
+                            <strong className="block mb-1">Motivo de Rechazo:</strong>
+                            <p className="whitespace-pre-line">{task.motivoRechazo}</p>
+                          </div>
+                        ) : (
+                          <div className="mt-4 p-3 bg-yellow-50 border border-yellow-200 text-yellow-800 rounded-lg text-sm">
+                            <strong className="block mb-1">Observaciones previas a corregir:</strong>
+                            <p className="whitespace-pre-line">{task.motivoRechazo}</p>
+                          </div>
+                        )
                       )}
 
                       {task.estado.toLowerCase() === 'aprobado' && task.motivoAprobacion && (

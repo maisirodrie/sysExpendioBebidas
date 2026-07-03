@@ -652,7 +652,7 @@ export const updateTasks = async (req, res) => {
             } else if (estadoLower === 'aprobado') {
                 updateData.motivoRechazo = null;
             } else if (['ingresado', 'pendiente', 'controlado', 'finalizado'].includes(estadoLower)) {
-                updateData.motivoRechazo = null;
+                // NO limpiamos motivoRechazo para mantener el historial del rechazo previo mientras se revisa
                 updateData.motivoAprobacion = null;
             }
         }
@@ -762,10 +762,8 @@ export const taskEstados = async (req, res) => {
             updateFields.motivoAprobacion = motivoAprobacion;
             updateFields.motivoRechazo = null;
         } else {
-            // Limpiamos ambos si el estado cambia a otro que no sea rechazado ni aprobado
-            if (task.motivoRechazo) {
-                 updateFields.motivoRechazo = null; 
-            }
+            // Limpiamos el motivo de aprobación ya que no está aprobado,
+            // pero mantenemos el motivo de rechazo previo para consulta.
             if (task.motivoAprobacion) {
                  updateFields.motivoAprobacion = null; 
             }

@@ -190,11 +190,18 @@ function TaskViewPage() {
         </p>
 
         {/* Bloque condicional para mostrar el motivoRechazo con colores dinámicos */}
-        {isRechazado && motivoRechazo && (
-          <div className="my-4 p-4 border-l-4 border-red-500 bg-red-100 rounded">
-            <h3 className="text-xl font-bold text-red-700 mb-2">Motivo de Rechazo</h3>
-            <p className="text-lg text-red-600">{motivoRechazo}</p>
-          </div>
+        {motivoRechazo && estado?.toLowerCase() !== "aprobado" && estado?.toLowerCase() !== "finalizado" && (
+          estado?.toLowerCase() === "rechazado" ? (
+            <div className="my-4 p-4 border-l-4 border-red-500 bg-red-100 rounded">
+              <h3 className="text-xl font-bold text-red-700 mb-2">Motivo de Rechazo</h3>
+              <p className="text-lg text-red-600 whitespace-pre-line">{motivoRechazo}</p>
+            </div>
+          ) : (
+            <div className="my-4 p-4 border-l-4 border-yellow-500 bg-yellow-50 rounded">
+              <h3 className="text-xl font-bold text-yellow-800 mb-2">Observaciones previas a corregir</h3>
+              <p className="text-lg text-yellow-700 whitespace-pre-line">{motivoRechazo}</p>
+            </div>
+          )
         )}
 
         {/* Bloque condicional para mostrar la información de pago al estar aprobado */}
