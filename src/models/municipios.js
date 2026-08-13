@@ -74,6 +74,11 @@ const Municipios = [
     { id: 73, nombre: "SANTO PIPÓ" },
     { id: 74, nombre: "TRES CAPONES" },
     { id: 75, nombre: "SALTO ENCANTADO" },
-    { id: 76, nombre: "POZO AZUL" }
-  ]
+    { id: 76, nombre: "POZO AZUL" },
+    { id: 77, nombre: "FRACRAN" },
+    { id: 78, nombre: "DOS HERMANAS" }
+  ];
+  
+  export default Municipios;
+
   

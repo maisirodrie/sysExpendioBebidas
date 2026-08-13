@@ -77,4 +77,6 @@ export const Municipios = [
   { id: 76, nombre: "SALTO ENCANTADO" },
   { id: 77, nombre: "POZO AZUL" },
   { id: 78, nombre: "FRACRAN" },
+  { id: 79, nombre: "DOS HERMANAS" },
 ];
+
