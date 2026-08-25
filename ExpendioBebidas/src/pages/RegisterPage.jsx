@@ -438,13 +438,13 @@ function RegisterPage() {
 
             <div className="mt-3 text-sm text-blue-950 bg-blue-100/60 p-4 rounded border border-blue-200 text-center space-y-2 max-w-xl mx-auto shadow-inner">
               <div><strong>Alias:</strong> EXPENDIOBEBIDAS</div>
-              <div><strong>CBU:</strong> 2850001030094255405241</div>
+              <div><strong>CBU:</strong> 2850001030094257979021</div>
               <div className="border-t border-blue-200/60 my-2 max-w-md mx-auto"></div>
               <div><strong>Banco:</strong> Banco Macro S.A.</div>
-              <div><strong>Razón Social / Titular:</strong> MINISTERIO DE GOBIERNO</div>
-              <div><strong>CUIT:</strong> 30-70812883-6</div>
+              <div><strong>Razón Social / Titular:</strong> TESORERIA GENERAL DE LA PROVINCIA</div>
+              <div><strong>CUIT:</strong> 30-67239401-1</div>
               <div className="text-xs text-blue-800 leading-relaxed max-w-md mx-auto">
-                <strong>Denominación:</strong> FONDO ESPECIAL PROVINCIAL PARA EL EXPENDIO DE BEBIDAS ALCOHÓLICAS
+                <strong>Denominación:</strong> FONDO ESPECIAL PROVINCIAL EXPENDIO DE BEBIDAS ALCOHOLICAS
               </div>
             </div>
 
