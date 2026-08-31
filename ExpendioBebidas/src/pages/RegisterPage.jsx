@@ -437,6 +437,7 @@ function RegisterPage() {
             </p>
 
             <div className="mt-3 text-sm text-blue-950 bg-blue-100/60 p-4 rounded border border-blue-200 text-center space-y-2 max-w-xl mx-auto shadow-inner">
+              <div><strong>Alias:</strong> Expendio.2026</div>
               <div><strong>CBU:</strong> 2850001030094257979021</div>
               <div className="border-t border-blue-200/60 my-2 max-w-md mx-auto"></div>
               <div><strong>Banco:</strong> Banco Macro S.A.</div>
