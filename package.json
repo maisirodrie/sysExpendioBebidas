@@ -5,14 +5,12 @@
   "main": "index.js",
   "type": "module",
   "scripts": {
-    "dev": "concurrently -n \"BACKEND,FRONTEND\" -c \"blue,magenta\" \"cross-env NODE_ENV=development nodemon src/index.js\" \"npm --prefix ExpendioBebidas run dev\"",
-    "build": "npm --prefix ExpendioBebidas run build",
-    "start": "npm run build && (cross-env NODE_ENV=production pm2 start src/index.js --name backendExpendio || pm2 restart backendExpendio) && pm2 save",
-    "restart": "pm2 restart backendExpendio",
-    "stop": "pm2 stop backendExpendio",
-    "logs": "pm2 logs backendExpendio",
-    "produ:start": "npm start",
-    "produ:restart": "npm run restart"
+    "dev": "concurrently \"nodemon src/index.js\" \"npm run dev:front\"",
+    "dev:front": "cd ExpendioBebidas && npm run dev",
+    "build": "bash deploy.sh",
+    "start": "bash deploy.sh",
+    "produ:start": "cross-env NODE_ENV=production pm2 start src/index.js --name backendExpendio",
+    "produ:logs": "pm2 logs backendExpendio --lines 50"
   },
   "keywords": [],
   "author": "",
