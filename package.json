@@ -6,8 +6,9 @@
   "type": "module",
   "scripts": {
     "dev": "cross-env NODE_ENV=development nodemon src/index.js",
-    "produ:start": "cross-env NODE_ENV=production pm2 start src/index.js --name backsysexpendio",
-    "produ:restart": "pm2 delete backsysexpendio || true && cross-env NODE_ENV=production pm2 start src/index.js --name backsysexpendio"
+    "produ:start": "cross-env NODE_ENV=production pm2 start src/index.js --name backendExpendio",
+    "produ:restart": "pm2 restart backendExpendio",
+    "produ:logs": "pm2 logs backendExpendio"
   },
   "keywords": [],
   "author": "",

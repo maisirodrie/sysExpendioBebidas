@@ -3,10 +3,11 @@ import { useForm } from "react-hook-form";
 import { useTasks } from "../context/TasksContext";
 import { Link, useNavigate, useParams } from "react-router-dom";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faArrowLeft } from "@fortawesome/free-solid-svg-icons";
+import { faArrowLeft, faTrashAlt, faSave, faPlusCircle } from "@fortawesome/free-solid-svg-icons";
 import { Municipios } from "../api/municipios";
-import "./taskformpage.css";
 import Swal from "sweetalert2";
+import ComponentCard from "../components/common/ComponentCard";
+import Button from "../components/common/Button";
 
 function TaskFormPage() {
   const { register, handleSubmit, setValue } = useForm();
@@ -22,13 +23,10 @@ function TaskFormPage() {
 
   useEffect(() => {
     async function loadTask() {
-      console.log("useEffect ejecutado"); // Verificar si se ejecuta el efecto
       if (params.id) {
         try {
           const task = await getTask(params.id);
-          console.log("Tarea cargada:", task); // Verifica qué datos se están cargando
           if (task) {
-            // Rellenar los valores del formulario con la tarea existente
             setValue("expendio", task.expendio);
             setValue("persona", task.persona);
             setValue("dni", task.dni);
@@ -65,84 +63,71 @@ function TaskFormPage() {
     loadTask();
   }, [params.id, setValue, getTask]);
 
- const onSubmit = handleSubmit(async (data) => {
-  try {
-    Swal.fire({
-      title: "Cargando...",
-      text: "Por favor, espere mientras se guarda el registro.",
-      allowOutsideClick: false,
-      didOpen: () => {
-        Swal.showLoading();
-      },
-    });
+  const onSubmit = handleSubmit(async (data) => {
+    try {
+      Swal.fire({
+        title: "Cargando...",
+        text: "Por favor, espere mientras se guarda el registro.",
+        allowOutsideClick: false,
+        didOpen: () => {
+          Swal.showLoading();
+        },
+      });
 
-    const formData = new FormData();
+      const formData = new FormData();
 
-    // Lógica para agregar campos del formulario de forma inteligente
-    Object.keys(data).forEach((key) => {
-      const value = data[key];
-      // Verifica que el valor no sea nulo, indefinido o una cadena vacía
-      if (
-        value !== null &&
-        value !== undefined &&
-        value !== ""
-      ) {
-        formData.append(key, value);
+      Object.keys(data).forEach((key) => {
+        const value = data[key];
+        if (
+          value !== null &&
+          value !== undefined &&
+          value !== ""
+        ) {
+          formData.append(key, value);
+        }
+      });
+
+      if (files && files.length > 0) {
+        files.forEach((file) => {
+          formData.append("files", file);
+        });
       }
-    });
 
-    // Lógica para agregar los archivos al FormData
-    if (files && files.length > 0) {
-      files.forEach((file) => {
-        formData.append("files", file);
+      if (params.id) {
+        await updateTask(params.id, formData);
+      } else {
+        await createTasksPublic(formData);
+      }
+
+      Swal.close();
+      Swal.fire({
+        icon: "success",
+        title: "¡Éxito!",
+        text: "El registro se guardó correctamente.",
+        confirmButtonText: "OK",
+      });
+
+      navigate("/task");
+    } catch (error) {
+      console.error("Error:", error);
+      Swal.close();
+      Swal.fire({
+        icon: "error",
+        title: "Error",
+        text: "Ocurrió un error al guardar el registro.",
       });
     }
-
-    // Opcional: para depurar y ver el contenido
-    console.log("Contenido del FormData a enviar:");
-    for (let [key, value] of formData.entries()) {
-      console.log(`${key}: ${value}`);
-    }
-
-    if (params.id) {
-      // Envía la solicitud de actualización con el FormData
-      await updateTask(params.id, formData);
-    } else {
-      // Envía la solicitud de creación con el FormData
-      await createTasksPublic(formData);
-    }
-
-    // Mantener los mensajes de éxito y error como los tienes
-    Swal.close();
-    Swal.fire({
-      icon: "success",
-      title: "¡Éxito!",
-      text: "El registro se guardó correctamente.",
-      confirmButtonText: "OK",
-    });
-
-    navigate("/task");
-  } catch (error) {
-    console.error("Error:", error);
-    Swal.close();
-    Swal.fire({
-      icon: "error",
-      title: "Error",
-      text: "Ocurrió un error al guardar el registro.",
-    });
-  }
-});
+  });
 
   const handleLocalidadChange = (event) => {
     setSelectedLocalidadValue(event.target.value);
   };
 
   const handleFileChange = (e) => {
-    const selectedFiles = Array.from(e.target.files); // Convertir el FileList a un array
-    setFiles((prevFiles) => [...prevFiles, ...selectedFiles]); // Acumular archivos
+    const selectedFiles = Array.from(e.target.files);
+    setFiles((prevFiles) => [...prevFiles, ...selectedFiles]);
   };
 
-  // Función para eliminar un archivo específico del acumulador
   const removeFile = (index) => {
     setFiles((prevFiles) => prevFiles.filter((_, i) => i !== index));
   };
@@ -150,13 +135,12 @@ function TaskFormPage() {
   const handleTipoExpendioChange = (e) => {
     const selectedExpendio = e.target.value;
     setTipoExpendio(selectedExpendio);
-    setValue("expendio", selectedExpendio); // Actualiza el valor en el formulario
+    setValue("expendio", selectedExpendio);
 
-    // Si se selecciona "Evento Particular", establecer persona como "Física"
     if (selectedExpendio === "Evento Particular") {
-      setValue("persona", "Física"); // Asegura que el valor en el formulario sea "Física"
+      setValue("persona", "Física");
     } else {
-      setValue("persona", ""); // Limpia el campo de persona si es "Local Comercial"
+      setValue("persona", "");
     }
   };
 
@@ -165,445 +149,416 @@ function TaskFormPage() {
     setValue("persona", e.target.value);
   };
 
-  return (
-    <div
-      className="flex items-center justify-center overflow-y-auto"
-      style={{
-        marginTop: "20px",
-        marginBottom: "20px",
-        paddingRight: "20px",
-        paddingLeft: "20px",
-      }}
-    >
-      <div className="bg-gray-300 max-w-screen-md w-full p-10 rounded-md">
-        <div className="flex justify-between items-center mb-4">
-          <h1 className="text-2xl font-bold text-black">
-            Registro de Expendio
-          </h1>
-          <Link
-            to="/task"
-            className="btn btn-success"
-            onClick={() => navigate("/task")}
-          >
-            <FontAwesomeIcon icon={faArrowLeft} />{" "}
-            {/* Ícono de flecha hacia la izquierda */}
-          </Link>
-        </div>
+  const inputClasses = "w-full rounded-xl border border-gray-300 bg-white px-4 py-2.5 text-sm text-gray-800 placeholder-gray-400 focus:border-brand-500 focus:ring-4 focus:ring-brand-500/10 outline-none transition shadow-theme-xs";
+  const labelClasses = "block text-xs font-semibold text-gray-700 uppercase tracking-wider mb-1.5 mt-3";
 
-        <form onSubmit={handleSubmit(onSubmit)} className="mt-4">
-          {/* Selección de Tipo de Evento */}
-          <label
-            htmlFor="Evento"
-            className="block text-sm font-medium text-black"
-          >
-            Tipo de Expendio de Bebidas
-          </label>
-          <select
-            id="expendio"
-            {...register("expendio", { required: true })}
-            onChange={handleTipoExpendioChange}
-            className="w-full bg-gray-100 text-black px-4 py-2 rounded-md my-2"
-          >
-            <option value="">Seleccione un tipo de Expendio de Bebidas</option>
-            <option value="Evento Particular">Evento Particular</option>
-            <option value="Local Comercial">
-              Habilitación de Venta de Bebidas para Local Comercial
-            </option>
-          </select>
+  return (
+    <div className="max-w-4xl mx-auto space-y-6 font-outfit">
+      <ComponentCard
+        title={params.id ? "Modificar Expediente" : "Nuevo Registro de Expendio"}
+        description="Complete los datos solicitados para generar un nuevo expediente de expendio"
+        headerAction={
+          <Link to="/task">
+            <Button
+              variant="secondary"
+              size="sm"
+              icon={<FontAwesomeIcon icon={faArrowLeft} />}
+            >
+              Volver a Expedientes
+            </Button>
+          </Link>
+        }
+      >
+        <form onSubmit={onSubmit} className="space-y-4">
+          <div>
+            <label htmlFor="expendio" className="block text-xs font-semibold text-gray-700 uppercase tracking-wider mb-1.5">
+              Tipo de Expendio de Bebidas
+            </label>
+            <select
+              id="expendio"
+              {...register("expendio", { required: true })}
+              onChange={handleTipoExpendioChange}
+              className={inputClasses}
+            >
+              <option value="">Seleccione un tipo de Expendio de Bebidas</option>
+              <option value="Evento Particular">Evento Particular</option>
+              <option value="Local Comercial">
+                Habilitación de Venta de Bebidas para Local Comercial
+              </option>
+            </select>
+          </div>
 
           {tipoExpendio && (
             <>
               {tipoExpendio === "Local Comercial" && (
-                <>
-                  <label
-                    htmlFor="tipoPersona"
-                    className="block text-sm font-medium text-black"
-                  >
+                <div>
+                  <label htmlFor="tipoPersona" className={labelClasses}>
                     Tipo de Persona
                   </label>
                   <select
                     id="persona"
                     {...register("persona", { required: true })}
                     onChange={handleTipoPersonaChange}
-                    className="w-full bg-gray-100 text-black px-4 py-2 rounded-md my-2"
+                    className={inputClasses}
                   >
                     <option value="">Seleccione un tipo de persona</option>
                     <option value="Física">Física</option>
                     <option value="Jurídica">Jurídica</option>
                   </select>
-                </>
+                </div>
               )}
             </>
           )}
 
           {tipoExpendio === "Evento Particular" && (
-            <>
-              {/* Campos para Evento Particular - Persona Física */}
-              <label
-                htmlFor="tipoPersona"
-                className="block text-sm font-medium text-black"
-              >
-                Tipo de Persona
-              </label>
-              <input
-                id="persona"
-                type="text"
-                {...register("persona", { required: true })}
-                className="w-full bg-gray-100 text-black px-4 py-2 rounded-md my-2"
-                value="Física"
-                readOnly
-              />
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div className="md:col-span-2">
+                <label htmlFor="persona" className={labelClasses}>
+                  Tipo de Persona
+                </label>
+                <input
+                  id="persona"
+                  type="text"
+                  {...register("persona", { required: true })}
+                  className={`${inputClasses} bg-gray-50 text-gray-500 cursor-not-allowed`}
+                  value="Física"
+                  readOnly
+                />
+              </div>
 
-              <label
-                htmlFor="dni"
-                className="block text-sm font-medium text-black"
-              >
-                DNI
-              </label>
-              <input
-                type="text"
-                {...register("dni", { required: true })}
-                className="w-full bg-gray-100 text-black px-4 py-2 rounded-md my-2"
-                placeholder="DNI"
-              />
+              <div>
+                <label htmlFor="dni" className={labelClasses}>
+                  DNI
+                </label>
+                <input
+                  type="text"
+                  {...register("dni", { required: true })}
+                  className={inputClasses}
+                  placeholder="Número de documento"
+                />
+              </div>
 
-              <label
-                htmlFor="apellido"
-                className="block text-sm font-medium text-black"
-              >
-                Apellido
-              </label>
-              <input
-                type="text"
-                {...register("apellido", { required: true })}
-                className="w-full bg-gray-100 text-black px-4 py-2 rounded-md my-2"
-                placeholder="Apellido"
-              />
+              <div>
+                <label htmlFor="apellido" className={labelClasses}>
+                  Apellido
+                </label>
+                <input
+                  type="text"
+                  {...register("apellido", { required: true })}
+                  className={inputClasses}
+                  placeholder="Apellido del solicitante"
+                />
+              </div>
 
-              <label
-                htmlFor="nombrePersona"
-                className="block text-sm font-medium text-black"
-              >
-                Nombre
-              </label>
-              <input
-                type="text"
-                {...register("nombre", { required: true })}
-                className="w-full bg-gray-100 text-black px-4 py-2 rounded-md my-2"
-                placeholder="Nombre"
-              />
+              <div>
+                <label htmlFor="nombrePersona" className={labelClasses}>
+                  Nombre
+                </label>
+                <input
+                  type="text"
+                  {...register("nombre", { required: true })}
+                  className={inputClasses}
+                  placeholder="Nombre del solicitante"
+                />
+              </div>
 
-              <label
-                htmlFor="localidad"
-                className="block text-sm font-medium text-black"
-              >
-                Localidad
-              </label>
-              <select
-                {...register("localidad")}
-                value={LocalidadValue}
-                className="w-full bg-gray-100 text-black px-4 py-2 rounded-md my-2"
-                onChange={handleLocalidadChange}
-              >
-                <option value="">Selecciona una localidad</option>
-                {Municipios.map((municipio) => (
-                  <option key={municipio.id} value={municipio.nombre}>
-                    {municipio.nombre}
-                  </option>
-                ))}
-              </select>
+              <div>
+                <label htmlFor="localidad" className={labelClasses}>
+                  Localidad
+                </label>
+                <select
+                  {...register("localidad")}
+                  value={LocalidadValue}
+                  className={inputClasses}
+                  onChange={handleLocalidadChange}
+                >
+                  <option value="">Selecciona una localidad</option>
+                  {Municipios.map((municipio) => (
+                    <option key={municipio.id} value={municipio.nombre}>
+                      {municipio.nombre}
+                    </option>
+                  ))}
+                </select>
+              </div>
 
-              <label
-                htmlFor="domicilio"
-                className="block text-sm font-medium text-black"
-              >
-                Domicilio Particular
-              </label>
-              <input
-                type="text"
-                {...register("domicilio", { required: true })}
-                className="w-full bg-gray-100 text-black px-4 py-2 rounded-md my-2"
-                placeholder="Domicilio"
-              />
+              <div>
+                <label htmlFor="domicilio" className={labelClasses}>
+                  Domicilio Particular
+                </label>
+                <input
+                  type="text"
+                  {...register("domicilio", { required: true })}
+                  className={inputClasses}
+                  placeholder="Calle, número, barrio"
+                />
+              </div>
 
-              <label
-                htmlFor="lugar"
-                className="block text-sm font-medium text-black"
-              >
-                Lugar de Realización del evento
-              </label>
-              <input
-                type="text"
-                {...register("lugar", { required: true })}
-                className="w-full bg-gray-100 text-black px-4 py-2 rounded-md my-2"
-                placeholder="Lugar de Realización del evento"
-              />
+              <div>
+                <label htmlFor="lugar" className={labelClasses}>
+                  Lugar de Realización del evento
+                </label>
+                <input
+                  type="text"
+                  {...register("lugar", { required: true })}
+                  className={inputClasses}
+                  placeholder="Lugar de realización"
+                />
+              </div>
 
-              <label
-                htmlFor="dias"
-                className="block text-sm font-medium text-black"
-              >
-                Días del evento
-              </label>
-              <textarea
-                type="text"
-                {...register("dias", { required: true })}
-                className="w-full bg-gray-100 text-black px-4 py-2 rounded-md my-2"
-                placeholder="Días"
-              />
+              <div>
+                <label htmlFor="tipoevento" className={labelClasses}>
+                  Tipo de Evento
+                </label>
+                <input
+                  type="text"
+                  {...register("tipoevento", { required: true })}
+                  className={inputClasses}
+                  placeholder="Ej: Cumpleaños, Casamiento, Festival"
+                />
+              </div>
 
-              <label
-                htmlFor="horarios"
-                className="block text-sm font-medium text-black"
-              >
-                Horarios del evento
-              </label>
-              <textarea
-                type="text"
-                {...register("horarios", { required: true })}
-                className="w-full bg-gray-100 text-black px-4 py-2 rounded-md my-2"
-                placeholder="Horarios"
-              />
+              <div>
+                <label htmlFor="contacto" className={labelClasses}>
+                  Nro de WhatsApp
+                </label>
+                <input
+                  type="text"
+                  {...register("contacto", { required: true })}
+                  className={inputClasses}
+                  placeholder="Teléfono de contacto"
+                />
+              </div>
 
-              <label
-                htmlFor="tipoevento"
-                className="block text-sm font-medium text-black"
-              >
-                Tipo de Evento
-              </label>
-              <input
-                type="text"
-                {...register("tipoevento", { required: true })}
-                className="w-full bg-gray-100 text-black px-4 py-2 rounded-md my-2"
-                placeholder="Tipo de Evento"
-              />
+              <div className="md:col-span-2">
+                <label htmlFor="email" className={labelClasses}>
+                  Email particular
+                </label>
+                <input
+                  type="email"
+                  {...register("email", { required: true })}
+                  className={inputClasses}
+                  placeholder="correo@ejemplo.com"
+                />
+              </div>
 
-              <label
-                htmlFor="email"
-                className="block text-sm font-medium text-black"
-              >
-                Email particular
-              </label>
-              <input
-                type="text"
-                {...register("email", { required: true })}
-                className="w-full bg-gray-100 text-black px-4 py-2 rounded-md my-2"
-                placeholder="Email"
-              />
+              <div>
+                <label htmlFor="dias" className={labelClasses}>
+                  Días del evento
+                </label>
+                <textarea
+                  rows="2"
+                  {...register("dias", { required: true })}
+                  className={inputClasses}
+                  placeholder="Fechas y días del evento"
+                />
+              </div>
 
-              <label
-                htmlFor="contacto"
-                className="block text-sm font-medium text-black"
-              >
-                Nro de WhatsApp
-              </label>
-              <input
-                type="text"
-                {...register("contacto", { required: true })}
-                className="w-full bg-gray-100 text-black px-4 py-2 rounded-md my-2"
-                placeholder="Teléfono de Contacto"
-              />
-            </>
+              <div>
+                <label htmlFor="horarios" className={labelClasses}>
+                  Horarios del evento
+                </label>
+                <textarea
+                  rows="2"
+                  {...register("horarios", { required: true })}
+                  className={inputClasses}
+                  placeholder="Horarios previstos"
+                />
+              </div>
+            </div>
           )}
 
           {tipoExpendio === "Local Comercial" && (
-            <>
-              {/* Campos para Habilitación de Venta de Bebidas */}
-              <label
-                htmlFor="dniPropietario"
-                className="block text-sm font-medium text-black"
-              >
-                DNI del Propietario
-              </label>
-              <input
-                type="text"
-                {...register("dni", { required: true })}
-                className="w-full bg-gray-100 text-black px-4 py-2 rounded-md my-2"
-                placeholder="DNI del Propietario"
-              />
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div>
+                <label htmlFor="dniPropietario" className={labelClasses}>
+                  DNI del Propietario
+                </label>
+                <input
+                  type="text"
+                  {...register("dni", { required: true })}
+                  className={inputClasses}
+                  placeholder="DNI del titular"
+                />
+              </div>
 
-              <label
-                htmlFor="apellidoPropietario"
-                className="block text-sm font-medium text-black"
-              >
-                Apellido
-              </label>
-              <input
-                type="text"
-                {...register("apellido", { required: true })}
-                className="w-full bg-gray-100 text-black px-4 py-2 rounded-md my-2"
-                placeholder="Apellido del Propietario"
-              />
+              <div>
+                <label htmlFor="apellidoPropietario" className={labelClasses}>
+                  Apellido
+                </label>
+                <input
+                  type="text"
+                  {...register("apellido", { required: true })}
+                  className={inputClasses}
+                  placeholder="Apellido"
+                />
+              </div>
 
-              <label
-                htmlFor="nombrePropietario"
-                className="block text-sm font-medium text-black"
-              >
-                Nombre
-              </label>
-              <input
-                type="text"
-                {...register("nombre", { required: true })}
-                className="w-full bg-gray-100 text-black px-4 py-2 rounded-md my-2"
-                placeholder="Nombre del Propietario"
-              />
+              <div>
+                <label htmlFor="nombrePropietario" className={labelClasses}>
+                  Nombre
+                </label>
+                <input
+                  type="text"
+                  {...register("nombre", { required: true })}
+                  className={inputClasses}
+                  placeholder="Nombre"
+                />
+              </div>
 
-              <label
-                htmlFor="localidad"
-                className="block text-sm font-medium text-black"
-              >
-                Localidad
-              </label>
-              <select
-                {...register("localidad")}
-                value={LocalidadValue}
-                className="w-full bg-gray-100 text-black px-4 py-2 rounded-md my-2"
-                onChange={handleLocalidadChange}
-              >
-                <option value="">Selecciona una localidad</option>
-                {Municipios.map((municipio) => (
-                  <option key={municipio.id} value={municipio.nombre}>
-                    {municipio.nombre}
-                  </option>
-                ))}
-              </select>
+              <div>
+                <label htmlFor="localidad" className={labelClasses}>
+                  Localidad
+                </label>
+                <select
+                  {...register("localidad")}
+                  value={LocalidadValue}
+                  className={inputClasses}
+                  onChange={handleLocalidadChange}
+                >
+                  <option value="">Selecciona una localidad</option>
+                  {Municipios.map((municipio) => (
+                    <option key={municipio.id} value={municipio.nombre}>
+                      {municipio.nombre}
+                    </option>
+                  ))}
+                </select>
+              </div>
 
-              <label
-                htmlFor="domicilio"
-                className="block text-sm font-medium text-black"
-              >
-                Domicilio particular
-              </label>
-              <input
-                type="text"
-                {...register("domicilio", { required: true })}
-                className="w-full bg-gray-100 text-black px-4 py-2 rounded-md my-2"
-                placeholder="Domicilio"
-              />
+              <div>
+                <label htmlFor="domicilio" className={labelClasses}>
+                  Domicilio Particular
+                </label>
+                <input
+                  type="text"
+                  {...register("domicilio", { required: true })}
+                  className={inputClasses}
+                  placeholder="Domicilio particular"
+                />
+              </div>
 
-              <label
-                htmlFor="nroHabilitacion"
-                className="block text-sm font-medium text-black"
-              >
-                Nro de Habilitación Municipal
-              </label>
-              <input
-                type="text"
-                {...register("nroHabilitacion", { required: true })}
-                className="w-full bg-gray-100 text-black px-4 py-2 rounded-md my-2"
-                placeholder="Nro de Habilitación Municipal"
-              />
+              <div>
+                <label htmlFor="nroHabilitacion" className={labelClasses}>
+                  Nro de Habilitación Municipal
+                </label>
+                <input
+                  type="text"
+                  {...register("nroHabilitacion", { required: true })}
+                  className={inputClasses}
+                  placeholder="Nro habilitación comercial"
+                />
+              </div>
 
-              <label
-                htmlFor="horarios"
-                className="block text-sm font-medium text-black"
-              >
-                Domicilio del Local Comercial
-              </label>
-              <input
-                type="text"
-                {...register("domicilioLocalComercial", {
-                  required: true,
-                })}
-                className="w-full bg-gray-100 text-black px-4 py-2 rounded-md my-2"
-                placeholder="Domicilio del Local Comercial"
-              />
+              <div>
+                <label htmlFor="domicilioLocalComercial" className={labelClasses}>
+                  Domicilio del Local Comercial
+                </label>
+                <input
+                  type="text"
+                  {...register("domicilioLocalComercial", { required: true })}
+                  className={inputClasses}
+                  placeholder="Dirección del comercio"
+                />
+              </div>
 
-              <label
-                htmlFor="dias"
-                className="block text-sm font-medium text-black"
-              >
-                Horario de atención
-              </label>
-              <textarea
-                type="text"
-                {...register("horarioAtencion", { required: true })}
-                className="w-full bg-gray-100 text-black px-4 py-2 rounded-md my-2"
-                placeholder="Horario de atención"
-              />
+              <div>
+                <label htmlFor="contacto" className={labelClasses}>
+                  Nro de WhatsApp
+                </label>
+                <input
+                  type="text"
+                  {...register("contacto", { required: true })}
+                  className={inputClasses}
+                  placeholder="Teléfono de contacto"
+                />
+              </div>
 
-              <label
-                htmlFor="dias"
-                className="block text-sm font-medium text-black"
-              >
-                Rubro
-              </label>
-              <textarea
-                type="text"
-                {...register("rubro", { required: true })}
-                className="w-full bg-gray-100 text-black px-4 py-2 rounded-md my-2"
-                placeholder="Rubro"
-              />
+              <div className="md:col-span-2">
+                <label htmlFor="email" className={labelClasses}>
+                  Email
+                </label>
+                <input
+                  type="email"
+                  {...register("email", { required: true })}
+                  className={inputClasses}
+                  placeholder="correo@ejemplo.com"
+                />
+              </div>
 
-              <label
-                htmlFor="email"
-                className="block text-sm font-medium text-black"
-              >
-                Email
-              </label>
-              <input
-                type="text"
-                {...register("email", { required: true })}
-                className="w-full bg-gray-100 text-black px-4 py-2 rounded-md my-2"
-                placeholder="Email"
-              />
+              <div>
+                <label htmlFor="horarioAtencion" className={labelClasses}>
+                  Horario de Atención
+                </label>
+                <textarea
+                  rows="2"
+                  {...register("horarioAtencion", { required: true })}
+                  className={inputClasses}
+                  placeholder="Horarios de atención"
+                />
+              </div>
 
-              <label
-                htmlFor="contacto"
-                className="block text-sm font-medium text-black"
-              >
-                Nro de Whatsapp
-              </label>
-              <input
-                type="text"
-                {...register("contacto", { required: true })}
-                className="w-full bg-gray-100 text-black px-4 py-2 rounded-md my-2"
-                placeholder="Teléfono de Contacto"
-              />
-            </>
+              <div>
+                <label htmlFor="rubro" className={labelClasses}>
+                  Rubro
+                </label>
+                <textarea
+                  rows="2"
+                  {...register("rubro", { required: true })}
+                  className={inputClasses}
+                  placeholder="Rubro comercial"
+                />
+              </div>
+            </div>
           )}
 
-          <label
-            htmlFor="file"
-            className="block text-sm font-medium text-black"
-          >
-            Archivos
-          </label>
-          <input
-            type="file"
-            name="file"
-            multiple
-            onChange={handleFileChange}
-            className="w-full bg-gray-100 text-black px-4 py-2 rounded-md my-2"
-          />
-
-          {/* Mostrar archivos seleccionados */}
-          <div className="mt-4">
-            <h3 className="text-lg font-semibold">Archivos seleccionados:</h3>
-            <ul className="list-disc list-inside">
-              {files.map((file, index) => (
-                <li key={index} className="flex justify-between">
-                  {file.name}
-                  <button
-                    type="button"
-                    onClick={() => removeFile(index)}
-                    className="text-red-600 hover:underline"
-                  >
-                    Eliminar
-                  </button>
-                </li>
-              ))}
-            </ul>
+          <div className="pt-2">
+            <label htmlFor="file" className={labelClasses}>
+              Archivos Adjuntos
+            </label>
+            <input
+              type="file"
+              name="file"
+              multiple
+              onChange={handleFileChange}
+              className="block w-full text-sm text-gray-500 file:mr-4 file:py-2.5 file:px-4 file:rounded-xl file:border-0 file:text-sm file:font-medium file:bg-brand-50 file:text-brand-700 hover:file:bg-brand-100 cursor-pointer border border-gray-300 rounded-xl bg-white"
+            />
           </div>
 
-          <button
-            type="submit"
-            className="w-full bg-blue-500 text-white px-4 py-2 rounded-md mt-4"
-          >
-            Guardar
-          </button>
+          {files.length > 0 && (
+            <div className="rounded-xl border border-gray-200 bg-gray-50/70 p-4 space-y-2">
+              <h4 className="text-xs font-semibold uppercase tracking-wider text-gray-700">
+                Archivos seleccionados ({files.length}):
+              </h4>
+              <ul className="space-y-1">
+                {files.map((file, index) => (
+                  <li key={index} className="flex items-center justify-between text-sm bg-white p-2 rounded-lg border border-gray-200">
+                    <span className="truncate text-gray-700 font-medium">{file.name}</span>
+                    <button
+                      type="button"
+                      onClick={() => removeFile(index)}
+                      className="text-xs text-red-600 hover:text-red-800 font-medium ml-2 px-2 py-1 rounded hover:bg-red-50 transition"
+                    >
+                      <FontAwesomeIcon icon={faTrashAlt} className="mr-1" />
+                      Eliminar
+                    </button>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          )}
+
+          <div className="pt-4">
+            <Button
+              type="submit"
+              variant="primary"
+              size="md"
+              icon={<FontAwesomeIcon icon={faSave} />}
+              className="w-full justify-center shadow-theme-sm"
+            >
+              {params.id ? "Actualizar Expediente" : "Guardar Expediente"}
+            </Button>
+          </div>
         </form>
-      </div>
+      </ComponentCard>
     </div>
   );
 }

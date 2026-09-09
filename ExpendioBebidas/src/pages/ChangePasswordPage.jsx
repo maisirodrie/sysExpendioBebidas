@@ -1,11 +1,11 @@
 import React, { useState, useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { useAuth } from "../context/AuthContext";
-import { useNavigate } from "react-router-dom";
-import "./login.css";
+import { useNavigate, Link } from "react-router-dom";
 import Swal from 'sweetalert2';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faEye, faEyeSlash } from '@fortawesome/free-solid-svg-icons';
+import PublicLayout from "../components/layout/PublicLayout";
 
 function ChangePasswordPage() {
   const {
@@ -19,20 +19,15 @@ function ChangePasswordPage() {
   const navigate = useNavigate();
   const { changePassword, errors: authErrors } = useAuth();
   
-  // States to control password visibility
   const [showOldPassword, setShowOldPassword] = useState(false);
   const [showNewPassword, setShowNewPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   
-  // Watch password fields in real-time
   const newPassword = watch("newPassword", "");
   const confirmPassword = watch("confirmPassword", "");
-
-  // State for real-time password matching feedback
   const [passwordsMatch, setPasswordsMatch] = useState(true);
 
   useEffect(() => {
-    // This effect runs whenever newPassword or confirmPassword change
     setPasswordsMatch(newPassword === confirmPassword);
   }, [newPassword, confirmPassword]);
 
@@ -47,7 +42,6 @@ function ChangePasswordPage() {
   }, [authErrors]);
 
   const onSubmit = handleSubmit(async (data) => {
-    // Only submit if passwords match
     if (!passwordsMatch) {
       Swal.fire({
         icon: 'error',
@@ -57,7 +51,6 @@ function ChangePasswordPage() {
       return;
     }
     
-    // Send only the required fields to the server
     const { oldPassword, newPassword } = data;
     const result = await changePassword({ oldPassword, newPassword });
     
@@ -76,137 +69,136 @@ function ChangePasswordPage() {
   });
 
   return (
-    <section>
-      <header
-        className="bg-cover bg-no-repeat py-10 text-white relative flex flex-col justify-center items-center"
-        style={{
-          backgroundImage: `url('./fondos/fondo.jpg')`,
-          backgroundPosition: "center bottom",
-          height: "85vh",
-        }}
-      >
-        <div className="bg-dark-overlay absolute inset-0 bg-black opacity-75"></div>
-        <div className="container mx-auto relative z-10 text-center">
-          <div className="flex items-center justify-center">
-            <div className="bg-gray-200 shadow-xl max-w-md w-full p-10 rounded-xl">
-              <h1 className="text-3xl font-bold text-gray-800 mb-6">
-                Cambiar Contraseña
-              </h1>
-              <form onSubmit={onSubmit}>
-                {/* Contraseña Actual */}
-                <div className="mb-4 text-left">
-                  <label
-                    htmlFor="oldPassword"
-                    className="block text-sm font-medium text-gray-700"
-                  >
-                    Contraseña Actual (Temporal)
-                  </label>
-                  <div className="relative">
-                    <input
-                      type={showOldPassword ? "text" : "password"}
-                      {...register("oldPassword", { required: true })}
-                      className="mt-1 w-full bg-white text-gray-800 px-4 py-2 rounded-md border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500 pr-10"
-                      placeholder="Contraseña Actual"
-                    />
-                    <span
-                      className="absolute inset-y-0 right-0 flex items-center pr-3 cursor-pointer text-gray-600"
-                      onClick={() => setShowOldPassword(!showOldPassword)}
-                    >
-                      <FontAwesomeIcon icon={showOldPassword ? faEyeSlash : faEye} />
-                    </span>
-                  </div>
-                  {errors.oldPassword && (
-                    <p className="text-red-500 text-xs mt-1 font-semibold">
-                      La contraseña actual es requerida.
-                    </p>
-                  )}
-                </div>
-
-                {/* Nueva Contraseña */}
-                <div className="mb-4 text-left">
-                  <label
-                    htmlFor="newPassword"
-                    className="block text-sm font-medium text-gray-700"
-                  >
-                    Nueva Contraseña
-                  </label>
-                  <div className="relative">
-                    <input
-                      type={showNewPassword ? "text" : "password"}
-                      {...register("newPassword", { 
-                        required: "La nueva contraseña es requerida.",
-                        minLength: {
-                          value: 6,
-                          message: "La contraseña debe tener al menos 6 caracteres."
-                        }
-                      })}
-                      className="mt-1 w-full bg-white text-gray-800 px-4 py-2 rounded-md border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500 pr-10"
-                      placeholder="Nueva Contraseña"
-                    />
-                    <span
-                      className="absolute inset-y-0 right-0 flex items-center pr-3 cursor-pointer text-gray-600"
-                      onClick={() => setShowNewPassword(!showNewPassword)}
-                    >
-                      <FontAwesomeIcon icon={showNewPassword ? faEyeSlash : faEye} />
-                    </span>
-                  </div>
-                  {errors.newPassword && (
-                    <p className="text-red-500 text-xs mt-1 font-semibold">
-                      {errors.newPassword.message}
-                    </p>
-                  )}
-                </div>
-
-                {/* Confirmar Nueva Contraseña */}
-                <div className="mb-6 text-left">
-                  <label
-                    htmlFor="confirmPassword"
-                    className="block text-sm font-medium text-gray-700"
-                  >
-                    Confirmar Nueva Contraseña
-                  </label>
-                  <div className="relative">
-                    <input
-                      type={showConfirmPassword ? "text" : "password"}
-                      {...register("confirmPassword", {
-                        required: true,
-                      })}
-                      className="mt-1 w-full bg-white text-gray-800 px-4 py-2 rounded-md border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500 pr-10"
-                      placeholder="Confirmar Nueva Contraseña"
-                    />
-                    <span
-                      className="absolute inset-y-0 right-0 flex items-center pr-3 cursor-pointer text-gray-600"
-                      onClick={() => setShowConfirmPassword(!showConfirmPassword)}
-                    >
-                      <FontAwesomeIcon icon={showConfirmPassword ? faEyeSlash : faEye} />
-                    </span>
-                  </div>
-                  {/* Real-time feedback for password matching */}
-                  {confirmPassword.length > 0 && !passwordsMatch && (
-                    <p className="text-red-500 text-xs mt-1 font-semibold">
-                      Las contraseñas no coinciden.
-                    </p>
-                  )}
-                  {/* Check for the required error from react-hook-form */}
-                  {errors.confirmPassword && (
-                    <p className="text-red-500 text-xs mt-1 font-semibold">
-                      La confirmación de la contraseña es requerida.
-                    </p>
-                  )}
-                </div>
-
-                <button
-                  type="submit"
-                  className="custom-button w-full bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 text-white font-bold py-2 px-4 rounded-md transition-all duration-300 transform hover:scale-105 shadow-lg"
-                >
-                  Cambiar Contraseña
-                </button>
-              </form>
-            </div>
+    <PublicLayout>
+      <div className="backdrop-blur-md bg-white/95 rounded-2xl p-7 sm:p-9 border border-white/30 shadow-2xl">
+        <div className="text-center mb-6">
+          <div className="inline-flex items-center justify-center w-12 h-12 rounded-2xl bg-brand-50 text-brand-600 mb-3 shadow-theme-xs border border-brand-200/60">
+            <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+            </svg>
           </div>
+          <h1 className="text-2xl font-bold text-gray-900 tracking-tight">
+            Cambiar Contraseña
+          </h1>
+          <p className="text-xs sm:text-sm text-gray-500 mt-1">
+            Actualiza tu clave de acceso al sistema
+          </p>
         </div>
-      </header>
-    </section>
+
+        <form onSubmit={onSubmit} className="space-y-4">
+          <div>
+            <label
+              htmlFor="oldPassword"
+              className="block text-xs font-semibold text-gray-700 uppercase tracking-wider mb-1.5"
+            >
+              Contraseña Actual (Temporal)
+            </label>
+            <div className="relative">
+              <input
+                id="oldPassword"
+                type={showOldPassword ? "text" : "password"}
+                {...register("oldPassword", { required: true })}
+                className="w-full rounded-xl border border-gray-300 bg-white px-4 py-2.5 text-sm text-gray-800 placeholder-gray-400 focus:border-brand-500 focus:ring-4 focus:ring-brand-500/10 outline-none transition shadow-theme-xs pr-11"
+                placeholder="Contraseña Actual"
+              />
+              <button
+                type="button"
+                className="absolute right-0 top-0 bottom-0 px-3.5 flex items-center text-gray-400 hover:text-gray-600 transition-colors focus:outline-none cursor-pointer"
+                onClick={() => setShowOldPassword(!showOldPassword)}
+              >
+                <FontAwesomeIcon icon={showOldPassword ? faEyeSlash : faEye} />
+              </button>
+            </div>
+            {errors.oldPassword && (
+              <p className="text-rose-600 text-xs mt-1.5 font-medium">
+                La contraseña actual es requerida.
+              </p>
+            )}
+          </div>
+
+          <div>
+            <label
+              htmlFor="newPassword"
+              className="block text-xs font-semibold text-gray-700 uppercase tracking-wider mb-1.5"
+            >
+              Nueva Contraseña
+            </label>
+            <div className="relative">
+              <input
+                id="newPassword"
+                type={showNewPassword ? "text" : "password"}
+                {...register("newPassword", {
+                  required: "La nueva contraseña es requerida.",
+                  minLength: { value: 6, message: "Debe tener al menos 6 caracteres." }
+                })}
+                className="w-full rounded-xl border border-gray-300 bg-white px-4 py-2.5 text-sm text-gray-800 placeholder-gray-400 focus:border-brand-500 focus:ring-4 focus:ring-brand-500/10 outline-none transition shadow-theme-xs pr-11"
+                placeholder="Nueva Contraseña"
+              />
+              <button
+                type="button"
+                className="absolute right-0 top-0 bottom-0 px-3.5 flex items-center text-gray-400 hover:text-gray-600 transition-colors focus:outline-none cursor-pointer"
+                onClick={() => setShowNewPassword(!showNewPassword)}
+              >
+                <FontAwesomeIcon icon={showNewPassword ? faEyeSlash : faEye} />
+              </button>
+            </div>
+            {errors.newPassword && (
+              <p className="text-rose-600 text-xs mt-1.5 font-medium">
+                {errors.newPassword.message}
+              </p>
+            )}
+          </div>
+
+          <div>
+            <label
+              htmlFor="confirmPassword"
+              className="block text-xs font-semibold text-gray-700 uppercase tracking-wider mb-1.5"
+            >
+              Confirmar Nueva Contraseña
+            </label>
+            <div className="relative">
+              <input
+                id="confirmPassword"
+                type={showConfirmPassword ? "text" : "password"}
+                {...register("confirmPassword", { required: true })}
+                className="w-full rounded-xl border border-gray-300 bg-white px-4 py-2.5 text-sm text-gray-800 placeholder-gray-400 focus:border-brand-500 focus:ring-4 focus:ring-brand-500/10 outline-none transition shadow-theme-xs pr-11"
+                placeholder="Confirmar Contraseña"
+              />
+              <button
+                type="button"
+                className="absolute right-0 top-0 bottom-0 px-3.5 flex items-center text-gray-400 hover:text-gray-600 transition-colors focus:outline-none cursor-pointer"
+                onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+              >
+                <FontAwesomeIcon icon={showConfirmPassword ? faEyeSlash : faEye} />
+              </button>
+            </div>
+            {errors.confirmPassword && (
+              <p className="text-rose-600 text-xs mt-1.5 font-medium">
+                Por favor, confirma la contraseña.
+              </p>
+            )}
+            {!passwordsMatch && confirmPassword && (
+              <p className="text-rose-600 text-xs mt-1.5 font-medium">
+                Las contraseñas no coinciden.
+              </p>
+            )}
+          </div>
+
+          <button
+            type="submit"
+            className="w-full bg-brand-500 hover:bg-brand-600 active:bg-brand-700 text-white font-medium py-2.5 px-4 rounded-xl shadow-theme-xs transition-all duration-150 cursor-pointer focus:ring-4 focus:ring-brand-500/20"
+          >
+            Actualizar Contraseña
+          </button>
+        </form>
+
+        <div className="mt-6 pt-4 border-t border-gray-100 text-center">
+          <Link to="/task" className="text-xs text-brand-600 hover:text-brand-700 font-medium hover:underline">
+            ← Volver al Panel
+          </Link>
+        </div>
+      </div>
+    </PublicLayout>
   );
 }
 

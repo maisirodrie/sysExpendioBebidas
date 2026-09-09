@@ -6,6 +6,8 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faArrowLeft } from "@fortawesome/free-solid-svg-icons";
 import "./taskformpage.css";
 import Swal from "sweetalert2";
+import ComponentCard from "../components/common/ComponentCard";
+import Button from "../components/common/Button";
 
 // Importar los componentes de formulario modulares
 import LocalComercialForm from "./LocalComercialForm";
@@ -461,88 +463,87 @@ function TaskFormPageEdit() {
     };
 
     return (
-        <div
-            ref={scrollRef}
-            className="flex items-center justify-center overflow-y-auto"
-            style={{
-                marginTop: "20px",
-                marginBottom: "20px",
-                paddingRight: "20px",
-                paddingLeft: "20px",
-            }}
-        >
-            <div className="bg-gray-300 max-w-screen-lg w-full p-10 rounded-md">
-                <div className="flex justify-between items-center mb-4">
-                    <h1 className="text-2xl font-bold text-black">
-                        Editar Registro de Archivo
-                    </h1>
-                    <Link
-                        to="/task"
-                        className="btn btn-success"
-                        onClick={() => navigate("/task")}
-                    >
-                        <FontAwesomeIcon icon={faArrowLeft} />
+        <div ref={scrollRef} className="max-w-4xl mx-auto space-y-6 font-outfit">
+            <ComponentCard
+                title="Editar Registro de Expediente"
+                description="Actualización de datos y documentación adjunta del trámite"
+                headerAction={
+                    <Link to="/task">
+                        <Button
+                            variant="secondary"
+                            size="sm"
+                            icon={<FontAwesomeIcon icon={faArrowLeft} />}
+                        >
+                            Volver a Expedientes
+                        </Button>
                     </Link>
-                </div>
+                }
+            >
                 {/* Asignar la referencia al formulario */}
-                <form ref={formRef} onSubmit={onSubmit} className="mt-4">
-                    <label
-                        htmlFor="nroexpediente"
-                        className="block text-sm font-medium text-black"
-                    >
-                        Número de Expediente
-                    </label>
-                    <div className="flex gap-2">
-                        <input
-                            type="text"
-                            name="nroexpediente-correlativo"
-                            value={nroExpedienteParts.correlativo || ""}
-                            onChange={(e) => handleNroExpedienteChange(e, "correlativo")}
-                            className="w-1/3 bg-gray-100 text-black px-4 py-2 rounded-md my-2"
-                            placeholder="Correlativo"
-                        />
-                        {tipoExpendioWatch === "Local Comercial" && (
-                            <>
-                                <span className="text-black text-3xl my-2">-</span>
-                                <input
-                                    type="text"
-                                    name="nroexpediente-codigoOrganismo"
-                                    value={nroExpedienteParts.codigoOrganismo || ""}
-                                    onChange={(e) => handleNroExpedienteChange(e, "codigoOrganismo")}
-                                    className="w-1/3 bg-gray-100 text-black px-4 py-2 rounded-md my-2"
-                                    placeholder="Cod. Organismo"
-                                />
-                            </>
-                        )}
-                        <span className="text-black text-3xl my-2">/</span>
-                        <input
-                            type="text"
-                            name="nroexpediente-anio"
-                            value={nroExpedienteParts.anio || ""}
-                            onChange={(e) => handleNroExpedienteChange(e, "anio")}
-                            className="w-1/3 bg-gray-100 text-black px-4 py-2 rounded-md my-2"
-                            placeholder="Año"
-                        />
+                <form ref={formRef} onSubmit={onSubmit} className="space-y-4">
+                    <div>
+                        <label
+                            htmlFor="nroexpediente"
+                            className="block text-xs font-semibold text-gray-700 uppercase tracking-wider mb-1.5"
+                        >
+                            Número de Expediente
+                        </label>
+                        <div className="flex items-center gap-2">
+                            <input
+                                type="text"
+                                name="nroexpediente-correlativo"
+                                value={nroExpedienteParts.correlativo || ""}
+                                onChange={(e) => handleNroExpedienteChange(e, "correlativo")}
+                                className="w-1/3 rounded-xl border border-gray-300 bg-white px-4 py-2.5 text-sm text-gray-800 placeholder-gray-400 focus:border-brand-500 focus:ring-4 focus:ring-brand-500/10 outline-none transition shadow-theme-xs font-mono font-medium"
+                                placeholder="Correlativo"
+                            />
+                            {tipoExpendioWatch === "Local Comercial" && (
+                                <>
+                                    <span className="text-gray-400 text-xl font-bold">-</span>
+                                    <input
+                                        type="text"
+                                        name="nroexpediente-codigoOrganismo"
+                                        value={nroExpedienteParts.codigoOrganismo || ""}
+                                        onChange={(e) => handleNroExpedienteChange(e, "codigoOrganismo")}
+                                        className="w-1/3 rounded-xl border border-gray-300 bg-white px-4 py-2.5 text-sm text-gray-800 placeholder-gray-400 focus:border-brand-500 focus:ring-4 focus:ring-brand-500/10 outline-none transition shadow-theme-xs font-mono font-medium"
+                                        placeholder="Cod. Organismo"
+                                    />
+                                </>
+                            )}
+                            <span className="text-gray-400 text-xl font-bold">/</span>
+                            <input
+                                type="text"
+                                name="nroexpediente-anio"
+                                value={nroExpedienteParts.anio || ""}
+                                onChange={(e) => handleNroExpedienteChange(e, "anio")}
+                                className="w-1/3 rounded-xl border border-gray-300 bg-white px-4 py-2.5 text-sm text-gray-800 placeholder-gray-400 focus:border-brand-500 focus:ring-4 focus:ring-brand-500/10 outline-none transition shadow-theme-xs font-mono font-medium"
+                                placeholder="Año"
+                            />
+                        </div>
                     </div>
-                    <label
-                        htmlFor="expendio"
-                        className="block text-sm font-medium text-black"
-                    >
-                        Tipo de Expendio de Bebidas
-                    </label>
-                    <select
-                        id="expendio"
-                        {...register("expendio", { required: true })}
-                        onChange={handleTipoExpendioChange}
-                        className="w-full bg-gray-100 text-black px-4 py-2 rounded-md my-2"
-                    >
-                        <option value="">Seleccione un tipo de Expendio de Bebidas</option>
-                        <option value="Evento Particular">Evento Particular</option>
-                        <option value="Local Comercial">
-                            Habilitación de Venta de Bebidas para Local Comercial
-                        </option>
-                        <option value="Intendencia">Intendencia</option>
-                    </select>
+
+                    <div>
+                        <label
+                            htmlFor="expendio"
+                            className="block text-xs font-semibold text-gray-700 uppercase tracking-wider mb-1.5"
+                        >
+                            Tipo de Expendio de Bebidas
+                        </label>
+                        <select
+                            id="expendio"
+                            {...register("expendio", { required: true })}
+                            onChange={handleTipoExpendioChange}
+                            className="w-full rounded-xl border border-gray-300 bg-white px-4 py-2.5 text-sm text-gray-800 focus:border-brand-500 focus:ring-4 focus:ring-brand-500/10 outline-none transition shadow-theme-xs cursor-pointer"
+                        >
+                            <option value="">Seleccione un tipo de Expendio de Bebidas</option>
+                            <option value="Evento Particular">Evento Particular</option>
+                            <option value="Local Comercial">
+                                Habilitación de Venta de Bebidas para Local Comercial
+                            </option>
+                            <option value="Intendencia">Intendencia</option>
+                        </select>
+                    </div>
+
                     {/* Renderizado Condicional de Evento Particular */}
                     {tipoExpendioWatch === "Evento Particular" && (
                         <EventoParticularForm
@@ -601,14 +602,18 @@ function TaskFormPageEdit() {
                         />
                     )}
 
-                    <button
-                        type="submit"
-                        className="w-full bg-blue-500 text-white px-4 py-2 rounded-md mt-4"
-                    >
-                        Guardar
-                    </button>
+                    <div className="pt-4 border-t border-gray-100">
+                        <Button
+                            type="submit"
+                            variant="primary"
+                            size="lg"
+                            className="w-full"
+                        >
+                            Guardar Cambios del Expediente
+                        </Button>
+                    </div>
                 </form>
-            </div>
+            </ComponentCard>
         </div>
     );
 }

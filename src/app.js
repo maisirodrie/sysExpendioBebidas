@@ -13,7 +13,13 @@ const app = express();
 
 // Middleware de CORS
 app.use(cors({
-    origin: ['http://localhost:5173', 'https://www.expendiobebidas.misiones.gov.ar'],
+    origin: [
+        'http://localhost:5173',
+        'http://localhost:3000',
+        'https://www.expendiobebidas.misiones.gov.ar',
+        'https://expendiobebidas.misiones.gov.ar',
+        'http://10.10.0.135'
+    ],
     credentials: true,
 }));
 

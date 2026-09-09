@@ -1,12 +1,11 @@
 // src/pages/LoginPage.jsx
-
 import React, { useState, useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { useAuth } from "../context/AuthContext";
-import { useNavigate } from "react-router-dom";
-import "./login.css"; // Asegúrate de que este archivo no tenga reglas que sobrescriban Tailwind
+import { useNavigate, Link } from "react-router-dom";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faEye, faEyeSlash } from "@fortawesome/free-solid-svg-icons";
+import PublicLayout from "../components/layout/PublicLayout";
 
 function LoginPage() {
   const [showPassword, setShowPassword] = useState(false);
@@ -16,6 +15,7 @@ function LoginPage() {
     handleSubmit,
     formState: { errors },
   } = useForm();
+
   const {
     signin,
     errors: signinErrors,
@@ -23,6 +23,7 @@ function LoginPage() {
     user,
     loading,
   } = useAuth();
+
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -44,96 +45,114 @@ function LoginPage() {
   };
 
   return (
-    <section>
-      <header
-        className="bg-gray-800 bg-cover bg-no-repeat py-10 text-white relative flex flex-col justify-center items-center rounded-b-lg"
-        style={{
-          backgroundImage: `url('./fondos/fondo.jpg')`,
-          backgroundPosition: "center bottom",
-          height: "85vh",
-        }}
-      >
-        <div className="bg-dark-overlay absolute inset-0 bg-black opacity-75"></div>
-        <div className="container mx-auto relative z-10 text-center">
-          <div className="flex items-center justify-center">
-            <div className="bg-gray-200 shadow-xl max-w-md w-full p-10 rounded-xl">
-              {Array.isArray(signinErrors) && signinErrors.length > 0 && (
-                <div className="bg-red-500 p-3 text-white rounded-md mb-4 text-sm font-semibold">
-                  {signinErrors.map((error, i) => (
-                    <p key={i}>{error}</p>
-                  ))}
-                </div>
-              )}
-
-              <h1 className="text-3xl font-bold text-gray-800 mb-6">Acceso</h1>
-              <form onSubmit={onSubmit}>
-                <div className="mb-4 text-left">
-                  <label
-                    htmlFor="username"
-                    className="block text-sm font-medium text-gray-700"
-                  >
-                    Usuario
-                  </label>
-                  <input
-                    type="text"
-                    {...register("username", { required: true })}
-                    className="mt-1 w-full bg-white text-gray-800 px-4 py-2 rounded-md border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500"
-                    placeholder="Usuario"
-                  />
-                  {errors.username && (
-                    <p className="text-red-500 text-xs mt-1 font-semibold">
-                      Usuario es requerido
-                    </p>
-                  )}
-                </div>
-
-                <div className="mb-6 text-left relative">
-                  <label
-                    htmlFor="password"
-                    className="block text-sm font-medium text-gray-700"
-                  >
-                    Contraseña
-                  </label>
-                  <input
-                    type={showPassword ? "text" : "password"}
-                    {...register("password", { required: true })}
-                    className="mt-1 w-full bg-white text-gray-800 px-4 py-2 rounded-md border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500 pr-10"
-                    placeholder="Contraseña"
-                  />
-                  <span
-                    // ✅ Clases actualizadas para usar tu CSS
-                    className="absolute right-0 flex items-center pr-3 cursor-pointer text-gray-600 password-icon"
-                    onClick={togglePasswordVisibility}
-                  >
-                    <FontAwesomeIcon icon={showPassword ? faEyeSlash : faEye} />
-                  </span>
-                  {errors.password && (
-                    <p className="text-red-500 text-xs mt-1 font-semibold">
-                      Contraseña es requerida
-                    </p>
-                  )}
-                </div>
-
-                <button
-                  type="submit"
-                  className="custom-button w-full bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 text-white font-bold py-2 px-4 rounded-md transition-all duration-300 transform hover:scale-105 shadow-lg"
-                >
-                  Iniciar Sesión
-                </button>
-              </form>
-              <div className="mt-4 text-center">
-                <a
-                  href="/forgot-password"
-                  className="text-sm text-gray-600 hover:text-blue-500 hover:underline transition-colors duration-300"
-                >
-                  ¿Olvidaste tu contraseña?
-                </a>
-              </div>
-            </div>
+    <PublicLayout>
+      <div className="backdrop-blur-md bg-white/95 rounded-2xl p-7 sm:p-9 border border-white/30 shadow-2xl">
+        <div className="text-center mb-6">
+          <div className="inline-flex items-center justify-center w-12 h-12 rounded-2xl bg-brand-50 text-brand-600 mb-3 shadow-theme-xs border border-brand-200/60">
+            <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+            </svg>
           </div>
+          <h1 className="text-2xl font-bold text-gray-900 tracking-tight">
+            Acceso al Sistema
+          </h1>
+          <p className="text-xs sm:text-sm text-gray-500 mt-1">
+            Portal administrativo de expendio de bebidas
+          </p>
         </div>
-      </header>
-    </section>
+
+        {Array.isArray(signinErrors) && signinErrors.length > 0 && (
+          <div className="bg-rose-50 border border-rose-200/80 p-3.5 text-rose-700 rounded-xl mb-5 text-sm font-medium">
+            {signinErrors.map((error, i) => (
+              <p key={i} className="flex items-center gap-2">
+                <svg className="w-4 h-4 shrink-0 text-rose-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                </svg>
+                {error}
+              </p>
+            ))}
+          </div>
+        )}
+
+        <form onSubmit={onSubmit} className="space-y-4">
+          <div>
+            <label
+              htmlFor="username"
+              className="block text-xs font-semibold text-gray-700 uppercase tracking-wider mb-1.5"
+            >
+              Usuario
+            </label>
+            <input
+              id="username"
+              type="text"
+              {...register("username", { required: true })}
+              className="w-full rounded-xl border border-gray-300 bg-white px-4 py-2.5 text-sm text-gray-800 placeholder-gray-400 focus:border-brand-500 focus:ring-4 focus:ring-brand-500/10 outline-none transition shadow-theme-xs"
+              placeholder="Ingresa tu nombre de usuario"
+            />
+            {errors.username && (
+              <p className="text-rose-600 text-xs mt-1.5 font-medium">
+                El usuario es requerido
+              </p>
+            )}
+          </div>
+
+          <div>
+            <div className="flex items-center justify-between mb-1.5">
+              <label
+                htmlFor="password"
+                className="block text-xs font-semibold text-gray-700 uppercase tracking-wider"
+              >
+                Contraseña
+              </label>
+              <Link
+                to="/forgot-password"
+                className="text-xs text-brand-600 hover:text-brand-700 font-medium hover:underline transition-colors"
+              >
+                ¿Olvidaste tu contraseña?
+              </Link>
+            </div>
+            <div className="relative">
+              <input
+                id="password"
+                type={showPassword ? "text" : "password"}
+                {...register("password", { required: true })}
+                className="w-full rounded-xl border border-gray-300 bg-white px-4 py-2.5 text-sm text-gray-800 placeholder-gray-400 focus:border-brand-500 focus:ring-4 focus:ring-brand-500/10 outline-none transition shadow-theme-xs pr-11"
+                placeholder="••••••••"
+              />
+              <button
+                type="button"
+                className="absolute right-0 top-0 bottom-0 px-3.5 flex items-center text-gray-400 hover:text-gray-600 transition-colors focus:outline-none cursor-pointer"
+                onClick={togglePasswordVisibility}
+                tabIndex={-1}
+              >
+                <FontAwesomeIcon icon={showPassword ? faEyeSlash : faEye} />
+              </button>
+            </div>
+            {errors.password && (
+              <p className="text-rose-600 text-xs mt-1.5 font-medium">
+                La contraseña es requerida
+              </p>
+            )}
+          </div>
+
+          <button
+            type="submit"
+            className="w-full mt-2 bg-brand-500 hover:bg-brand-600 active:bg-brand-700 text-white font-medium py-2.5 px-4 rounded-xl shadow-theme-xs transition-all duration-150 transform active:scale-[0.99] cursor-pointer focus:ring-4 focus:ring-brand-500/20"
+          >
+            Iniciar Sesión
+          </button>
+        </form>
+
+        <div className="mt-6 pt-4 border-t border-gray-200/60 text-center">
+          <Link
+            to="/consulta-estado"
+            className="text-xs text-gray-500 hover:text-brand-600 transition-colors font-medium"
+          >
+            ← Volver a consulta pública de trámites
+          </Link>
+        </div>
+      </div>
+    </PublicLayout>
   );
 }
 

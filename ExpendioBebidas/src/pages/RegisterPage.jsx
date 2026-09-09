@@ -5,10 +5,10 @@ import { Link, useNavigate, useParams } from "react-router-dom";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import axios from "axios";
 import { Municipios } from "../api/municipios";
-import { faArrowLeft, faTimes } from "@fortawesome/free-solid-svg-icons";
+import { faArrowLeft, faTimes, faFilePdf, faDownload, faPhoneAlt, faExclamationTriangle } from "@fortawesome/free-solid-svg-icons";
 import Swal from "sweetalert2";
-import "./taskformpage.css";
-import "./RegisterPage.css";
+import Button from "../components/common/Button";
+import ComponentCard from "../components/common/ComponentCard";
 
 // IMPORTACIÓN DE COMPONENTES MODULARES
 import EventoParticularForm from "./EventoParticularForm";
@@ -318,174 +318,196 @@ function RegisterPage() {
   };
 
   return (
-    <div
-      className="flex items-center justify-center overflow-y-auto"
-      style={{
-        marginTop: "20px",
-        marginBottom: "20px",
-        paddingRight: "20px",
-        paddingLeft: "20px",
-      }}
-    >
-      <div className="bg-gray-300 max-w-screen-lg w-full p-10 rounded-md">
-        <div className="flex justify-between items-center mb-4">
-          <h1 className="text-2xl font-bold text-black">
-            Registro de Expendio
-          </h1>
-          <Link
-            to="/"
-            className="btn btn-success"
-            onClick={() => navigate("/")}
-          >
-            <FontAwesomeIcon icon={faArrowLeft} />
+    <div className="min-h-screen bg-gray-50/70 py-10 px-4 sm:px-6 lg:px-8 font-outfit">
+      <div className="max-w-4xl mx-auto bg-white rounded-2xl border border-gray-200 shadow-theme-sm p-6 sm:p-10">
+        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 pb-6 border-b border-gray-100 mb-6">
+          <div>
+            <h1 className="text-2xl font-bold text-gray-900 tracking-tight">
+              Registro de Expendio
+            </h1>
+            <p className="text-sm text-gray-500 mt-1">
+              Formulario oficial de solicitud de habilitación para expendio de bebidas alcohólicas
+            </p>
+          </div>
+          <Link to="/">
+            <Button
+              variant="secondary"
+              size="sm"
+              icon={<FontAwesomeIcon icon={faArrowLeft} />}
+            >
+              Volver al Inicio
+            </Button>
           </Link>
         </div>
 
         {/* Sección de Requisitos con documentos descargables */}
-        {/* Sección de Requisitos con documentos descargables */}
-        <div className="relative mb-4 bg-yellow-200 p-4 rounded-md shadow-lg">
-          <h2 className="font-bold text-lg">Importante:</h2>
-          <p className="text-sm text-black-700 mt-2 font-semibold">
-            Antes de proceder con el registro, es fundamental que leas y comprendas los requisitos necesarios para completar el proceso de manera efectiva. Por favor, asegúrate de tener los siguientes documentos listos:
+        <div className="rounded-xl border border-amber-200 bg-amber-50/80 p-6 mb-6 text-amber-950 shadow-theme-xs space-y-4">
+          <div className="flex items-center gap-2 text-amber-800 font-bold text-base">
+            <FontAwesomeIcon icon={faExclamationTriangle} className="text-amber-600" />
+            <span>Información Importante</span>
+          </div>
+          <p className="text-sm text-amber-900 leading-relaxed font-normal">
+            Antes de proceder con el registro, es fundamental que lea y comprenda los requisitos necesarios para completar el proceso de manera efectiva. Por favor, asegúrese de tener la documentación requerida lista para adjuntar:
           </p>
 
-
-          {/* AJUSTE DE MARGEN AQUÍ: Cambié mt-2 por my-4 para añadir margen arriba y abajo */}
-          <div className="flex space-x-2 justify-center my-4">
-            <button
+          <div className="flex flex-wrap gap-3 justify-center pt-2">
+            <Button
+              type="button"
+              variant="outline"
+              size="sm"
+              icon={<FontAwesomeIcon icon={faFilePdf} className="text-red-500 mr-1" />}
               onClick={() =>
                 downloadFile(
                   `${import.meta.env.VITE_API_ARCHIVO.replace('/tasks/download', '')
                   }/documentos/requisitos-local.pdf`
                 )
               }
-              className="bg-blue-500 text-white py-2 px-4 rounded hover:bg-blue-700"
             >
-              Descargar para habilitación de local
-            </button>
-            <button
+              Requisitos Habilitación Local (PDF)
+            </Button>
+            <Button
+              type="button"
+              variant="outline"
+              size="sm"
+              icon={<FontAwesomeIcon icon={faFilePdf} className="text-red-500 mr-1" />}
               onClick={() =>
                 downloadFile(
                   `${import.meta.env.VITE_API_ARCHIVO.replace('/tasks/download', '')
                   }/documentos/requisitos-eventos.pdf`
                 )
               }
-              className="bg-blue-500 text-white py-2 px-4 rounded hover:bg-blue-700"
             >
-              Descargar para habilitación de eventos
-            </button>
+              Requisitos Habilitación Eventos (PDF)
+            </Button>
           </div>
 
           {/* Sección de Requisitos de Terceros y Contacto */}
-          <div>
-            <h3 className="font-bold text-l">Requisito para Trámites de Terceros:</h3>
-            <p className="text-sm text-black-700 mt-2 font-semibold">
-              <strong></strong> Si la gestión es realizada por una persona distinta al titular, es imprescindible adjuntar una nota de autorización <strong>firmada por el titular</strong> y <strong>certificada por Juez de Paz</strong>. Dicha nota debe detallar claramente: <strong>datos completos del titular</strong>, la <strong>identificación del tercero autorizado</strong> y el <strong>alcance específico del trámite</strong> a realizar.
+          <div className="pt-2 border-t border-amber-200/80 text-xs text-amber-900/90 space-y-2">
+            <p className="font-semibold text-amber-950">
+              Requisito para Trámites realizados por Terceros:
             </p>
-            {/* Bloque de Contacto */}
-            <div className="flex justify-center items-center text-center mt-5">
-              <p>Para cualquier consulta, llame al: <strong>0376-4448963</strong>.</p>
+            <p className="leading-relaxed">
+              Si la gestión es realizada por una persona distinta al titular, es imprescindible adjuntar una nota de autorización <strong>firmada por el titular</strong> y <strong>certificada por Juez de Paz</strong>, detallando datos completos del titular, identificación del autorizado y alcance del trámite.
+            </p>
+            <div className="flex items-center justify-center gap-2 pt-2 text-amber-950 font-medium">
+              <FontAwesomeIcon icon={faPhoneAlt} className="text-amber-700" />
+              <span>Para cualquier consulta o asistencia: <strong>0376-4448963</strong></span>
             </div>
           </div>
         </div>
-        <div className="text-center mt-4">
-          <div className="flex justify-center items-center bg-gray-100">
-            <table className="table" style={{ textTransform: "uppercase" }}>
-              <thead className="bg-blue-500 text-white">
+
+        {/* Tabla de Aranceles */}
+        <div className="my-6">
+          <div className="overflow-hidden rounded-xl border border-gray-200 shadow-theme-xs">
+            <table className="w-full text-left text-sm text-gray-700">
+              <thead className="bg-gray-50 text-xs uppercase font-semibold text-gray-600 border-b border-gray-200">
                 <tr>
-                  <th className="border border-gray-400 px-4 py-2">Categoría</th>
-                  <th className="border border-gray-400 px-4 py-2">Arancel</th>
+                  <th className="py-3 px-4">Categoría de Comercio / Actividad</th>
+                  <th className="py-3 px-4 text-right">Arancel Vigente</th>
                 </tr>
               </thead>
-              <tbody>
-                <tr>
-                  <td data-label="Categoría" className="border border-gray-400 px-4 py-2">Eventos Temporarios</td>
-                  <td data-label="Arancel" className="border border-gray-400 px-4 py-2">$ 26.389,0</td>
+              <tbody className="divide-y divide-gray-100">
+                <tr className="hover:bg-gray-50/50 transition">
+                  <td className="py-2.5 px-4 font-medium text-gray-800">Eventos Temporarios</td>
+                  <td className="py-2.5 px-4 text-right font-semibold text-gray-900">$ 26.389,00</td>
                 </tr>
-                <tr>
-                  <td data-label="Categoría" className="border border-gray-400 px-4 py-2">Kioskos</td>
-                  <td data-label="Arancel" className="border border-gray-400 px-4 py-2">$ 71.970,0</td>
+                <tr className="hover:bg-gray-50/50 transition bg-gray-50/30">
+                  <td className="py-2.5 px-4 font-medium text-gray-800">Kioskos</td>
+                  <td className="py-2.5 px-4 text-right font-semibold text-gray-900">$ 71.970,00</td>
                 </tr>
-                <tr>
-                  <td data-label="Categoría" className="border border-gray-400 px-4 py-2">MiniMercados</td>
-                  <td data-label="Arancel" className="border border-gray-400 px-4 py-2">$ 79.167,0</td>
+                <tr className="hover:bg-gray-50/50 transition">
+                  <td className="py-2.5 px-4 font-medium text-gray-800">MiniMercados</td>
+                  <td className="py-2.5 px-4 text-right font-semibold text-gray-900">$ 79.167,00</td>
                 </tr>
-                <tr>
-                  <td data-label="Categoría" className="border border-gray-400 px-4 py-2">Supermercados</td>
-                  <td data-label="Arancel" className="border border-gray-400 px-4 py-2">$ 88.763,0</td>
+                <tr className="hover:bg-gray-50/50 transition bg-gray-50/30">
+                  <td className="py-2.5 px-4 font-medium text-gray-800">Supermercados</td>
+                  <td className="py-2.5 px-4 text-right font-semibold text-gray-900">$ 88.763,00</td>
                 </tr>
-                <tr>
-                  <td data-label="Categoría" className="border border-gray-400 px-4 py-2">Locales Bailables, Bares, Pub</td>
-                  <td data-label="Arancel" className="border border-gray-400 px-4 py-2">$ 95.960,0</td>
+                <tr className="hover:bg-gray-50/50 transition">
+                  <td className="py-2.5 px-4 font-medium text-gray-800">Locales Bailables, Bares, Pub</td>
+                  <td className="py-2.5 px-4 text-right font-semibold text-gray-900">$ 95.960,00</td>
                 </tr>
-                <tr>
-                  <td data-label="Categoría" className="border border-gray-400 px-4 py-2">Otros (No definidos anteriormente)</td>
-                  <td data-label="Arancel" className="border border-gray-400 px-4 py-2">$ 79.167,0</td>
+                <tr className="hover:bg-gray-50/50 transition bg-gray-50/30">
+                  <td className="py-2.5 px-4 font-medium text-gray-800">Otros (No definidos anteriormente)</td>
+                  <td className="py-2.5 px-4 text-right font-semibold text-gray-900">$ 79.167,00</td>
                 </tr>
-
               </tbody>
-
             </table>
-
           </div>
-          <div className="bg-blue-50 border-l-4 border-blue-500 p-5 rounded-r-md mt-4 shadow-sm text-center">
-            <p className="text-sm font-bold text-blue-900">
-              ⚠️ IMPORTANTE: Solamente se reciben TRANSFERENCIAS.
-            </p>
-            <p className="text-sm text-blue-800 mt-2">
+
+          {/* Banner de Pago */}
+          <div className="rounded-xl border border-brand-200 bg-brand-50/60 p-6 mt-6 shadow-theme-xs text-center space-y-3">
+            <div className="inline-flex items-center gap-2 text-brand-900 font-bold text-sm uppercase tracking-wide">
+              <span>⚠️ Solamente se reciben transferencias bancarias</span>
+            </div>
+            <p className="text-xs text-brand-800 leading-relaxed max-w-xl mx-auto">
               La misma deberá efectuarse una vez terminado el procedimiento de verificación de la documentación presentada, utilizando los siguientes datos:
             </p>
 
-            <div className="mt-3 text-sm text-blue-950 bg-blue-100/60 p-4 rounded border border-blue-200 text-center space-y-2 max-w-xl mx-auto shadow-inner">
-              <div><strong>Alias:</strong> Expendio.2026</div>
-              <div><strong>CBU:</strong> 2850001030094257979021</div>
-              <div className="border-t border-blue-200/60 my-2 max-w-md mx-auto"></div>
-              <div><strong>Banco:</strong> Banco Macro S.A.</div>
-              <div><strong>Razón Social / Titular:</strong> TESORERIA GENERAL DE LA PROVINCIA</div>
-              <div><strong>CUIT:</strong> 30-67239401-1</div>
-              <div className="text-xs text-blue-800 leading-relaxed max-w-md mx-auto">
+            <div className="bg-white/90 border border-brand-200/80 rounded-xl p-4 max-w-xl mx-auto text-left text-xs text-gray-800 space-y-2 shadow-theme-xs font-mono">
+              <div className="flex justify-between border-b border-gray-100 pb-1.5">
+                <span className="font-semibold text-gray-600 font-sans">Alias:</span>
+                <span className="font-bold text-brand-700">Expendio.2026</span>
+              </div>
+              <div className="flex justify-between border-b border-gray-100 pb-1.5">
+                <span className="font-semibold text-gray-600 font-sans">CBU:</span>
+                <span className="font-bold text-gray-900">2850001030094257979021</span>
+              </div>
+              <div className="flex justify-between border-b border-gray-100 pb-1.5">
+                <span className="font-semibold text-gray-600 font-sans">Banco:</span>
+                <span>Banco Macro S.A.</span>
+              </div>
+              <div className="flex justify-between border-b border-gray-100 pb-1.5">
+                <span className="font-semibold text-gray-600 font-sans">Titular:</span>
+                <span>TESORERIA GENERAL DE LA PROVINCIA</span>
+              </div>
+              <div className="flex justify-between border-b border-gray-100 pb-1.5">
+                <span className="font-semibold text-gray-600 font-sans">CUIT:</span>
+                <span>30-67239401-1</span>
+              </div>
+              <div className="pt-1 text-[11px] text-gray-500 font-sans">
                 <strong>Denominación:</strong> FONDO ESPECIAL PROVINCIAL EXPENDIO DE BEBIDAS ALCOHOLICAS
               </div>
             </div>
 
-            <p className="text-sm text-blue-900 mt-3 font-semibold">
+            <p className="text-xs text-brand-900 font-medium pt-1">
               📧 Una vez efectuada la transferencia, se deberá enviar el comprobante de pago al correo:{' '}
-              <a href="mailto:expendio.aranceles@misiones.gov.ar" className="underline font-bold hover:text-blue-700 transition-colors">
+              <a href="mailto:expendio.aranceles@misiones.gov.ar" className="underline font-bold text-brand-600 hover:text-brand-800 transition">
                 expendio.aranceles@misiones.gov.ar
               </a>
             </p>
           </div>
         </div>
 
-
         {/* --- FORMULARIO PRINCIPAL --- */}
-        <form onSubmit={handleSubmit(onSubmit)} className="mt-4">
+        <form onSubmit={handleSubmit(onSubmit)} className="space-y-4 pt-4 border-t border-gray-200">
           {/* SELECCIÓN DE TIPO DE EXPENDIO (COMÚN A AMBOS) */}
-          <label
-            htmlFor="expendio"
-            className="block text-sm font-medium text-black"
-          >
-            Tipo de Expendio de Bebidas
-          </label>
-          <select
-            id="expendio"
-            {...register("expendio", { required: true })}
-            onChange={handleTipoExpendioChange}
-            className="w-full bg-gray-100 text-black px-4 py-2 rounded-md my-2"
-          >
-            <option value="">Seleccione un tipo de Expendio de Bebidas</option>
-
-            <option value="Evento Particular">Evento Particular</option>
-            <option value="Local Comercial">
-              Habilitación de Venta de Bebidas para Local Comercial
-            </option>
-            <option value="Intendencia">Intendencia</option>
-          </select>
-          {errors.expendio && (
-            <p className="text-red-500 text-sm mt-1">
-              El tipo de expendio es requerido.
-            </p>
-          )}
+          <div>
+            <label
+              htmlFor="expendio"
+              className="block text-xs font-semibold text-gray-700 uppercase tracking-wider mb-1.5"
+            >
+              Tipo de Expendio de Bebidas
+            </label>
+            <select
+              id="expendio"
+              {...register("expendio", { required: true })}
+              onChange={handleTipoExpendioChange}
+              className="w-full rounded-xl border border-gray-300 bg-white px-4 py-2.5 text-sm text-gray-800 placeholder-gray-400 focus:border-brand-500 focus:ring-4 focus:ring-brand-500/10 outline-none transition shadow-theme-xs"
+            >
+              <option value="">Seleccione un tipo de Expendio de Bebidas</option>
+              <option value="Evento Particular">Evento Particular</option>
+              <option value="Local Comercial">
+                Habilitación de Venta de Bebidas para Local Comercial
+              </option>
+              <option value="Intendencia">Intendencia</option>
+            </select>
+            {errors.expendio && (
+              <p className="text-red-500 text-xs mt-1 font-medium">
+                El tipo de expendio es requerido.
+              </p>
+            )}
+          </div>
 
           {/* RENDERIZADO CONDICIONAL DE FORMULARIOS ESPECÍFICOS */}
           {tipoExpendio === "Evento Particular" && (
@@ -523,16 +545,18 @@ function RegisterPage() {
             />
           )}
 
-          {/* SECCIÓN DE SUBIDA DE ARCHIVOS (SE ELIMINÓ LA PARTE LOCAL) */}
-          {/* Ahora solo se muestra el botón de submit si se ha seleccionado un tipo */}
           {tipoExpendio && (
-            <button
-              type="submit"
-              className="bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded-md mt-6 w-full"
-              disabled={!tipoExpendio}
-            >
-              {params.id ? "Actualizar Registro" : "Guardar Registro"}
-            </button>
+            <div className="pt-4">
+              <Button
+                type="submit"
+                variant="primary"
+                size="md"
+                className="w-full justify-center shadow-theme-sm"
+                disabled={!tipoExpendio}
+              >
+                {params.id ? "Actualizar Registro" : "Guardar Registro"}
+              </Button>
+            </div>
           )}
         </form>
       </div>
