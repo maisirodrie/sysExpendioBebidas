@@ -36,7 +36,7 @@ echo ""
 echo ">>> [3/5] Reiniciando backend ($BACKEND_NAME)..."
 cd "$REPO_DIR"
 pm2 delete $BACKEND_NAME 2>/dev/null || true
-cross-env NODE_ENV=production pm2 start src/index.js --name $BACKEND_NAME
+NODE_ENV=production pm2 start src/index.js --name $BACKEND_NAME
 echo "    ✓ Backend reiniciado."
 echo ""
 
