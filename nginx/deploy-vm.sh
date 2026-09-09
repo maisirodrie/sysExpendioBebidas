@@ -30,18 +30,11 @@ npm install --production=false
 sudo systemctl enable nginx
 sudo systemctl enable mongod || sudo systemctl enable mongodb || true
 
-echo "⚙️ Iniciando / Reiniciando Backend con PM2..."
-npm run produ:start || npm run produ:restart
+echo "⚙️ Ejecutando inicio unificado de Frontend y Backend (npm start)..."
+npm start
 
-# Guardar lista de procesos y configurar servicio systemd para que reviva solo al reiniciar
+# Configurar servicio systemd para que reviva solo al reiniciar la VM
 pm2 startup systemd -u administrador --hp /home/administrador --service-name pm2-administrador || true
-pm2 save
-
-# 3. Compilación Frontend (React 18 + Vite + Tailwind CSS)
-echo "🎨 Compilando Frontend TailAdmin..."
-cd "$PROJECT_DIR/ExpendioBebidas"
-npm install
-npm run build
 
 echo "✅ ¡Despliegue completado con éxito!"
 echo "🌐 Frontend: https://www.expendiobebidas.misiones.gov.ar"
