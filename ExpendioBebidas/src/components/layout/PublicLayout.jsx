@@ -15,16 +15,7 @@ export const PublicLayout = ({
       className={`relative min-h-screen ${
         fullHeight ? "md:h-screen md:overflow-hidden" : ""
       } bg-slate-900 flex flex-col font-outfit`}
-      style={{
-        backgroundImage: "url('/fondos/fondo.jpg')",
-        backgroundPosition: "center 85%",
-        backgroundSize: "cover",
-        backgroundRepeat: "no-repeat",
-      }}
     >
-      {/* OVERLAY OSCURO FLUIDO */}
-      <div className="absolute inset-0 bg-slate-950/65 backdrop-blur-[2px] z-0" />
-
       {/* TOP HEADER PÚBLICO .navbar-modern */}
       <header
         className="relative z-50 w-full px-6 flex items-center justify-between shrink-0 border-b border-slate-200/80"
@@ -86,12 +77,23 @@ export const PublicLayout = ({
         </nav>
       </header>
 
-      {/* CONTENEDOR CENTRAL */}
-      <main className="relative z-10 flex-1 flex items-center justify-center p-4 sm:p-6 overflow-y-auto">
-        <div className={`w-full ${maxWidth} mx-auto my-auto animate-in fade-in zoom-in-95 duration-200`}>
-          {children}
-        </div>
-      </main>
+      {/* CONTENEDOR CENTRAL EXACTO DE ROHTDA */}
+      <div className="flex-1 flex flex-col min-h-0 overflow-hidden">
+        <section
+          className="flex-1 w-full h-full flex flex-col justify-center items-center px-4 py-4 relative overflow-hidden font-outfit"
+          style={{
+            backgroundImage: 'url("/fondos/fondo.jpg")',
+            backgroundPosition: "center 85%",
+            backgroundSize: "cover",
+            backgroundRepeat: "no-repeat",
+          }}
+        >
+          <div className="absolute inset-0 bg-slate-950/60 backdrop-blur-[1px]" />
+          <div className={`relative z-10 w-full ${maxWidth} mx-auto my-auto animate-in fade-in zoom-in-95 duration-200 overflow-y-auto`}>
+            {children}
+          </div>
+        </section>
+      </div>
 
       {/* FOOTER PÚBLICO INSTITUCIONAL AZUL */}
       <footer className="relative z-10 w-full bg-[#1d68e1] py-2.5 px-6 flex items-center justify-center shadow-lg shrink-0 text-center font-medium">
