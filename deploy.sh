@@ -49,8 +49,8 @@ npm install
 echo "    ✓ Dependencias del frontend OK."
 echo ""
 
-# 5. Compilar frontend y levantar en PM2 (puerto 3002)
-echo ">>> [5/5] Compilando y levantando frontend en PM2..."
+# 5. Compilar frontend y levantar en PM2 (puerto 80)
+echo ">>> [5/5] Compilando y levantando frontend en PM2 (puerto 80)..."
 cd "$FRONTEND_DIR"
 # Copiar el .env.production de la raíz al frontend para que Vite compile con la URL correcta
 cp "$REPO_DIR/.env.production" "$FRONTEND_DIR/.env.production" 2>/dev/null || true
@@ -58,10 +58,10 @@ npm run build
 cp -r logos/ build/ 2>/dev/null || true
 cp -r fondos/ build/ 2>/dev/null || true
 
-# Levantar frontend en PM2 en el puerto 3002 (como en Rohtda)
+# Levantar frontend en PM2 en el puerto 80
 pm2 delete frontendExpendio 2>/dev/null || true
-pm2 serve build 3002 --spa --name frontendExpendio
-echo "    ✓ Frontend compilado y corriendo en PM2 en el puerto 3002."
+pm2 serve build 80 --spa --name frontendExpendio
+echo "    ✓ Frontend compilado y corriendo en PM2 en el puerto 80."
 echo ""
 
 # Guardar lista PM2 para sobrevivir reinicios del servidor
