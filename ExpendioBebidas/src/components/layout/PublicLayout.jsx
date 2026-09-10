@@ -25,19 +25,26 @@ export const PublicLayout = ({
       {/* OVERLAY OSCURO FLUIDO */}
       <div className="absolute inset-0 bg-slate-950/65 backdrop-blur-[2px] z-0" />
 
-      {/* TOP HEADER PÚBLICO MINIMALISTA */}
-      <header className="relative z-10 w-full px-6 py-3.5 flex items-center justify-between border-b border-white/10 shrink-0">
+      {/* TOP HEADER PÚBLICO .navbar-modern */}
+      <header
+        className="relative z-50 w-full px-6 flex items-center justify-between shrink-0 border-b border-slate-200/80"
+        style={{
+          background: "linear-gradient(135deg, #fff, #f1f5f9, #e2e8f0)",
+          boxShadow: "0 2px 15px #00000014",
+          minHeight: "4.5rem",
+        }}
+      >
         <Link to="/" className="flex items-center gap-3 group">
           <img
             src="/logos/logoccpm.png"
             alt="Misiones - Centro de Cómputos"
-            className="h-10 sm:h-12 w-auto object-contain bg-white/95 px-2.5 py-1 rounded-xl shadow-theme-xs border border-white/40 group-hover:scale-105 transition-transform"
+            className="h-11 sm:h-12 w-auto object-contain group-hover:scale-105 transition-transform"
           />
           <div className="hidden md:flex flex-col text-left">
-            <span className="font-bold text-white text-sm sm:text-base tracking-tight leading-tight">
+            <span className="font-bold text-gray-900 text-sm sm:text-base tracking-tight leading-tight">
               Expendio de Bebidas Alcohólicas
             </span>
-            <span className="text-[11px] text-gray-300 font-medium">
+            <span className="text-[11px] text-gray-500 font-medium">
               Ministerio de Gobierno • Misiones
             </span>
           </div>
@@ -47,7 +54,7 @@ export const PublicLayout = ({
           {location.pathname !== "/" && (
             <Link
               to="/"
-              className="text-xs sm:text-sm text-gray-200 hover:text-white px-3 py-1.5 rounded-lg hover:bg-white/10 transition-colors"
+              className="text-xs sm:text-sm font-medium text-gray-700 hover:text-gray-900 px-3 py-1.5 rounded-lg hover:bg-black/5 transition-colors"
             >
               Inicio
             </Link>
@@ -55,7 +62,7 @@ export const PublicLayout = ({
           {location.pathname !== "/consulta-estado" && (
             <Link
               to="/consulta-estado"
-              className="text-xs sm:text-sm text-gray-200 hover:text-white px-3 py-1.5 rounded-lg hover:bg-white/10 transition-colors"
+              className="text-xs sm:text-sm font-medium text-gray-700 hover:text-gray-900 px-3 py-1.5 rounded-lg hover:bg-black/5 transition-colors"
             >
               Consultar Trámite
             </Link>
@@ -63,7 +70,7 @@ export const PublicLayout = ({
           {location.pathname !== "/register" && (
             <Link
               to="/register"
-              className="text-xs sm:text-sm text-white bg-brand-500/80 hover:bg-brand-500 px-3.5 py-1.5 rounded-xl transition-all shadow-theme-xs border border-white/20"
+              className="text-xs sm:text-sm font-medium text-white bg-brand-500 hover:bg-brand-600 px-3.5 py-1.5 rounded-xl transition-all shadow-theme-xs border border-brand-600"
             >
               Iniciar Trámite
             </Link>
@@ -71,7 +78,7 @@ export const PublicLayout = ({
           {location.pathname !== "/login" && (
             <Link
               to="/login"
-              className="text-xs sm:text-sm text-gray-200 hover:text-white px-3 py-1.5 rounded-lg hover:bg-white/10 transition-colors"
+              className="text-xs sm:text-sm font-medium text-gray-700 hover:text-gray-900 px-3 py-1.5 rounded-lg hover:bg-black/5 transition-colors"
             >
               Acceso Staff
             </Link>

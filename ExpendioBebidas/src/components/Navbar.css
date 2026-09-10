@@ -1,5 +1,17 @@
 
 
+.navbar-modern {
+    background: linear-gradient(135deg, #fff, #f1f5f9, #e2e8f0);
+    padding: 0 1.5rem;
+    box-shadow: 0 2px 15px #00000014;
+    width: 100%;
+    position: relative;
+    z-index: 50;
+    display: flex;
+    align-items: center;
+    min-height: 4.5rem;
+}
+
 .bg-custom-nav {
   background-color: #4186DC;
 }

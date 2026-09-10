@@ -212,7 +212,13 @@ export const DashboardLayout = ({ children }) => {
         }`}
       >
         {/* HEADER SUPERIOR */}
-        <header className="h-16 sticky top-0 z-30 bg-white border-b border-gray-200 px-4 sm:px-6 flex items-center justify-between gap-4 shadow-theme-xs">
+        <header
+          className="h-16 flex items-center justify-between px-4 sm:px-6 lg:px-8 shrink-0 z-20 border-b border-gray-200"
+          style={{
+            background: "linear-gradient(135deg, #fff, #f1f5f9, #e2e8f0)",
+            boxShadow: "0 2px 15px #00000014",
+          }}
+        >
           <div className="flex items-center gap-3">
             {/* BOTÓN HAMBURGUESA SVG FIJO DE 3 BARRAS (SIN CAMBIAR A 'X') */}
             <button
