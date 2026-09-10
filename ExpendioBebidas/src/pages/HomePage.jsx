@@ -23,9 +23,9 @@ function HomePage() {
 
           <Link
             to="/consulta-estado"
-            className="w-full sm:w-auto inline-flex items-center justify-center gap-2 bg-white hover:bg-gray-50 active:bg-gray-100 text-gray-700 border border-gray-300 font-medium py-3 px-6 rounded-xl shadow-theme-xs transition-all duration-150 cursor-pointer focus:ring-4 focus:ring-gray-200"
+            className="w-full sm:w-auto inline-flex items-center justify-center gap-2 bg-brand-500 hover:bg-brand-600 active:bg-brand-700 text-white font-medium py-3 px-6 rounded-xl shadow-theme-xs transition-all duration-150 transform active:scale-[0.99] cursor-pointer focus:ring-4 focus:ring-brand-500/20"
           >
-            <svg className="w-5 h-5 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
             </svg>
             Consultar Estado de Trámite

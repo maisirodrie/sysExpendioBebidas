@@ -34,36 +34,19 @@ export const PublicLayout = ({
         </Link>
 
         <nav className="flex items-center gap-2 sm:gap-3">
-          {location.pathname !== "/" && (
-            <Link
-              to="/"
-              className="text-xs sm:text-sm font-medium text-gray-700 hover:text-gray-900 px-3 py-1.5 rounded-lg hover:bg-black/5 transition-colors"
-            >
-              Inicio
-            </Link>
-          )}
-          {location.pathname !== "/consulta-estado" && (
-            <Link
-              to="/consulta-estado"
-              className="text-xs sm:text-sm font-medium text-gray-700 hover:text-gray-900 px-3 py-1.5 rounded-lg hover:bg-black/5 transition-colors"
-            >
-              Consultar Trámite
-            </Link>
-          )}
-          {location.pathname !== "/register" && (
-            <Link
-              to="/register"
-              className="text-xs sm:text-sm font-medium text-white bg-brand-500 hover:bg-brand-600 px-3.5 py-1.5 rounded-xl transition-all shadow-theme-xs border border-brand-600"
-            >
-              Iniciar Trámite
-            </Link>
-          )}
-          {location.pathname !== "/login" && (
+          {location.pathname !== "/login" ? (
             <Link
               to="/login"
               className="text-xs sm:text-sm font-medium text-gray-700 hover:text-gray-900 px-3 py-1.5 rounded-lg hover:bg-black/5 transition-colors"
             >
               Acceso
+            </Link>
+          ) : (
+            <Link
+              to="/"
+              className="text-xs sm:text-sm font-medium text-gray-700 hover:text-gray-900 px-3 py-1.5 rounded-lg hover:bg-black/5 transition-colors"
+            >
+              Inicio
             </Link>
           )}
         </nav>
