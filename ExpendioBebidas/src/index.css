@@ -31,3 +31,10 @@
 .app-container {
   min-height: calc(100vh - 64px);
 }
+
+.footer-text {
+    color: #fffffff2;
+    font-size: .825rem;
+    margin: 0;
+    letter-spacing: .3px;
+}

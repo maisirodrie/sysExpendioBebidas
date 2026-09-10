@@ -346,8 +346,8 @@ export const DashboardLayout = ({ children }) => {
         </main>
 
         {/* FOOTER INSTITUCIONAL AZUL */}
-        <footer className="w-full bg-[#1d68e1] py-2.5 px-6 flex items-center justify-center text-xs text-white shrink-0 mt-auto shadow-sm text-center font-medium">
-          <span>© {new Date().getFullYear()} Centro de Cómputos de la Provincia de Misiones - Todos los derechos reservados</span>
+        <footer className="w-full bg-[#1d68e1] py-2.5 px-6 flex items-center justify-center shrink-0 mt-auto shadow-sm text-center font-medium">
+          <p className="footer-text">© {new Date().getFullYear()} Centro de Cómputos de la Provincia de Misiones - Todos los derechos reservados</p>
         </footer>
       </div>
     </div>

@@ -94,8 +94,8 @@ export const PublicLayout = ({
       </main>
 
       {/* FOOTER PÚBLICO INSTITUCIONAL AZUL */}
-      <footer className="relative z-10 w-full bg-[#1d68e1] py-2.5 px-6 flex items-center justify-center text-xs text-white shadow-lg shrink-0 text-center font-medium">
-        <span>© {new Date().getFullYear()} Centro de Cómputos de la Provincia de Misiones - Todos los derechos reservados</span>
+      <footer className="relative z-10 w-full bg-[#1d68e1] py-2.5 px-6 flex items-center justify-center shadow-lg shrink-0 text-center font-medium">
+        <p className="footer-text">© {new Date().getFullYear()} Centro de Cómputos de la Provincia de Misiones - Todos los derechos reservados</p>
       </footer>
     </div>
   );
