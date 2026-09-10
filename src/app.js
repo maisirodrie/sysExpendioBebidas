@@ -18,7 +18,12 @@ app.use(cors({
         'http://localhost:3000',
         'https://www.expendiobebidas.misiones.gov.ar',
         'https://expendiobebidas.misiones.gov.ar',
-        'http://10.10.0.135'
+        'https://api.expendiobebidas.misiones.gov.ar',
+        'https://www.expediobebidas.misiones.gov.ar',
+        'https://expediobebidas.misiones.gov.ar',
+        'https://api.expediobebidas.misiones.gov.ar',
+        'http://10.10.0.135',
+        'http://10.10.0.135:80'
     ],
     credentials: true,
 }));

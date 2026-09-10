@@ -11,7 +11,7 @@ REPO_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 FRONTEND_DIR="$REPO_DIR/ExpendioBebidas"
 BACKEND_NAME="backendExpendio"
 FRONTEND_NAME="frontendExpendio"
-FRONTEND_PORT="3002"
+FRONTEND_PORT="80"
 
 echo ""
 echo "======================================"
