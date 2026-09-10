@@ -124,21 +124,19 @@ export const DashboardLayout = ({ children }) => {
         }`}
       >
         {/* LOGO AREA */}
-        <div className="h-16 flex items-center px-5 border-b border-gray-100 gap-3">
-          <img
-            src="/favicon.png"
-            alt="Logo"
-            className="h-9 w-9 rounded-xl object-contain shadow-theme-xs ring-1 ring-brand-500/20"
-          />
-          {(sidebarOpen || mobileOpen) && (
-            <div className="flex flex-col">
-              <span className="font-bold text-sm text-gray-900 tracking-tight leading-tight">
-                Expendio Bebidas
-              </span>
-              <span className="text-[11px] text-gray-500 font-medium">
-                Gobierno de Misiones
-              </span>
-            </div>
+        <div className="h-16 flex items-center px-4 border-b border-gray-100 gap-3 overflow-hidden">
+          {sidebarOpen || mobileOpen ? (
+            <img
+              src="/logos/logoccpm.png"
+              alt="Misiones CCPM"
+              className="h-9 w-auto object-contain"
+            />
+          ) : (
+            <img
+              src="/favicon.png"
+              alt="Logo"
+              className="h-8 w-8 rounded-lg object-contain mx-auto"
+            />
           )}
         </div>
 
@@ -342,7 +340,7 @@ export const DashboardLayout = ({ children }) => {
         </main>
 
         {/* FOOTER INSTITUCIONAL AZUL */}
-        <footer className="w-full bg-[#1d68e1] py-2 px-6 flex items-center justify-end text-xs text-white shrink-0 mt-auto shadow-sm">
+        <footer className="w-full bg-[#1d68e1] py-2.5 px-6 flex items-center justify-center text-xs text-white shrink-0 mt-auto shadow-sm text-center font-medium">
           <span>© {new Date().getFullYear()} Centro de Cómputos de la Provincia de Misiones - Todos los derechos reservados</span>
         </footer>
       </div>

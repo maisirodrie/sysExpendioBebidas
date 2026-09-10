@@ -26,14 +26,14 @@ export const PublicLayout = ({
       <div className="absolute inset-0 bg-slate-950/65 backdrop-blur-[2px] z-0" />
 
       {/* TOP HEADER PÚBLICO MINIMALISTA */}
-      <header className="relative z-10 w-full px-6 py-4 flex items-center justify-between border-b border-white/10 shrink-0">
+      <header className="relative z-10 w-full px-6 py-3.5 flex items-center justify-between border-b border-white/10 shrink-0">
         <Link to="/" className="flex items-center gap-3 group">
           <img
-            src="/favicon.png"
-            alt="Logo Provincial"
-            className="h-10 w-10 rounded-xl object-contain shadow-theme-sm ring-1 ring-white/20 group-hover:scale-105 transition-transform"
+            src="/logos/logoccpm.png"
+            alt="Misiones - Centro de Cómputos"
+            className="h-10 sm:h-12 w-auto object-contain bg-white/95 px-2.5 py-1 rounded-xl shadow-theme-xs border border-white/40 group-hover:scale-105 transition-transform"
           />
-          <div className="flex flex-col text-left">
+          <div className="hidden md:flex flex-col text-left">
             <span className="font-bold text-white text-sm sm:text-base tracking-tight leading-tight">
               Expendio de Bebidas Alcohólicas
             </span>
@@ -87,7 +87,7 @@ export const PublicLayout = ({
       </main>
 
       {/* FOOTER PÚBLICO INSTITUCIONAL AZUL */}
-      <footer className="relative z-10 w-full bg-[#1d68e1] py-2.5 px-6 flex items-center justify-end text-xs text-white shadow-lg shrink-0">
+      <footer className="relative z-10 w-full bg-[#1d68e1] py-2.5 px-6 flex items-center justify-center text-xs text-white shadow-lg shrink-0 text-center font-medium">
         <span>© {new Date().getFullYear()} Centro de Cómputos de la Provincia de Misiones - Todos los derechos reservados</span>
       </footer>
     </div>
