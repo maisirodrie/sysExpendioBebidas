@@ -60,6 +60,9 @@ cp -r fondos/ build/ 2>/dev/null || true
 echo "    ✓ Frontend compilado en $FRONTEND_DIR/build."
 echo ""
 
+# Limpiar proceso viejo de frontend en PM2 si existiera
+pm2 delete frontendExpendio 2>/dev/null || true
+
 # Guardar lista PM2 para sobrevivir reinicios del servidor
 pm2 save
 
