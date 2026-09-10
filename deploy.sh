@@ -58,9 +58,13 @@ npm run build
 cp -r logos/ build/ 2>/dev/null || true
 cp -r fondos/ build/ 2>/dev/null || true
 
+# Asegurar que Nginx esté detenido para que no ocupe el puerto 80
+systemctl stop nginx 2>/dev/null || true
+systemctl disable nginx 2>/dev/null || true
+
 # Levantar frontend en PM2 en el puerto 80
 pm2 delete frontendExpendio 2>/dev/null || true
-pm2 serve build 80 --spa --name frontendExpendio
+pm2 serve "$FRONTEND_DIR/build" 80 --spa --name frontendExpendio
 echo "    ✓ Frontend compilado y corriendo en PM2 en el puerto 80."
 echo ""
 
