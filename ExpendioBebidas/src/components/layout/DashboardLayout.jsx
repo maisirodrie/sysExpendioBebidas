@@ -126,9 +126,9 @@ export const DashboardLayout = ({ children }) => {
         {/* LOGO AREA */}
         <div className="h-16 flex items-center px-5 border-b border-gray-100 gap-3">
           <img
-            src="/logopagina.jpg"
+            src="/favicon.png"
             alt="Logo"
-            className="h-9 w-9 rounded-xl object-cover shadow-theme-xs ring-1 ring-brand-500/20"
+            className="h-9 w-9 rounded-xl object-contain shadow-theme-xs ring-1 ring-brand-500/20"
           />
           {(sidebarOpen || mobileOpen) && (
             <div className="flex flex-col">
@@ -340,6 +340,11 @@ export const DashboardLayout = ({ children }) => {
         <main className="flex-1 p-4 sm:p-6 lg:p-8 min-w-0">
           {children || <Outlet />}
         </main>
+
+        {/* FOOTER INSTITUCIONAL AZUL */}
+        <footer className="w-full bg-[#1d68e1] py-2 px-6 flex items-center justify-end text-xs text-white shrink-0 mt-auto shadow-sm">
+          <span>© {new Date().getFullYear()} Centro de Cómputos de la Provincia de Misiones - Todos los derechos reservados</span>
+        </footer>
       </div>
     </div>
   );

@@ -29,9 +29,9 @@ export const PublicLayout = ({
       <header className="relative z-10 w-full px-6 py-4 flex items-center justify-between border-b border-white/10 shrink-0">
         <Link to="/" className="flex items-center gap-3 group">
           <img
-            src="/logopagina.jpg"
+            src="/favicon.png"
             alt="Logo Provincial"
-            className="h-9 w-9 rounded-xl object-cover shadow-theme-sm ring-1 ring-white/20 group-hover:scale-105 transition-transform"
+            className="h-10 w-10 rounded-xl object-contain shadow-theme-sm ring-1 ring-white/20 group-hover:scale-105 transition-transform"
           />
           <div className="flex flex-col text-left">
             <span className="font-bold text-white text-sm sm:text-base tracking-tight leading-tight">
@@ -86,9 +86,9 @@ export const PublicLayout = ({
         </div>
       </main>
 
-      {/* FOOTER PÚBLICO */}
-      <footer className="relative z-10 text-center py-2.5 text-[11px] text-gray-400 border-t border-white/10">
-        © {new Date().getFullYear()} Subsecretaría de Gobierno • Ministerio de Gobierno de la Provincia de Misiones
+      {/* FOOTER PÚBLICO INSTITUCIONAL AZUL */}
+      <footer className="relative z-10 w-full bg-[#1d68e1] py-2.5 px-6 flex items-center justify-end text-xs text-white shadow-lg shrink-0">
+        <span>© {new Date().getFullYear()} Centro de Cómputos de la Provincia de Misiones - Todos los derechos reservados</span>
       </footer>
     </div>
   );

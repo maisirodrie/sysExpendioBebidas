@@ -6,21 +6,9 @@ function HomePage() {
   return (
     <PublicLayout maxWidth="max-w-2xl">
       <div className="backdrop-blur-md bg-white/95 rounded-2xl p-8 sm:p-12 border border-white/30 shadow-2xl text-center">
-        <div className="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-brand-50 text-brand-600 mb-6 shadow-theme-xs border border-brand-200/60 ring-4 ring-brand-500/10">
-          <img
-            src="/logopagina.jpg"
-            alt="Logo"
-            className="w-10 h-10 rounded-xl object-cover"
-          />
-        </div>
-
-        <h1 className="text-3xl sm:text-4xl font-extrabold text-gray-900 tracking-tight leading-tight mb-4">
+        <h1 className="text-3xl sm:text-4xl font-extrabold text-gray-900 tracking-tight leading-tight mb-8">
           Solicitud Provincial de Expendio de Bebidas
         </h1>
-
-        <p className="text-sm sm:text-base text-gray-600 max-w-lg mx-auto mb-8 leading-relaxed">
-          Plataforma oficial para la gestión, habilitación y consulta de permisos de expendio de bebidas alcohólicas en la Provincia de Misiones.
-        </p>
 
         <div className="flex flex-col sm:flex-row items-center justify-center gap-3.5">
           <Link
@@ -42,15 +30,6 @@ function HomePage() {
             </svg>
             Consultar Estado de Trámite
           </Link>
-        </div>
-
-        <div className="mt-8 pt-6 border-t border-gray-100 flex items-center justify-center gap-4 text-xs text-gray-500">
-          <span className="flex items-center gap-1.5">
-            <span className="w-2 h-2 rounded-full bg-emerald-500" />
-            Sistema en Línea
-          </span>
-          <span>•</span>
-          <span>Decreto Provincial Nº 1724/04</span>
         </div>
       </div>
     </PublicLayout>
