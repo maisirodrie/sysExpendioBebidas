@@ -25,20 +25,12 @@ export const PublicLayout = ({
           minHeight: "4.5rem",
         }}
       >
-        <Link to="/" className="flex items-center gap-3 group">
+        <Link to="/" className="flex items-center group">
           <img
             src="/logos/logoccpm.png"
             alt="Misiones - Centro de Cómputos"
             className="h-11 sm:h-12 w-auto object-contain group-hover:scale-105 transition-transform"
           />
-          <div className="hidden md:flex flex-col text-left">
-            <span className="font-bold text-gray-900 text-sm sm:text-base tracking-tight leading-tight">
-              Expendio de Bebidas Alcohólicas
-            </span>
-            <span className="text-[11px] text-gray-500 font-medium">
-              Ministerio de Gobierno • Misiones
-            </span>
-          </div>
         </Link>
 
         <nav className="flex items-center gap-2 sm:gap-3">
@@ -71,7 +63,7 @@ export const PublicLayout = ({
               to="/login"
               className="text-xs sm:text-sm font-medium text-gray-700 hover:text-gray-900 px-3 py-1.5 rounded-lg hover:bg-black/5 transition-colors"
             >
-              Acceso Staff
+              Acceso
             </Link>
           )}
         </nav>
