@@ -13,18 +13,7 @@ const app = express();
 
 // Middleware de CORS
 app.use(cors({
-    origin: [
-        'http://localhost:5173',
-        'http://localhost:3000',
-        'https://www.expendiobebidas.misiones.gov.ar',
-        'https://expendiobebidas.misiones.gov.ar',
-        'https://api.expendiobebidas.misiones.gov.ar',
-        'https://www.expediobebidas.misiones.gov.ar',
-        'https://expediobebidas.misiones.gov.ar',
-        'https://api.expediobebidas.misiones.gov.ar',
-        'http://10.10.0.135',
-        'http://10.10.0.135:80'
-    ],
+    origin: true,
     credentials: true,
 }));
 
@@ -42,6 +31,11 @@ app.use('/api/documentos', express.static(documentosPath));
 app.use(morgan('dev'));
 app.use(express.json());
 app.use(cookieParser());
+
+// Ruta raíz de verificación / healthcheck
+app.get('/', (req, res) => {
+    res.json({ status: 'ok', message: 'API Backend Expendio Bebidas online' });
+});
 
 // Rutas de la API
 app.use('/api', authRoutes);
