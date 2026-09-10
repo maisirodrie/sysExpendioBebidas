@@ -10,6 +10,8 @@ set -e  # Detener si cualquier comando falla
 REPO_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 FRONTEND_DIR="$REPO_DIR/ExpendioBebidas"
 BACKEND_NAME="backendExpendio"
+FRONTEND_NAME="frontendExpendio"
+FRONTEND_PORT="3002"
 
 echo ""
 echo "======================================"
@@ -47,15 +49,17 @@ npm install
 echo "    ✓ Dependencias del frontend OK."
 echo ""
 
-# 5. Compilar frontend para Nginx
-echo ">>> [5/5] Compilando frontend..."
+# 5. Compilar y servir frontend con PM2
+echo ">>> [5/5] Compilando y levantando frontend ($FRONTEND_NAME)..."
 cd "$FRONTEND_DIR"
 # Copiar el .env.production de la raíz al frontend para que Vite compile con la URL correcta
 cp "$REPO_DIR/.env.production" "$FRONTEND_DIR/.env.production" 2>/dev/null || true
 npm run build
 cp -r logos/ build/ 2>/dev/null || true
 cp -r fondos/ build/ 2>/dev/null || true
-echo "    ✓ Frontend compilado en build/ para Nginx."
+pm2 delete $FRONTEND_NAME 2>/dev/null || true
+pm2 serve build $FRONTEND_PORT --spa --name $FRONTEND_NAME
+echo "    ✓ Frontend compilado y corriendo en PM2 en el puerto $FRONTEND_PORT."
 echo ""
 
 # Guardar lista PM2 para sobrevivir reinicios del servidor
