@@ -26,29 +26,25 @@ function App() {
     <AuthProvider>
       <TaskProvider>
         <BrowserRouter>
-          <main className="container mx-auto">
-            <Navbar/>
-            <Routes>
-              <Route path='/' element={<HomePage/>} />
-              <Route path='/login' element={<LoginPage/>} />
-              <Route path='/register' element={<RegisterPage/>} />
-              <Route path='/consulta-estado' element={<Busquedadni/>} />
-              <Route path="/forgot-password" element={<ForgotPasswordPage />} />
-              <Route path='/change-password' element={<ChangePasswordPage/>} />
-              <Route path='/reset-password' element={<ResetPasswordPage/>} />
-              
-              <Route element={<ProtectedRoute/>}>
-                <Route path='/registeradmin' element={<RegisterPageAdmin/>} />
-                <Route path='/add-task' element={<TaskFormPage/>} />
-                <Route path='/task' element={<TaskPage/>}/>
-                <Route path='/view/task/:id/' element={<TaskViewPage/>} />
-                <Route path="/edit-task/:id" element={<TaskFormPageEdit />} />
-                <Route path='/profile' element={<Profilepage/>} />
-                <Route path='/pago' element={<Pago/>} />
-              </Route>
-            </Routes>
-            <Footer/>
-          </main>
+          <Routes>
+            <Route path='/' element={<HomePage/>} />
+            <Route path='/login' element={<LoginPage/>} />
+            <Route path='/register' element={<RegisterPage/>} />
+            <Route path='/consulta-estado' element={<Busquedadni/>} />
+            <Route path="/forgot-password" element={<ForgotPasswordPage />} />
+            <Route path='/change-password' element={<ChangePasswordPage/>} />
+            <Route path='/reset-password' element={<ResetPasswordPage/>} />
+            
+            <Route element={<ProtectedRoute/>}>
+              <Route path='/registeradmin' element={<RegisterPageAdmin/>} />
+              <Route path='/add-task' element={<TaskFormPage/>} />
+              <Route path='/task' element={<TaskPage/>}/>
+              <Route path='/view/task/:id/' element={<TaskViewPage/>} />
+              <Route path="/edit-task/:id" element={<TaskFormPageEdit />} />
+              <Route path='/profile' element={<Profilepage/>} />
+              <Route path='/pago' element={<Pago/>} />
+            </Route>
+          </Routes>
         </BrowserRouter>
       </TaskProvider>
     </AuthProvider>
