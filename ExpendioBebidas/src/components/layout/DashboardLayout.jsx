@@ -9,10 +9,38 @@ export const DashboardLayout = ({ children }) => {
   const location = useLocation();
   const navigate = useNavigate();
 
-  const [sidebarOpen, setSidebarOpen] = useState(true);
+  const [sidebarPinned, setSidebarPinned] = useState(false);
+  const [sidebarHovered, setSidebarHovered] = useState(false);
   const [mobileOpen, setMobileOpen] = useState(false);
   const [userDropdownOpen, setUserDropdownOpen] = useState(false);
   const dropdownRef = useRef(null);
+  const hoverTimeoutRef = useRef(null);
+
+  const isExpanded = sidebarPinned || sidebarHovered || mobileOpen;
+
+  const handleSidebarMouseEnter = () => {
+    if (hoverTimeoutRef.current) {
+      clearTimeout(hoverTimeoutRef.current);
+      hoverTimeoutRef.current = null;
+    }
+    setSidebarHovered(true);
+  };
+
+  const handleSidebarMouseLeave = () => {
+    if (hoverTimeoutRef.current) {
+      clearTimeout(hoverTimeoutRef.current);
+    }
+    hoverTimeoutRef.current = setTimeout(() => {
+      setSidebarHovered(false);
+    }, 120);
+  };
+
+  const handleContentMouseEnter = () => {
+    if (hoverTimeoutRef.current) {
+      clearTimeout(hoverTimeoutRef.current);
+    }
+    setSidebarHovered(false);
+  };
 
   // Cerrar dropdown al hacer click afuera
   useEffect(() => {
@@ -117,32 +145,34 @@ export const DashboardLayout = ({ children }) => {
 
       {/* SIDEBAR */}
       <aside
+        onMouseEnter={handleSidebarMouseEnter}
+        onMouseLeave={handleSidebarMouseLeave}
         className={`fixed top-0 bottom-0 left-0 z-50 flex flex-col bg-white border-r border-gray-200 transition-all duration-300 ease-in-out ${
-          sidebarOpen ? "w-64" : "w-20"
+          isExpanded ? "w-64 shadow-2xl" : "w-20 shadow-none"
         } ${
           mobileOpen ? "translate-x-0 w-64" : "-translate-x-full lg:translate-x-0"
         }`}
       >
         {/* LOGO AREA */}
         <div className="h-16 flex items-center px-4 border-b border-gray-100 gap-3 overflow-hidden">
-          {sidebarOpen || mobileOpen ? (
+          {isExpanded ? (
             <img
               src="/logos/logoccpm.png"
               alt="Misiones CCPM"
-              className="h-9 w-auto object-contain"
+              className="h-9 w-auto object-contain transition-all duration-300"
             />
           ) : (
             <img
               src="/favicon.png"
               alt="Logo"
-              className="h-8 w-8 rounded-lg object-contain mx-auto"
+              className="h-8 w-8 rounded-lg object-contain mx-auto transition-all duration-300"
             />
           )}
         </div>
 
         {/* NAVEGACIÓN */}
         <div className="flex-1 py-4 px-3 space-y-1 overflow-y-auto">
-          {(sidebarOpen || mobileOpen) && (
+          {isExpanded && (
             <p className="px-3 text-[11px] font-semibold text-gray-400 uppercase tracking-wider mb-2">
               Menú Principal
             </p>
@@ -156,12 +186,12 @@ export const DashboardLayout = ({ children }) => {
                 <Link
                   key={item.path}
                   to={item.path}
-                  title={!sidebarOpen ? item.label : ""}
+                  title={!isExpanded ? item.label : ""}
                   className={`flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition-all group ${
                     isActive
                       ? "bg-brand-50 text-brand-600 font-semibold shadow-theme-xs ring-1 ring-brand-500/15"
                       : "text-gray-600 hover:text-gray-900 hover:bg-gray-100/80"
-                  }`}
+                  } ${!isExpanded ? "justify-center" : ""}`}
                 >
                   <span
                     className={`shrink-0 transition-colors ${
@@ -170,8 +200,8 @@ export const DashboardLayout = ({ children }) => {
                   >
                     {item.icon}
                   </span>
-                  {(sidebarOpen || mobileOpen) && (
-                    <span className="truncate">{item.label}</span>
+                  {isExpanded && (
+                    <span className="truncate whitespace-nowrap">{item.label}</span>
                   )}
                 </Link>
               );
@@ -182,9 +212,9 @@ export const DashboardLayout = ({ children }) => {
         <div className="p-3 border-t border-gray-100">
           <button
             onClick={handleLogout}
-            title={!sidebarOpen ? "Cerrar Sesión" : ""}
+            title={!isExpanded ? "Cerrar Sesión" : ""}
             className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium text-rose-600 hover:bg-rose-50 transition-colors group cursor-pointer ${
-              !sidebarOpen && !mobileOpen ? "justify-center" : ""
+              !isExpanded ? "justify-center" : ""
             }`}
           >
             <svg
@@ -200,15 +230,16 @@ export const DashboardLayout = ({ children }) => {
                 d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"
               />
             </svg>
-            {(sidebarOpen || mobileOpen) && <span>Cerrar Sesión</span>}
+            {isExpanded && <span className="whitespace-nowrap">Cerrar Sesión</span>}
           </button>
         </div>
       </aside>
 
       {/* CONTENIDO PRINCIPAL */}
       <div
+        onMouseEnter={handleContentMouseEnter}
         className={`flex-1 flex flex-col min-w-0 transition-all duration-300 ease-in-out ${
-          sidebarOpen ? "lg:ml-64" : "lg:ml-20"
+          sidebarPinned ? "lg:ml-64" : "lg:ml-20"
         }`}
       >
         {/* HEADER SUPERIOR */}
@@ -226,10 +257,11 @@ export const DashboardLayout = ({ children }) => {
                 if (window.innerWidth < 1024) {
                   setMobileOpen(!mobileOpen);
                 } else {
-                  setSidebarOpen(!sidebarOpen);
+                  setSidebarPinned(!sidebarPinned);
                 }
               }}
               className="p-2 rounded-xl text-gray-500 hover:text-gray-800 hover:bg-gray-100 transition-colors focus:ring-2 focus:ring-brand-500/20 outline-none cursor-pointer"
+              title={sidebarPinned ? "Fijado abierto (Click para activar apertura automática con mouse)" : "Apertura automática con mouse (Click para fijar abierto)"}
               aria-label="Alternar navegación"
             >
               <svg
