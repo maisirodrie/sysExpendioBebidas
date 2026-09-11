@@ -418,4 +418,36 @@ input:checked + .slider:before {
   transform: translateX(26px);
 }
 
+/* Colores de fondo por Tipo de Expendio */
+.table tbody tr.row-evento-particular,
+.table tbody tr.row-evento-particular td {
+  background-color: #e8f5e9 !important; /* Verde claro */
+}
+
+.table tbody tr.row-local-comercial,
+.table tbody tr.row-local-comercial td {
+  background-color: #e3f2fd !important; /* Celeste claro */
+}
+
+.table tbody tr.row-intendencia,
+.table tbody tr.row-intendencia td {
+  background-color: #fff9c4 !important; /* Amarillo claro */
+}
+
+.table tbody tr.row-evento-particular:hover,
+.table tbody tr.row-evento-particular:hover td {
+  background-color: #d7edd8 !important;
+}
+
+.table tbody tr.row-local-comercial:hover,
+.table tbody tr.row-local-comercial:hover td {
+  background-color: #d0e7fa !important;
+}
+
+.table tbody tr.row-intendencia:hover,
+.table tbody tr.row-intendencia:hover td {
+  background-color: #fff59d !important;
+}
+
+
 

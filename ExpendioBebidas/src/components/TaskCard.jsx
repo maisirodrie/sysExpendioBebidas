@@ -296,6 +296,15 @@ function Table() {
     return "transparent";
   };
 
+  const getRowClass = (expendio) => {
+    if (!expendio) return "";
+    const exp = expendio.trim().toLowerCase();
+    if (exp === "evento particular") return "row-evento-particular";
+    if (exp === "local comercial") return "row-local-comercial";
+    if (exp === "intendencia") return "row-intendencia";
+    return "";
+  };
+
   // Color exacto del texto según Estado
   const getStatusColor = (status) => {
     const st = (status === "controlado" ? "en revisión" : status || "").toLowerCase();
@@ -320,7 +329,7 @@ function Table() {
   const getStatusIcon = (status) => (
     <FontAwesomeIcon
       icon={faCircle}
-      style={{ color: getStatusColor(status), fontSize: "8px" }}
+      style={{ color: getStatusColor(status), fontSize: "10px", marginLeft: "4px" }}
     />
   );
 
@@ -708,8 +717,8 @@ function Table() {
                   return (
                     <tr
                       key={task._id}
+                      className={`hover:brightness-95 transition-all ${getRowClass(task.expendio)}`}
                       style={{ backgroundColor: getRowBgColor(task.expendio) }}
-                      className="hover:brightness-95 transition-all"
                     >
                       <td data-label="N° Expediente" className="text-center font-bold text-gray-900" style={{ padding: "10px 8px", border: "1px solid #ccc" }}>
                         {getExpedienteString(task.nroexpediente).toUpperCase() || "-"}
@@ -769,25 +778,19 @@ function Table() {
                               ))}
                             </select>
                           ) : (
-                            <div
+                            <span
                               style={{
                                 color: getStatusColor(task.estado),
                                 fontWeight: "bold",
                                 textTransform: "uppercase",
-                                width: "135px",
-                                height: "32px",
                                 display: "inline-flex",
                                 alignItems: "center",
                                 justifyContent: "center",
-                                gap: "6px",
-                                borderRadius: "4px",
-                                border: "1px solid #ccc",
-                                backgroundColor: "white",
-                                margin: "0 auto"
+                                gap: "6px"
                               }}
                             >
                               {(task.estado === 'controlado' ? 'en revisión' : task.estado)?.toUpperCase()} {getStatusIcon(task.estado)}
-                            </div>
+                            </span>
                           )}
 
                           {task.estado === "rechazado" && ["juridicos", "admin", "editor"].includes(user?.role) && (
