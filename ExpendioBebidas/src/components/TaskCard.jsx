@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
-import { jsPDF } from "jspdf";
-import * as XLSX from "xlsx";
-import "jspdf-autotable";
+import { jsPDF } from 'jspdf';
+import * as XLSX from "xlsx"; // Importa SheetJS
+import 'jspdf-autotable'; // Esta línea importa el complemento para `autoTable`
 import { useTasks } from "../context/TasksContext";
 import { useAuth } from "../context/AuthContext";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
@@ -16,41 +16,30 @@ import {
   faRotate,
   faCircle,
   faDollar,
-  faFileExcel,
-  faFilter,
-  faTimes,
-  faBuilding,
-  faUsers,
-  faMapMarkerAlt,
-  faCheckDouble,
-  faLock,
-  faLockOpen
+  faFilePdf,
+  faFileExcel
 } from "@fortawesome/free-solid-svg-icons";
-import Paginator from "./Paginator";
 import "./Table.css";
+import Paginator from "./Paginator";
 import Swal from "sweetalert2";
 import { DateTime } from "luxon";
-import ComponentCard from "./common/ComponentCard";
-import Badge from "./common/Badge";
-import Button from "./common/Button";
+
 
 // Función auxiliar para unificar el nroexpediente
 const getExpedienteString = (nroexpediente) => {
   if (Array.isArray(nroexpediente)) {
-    return nroexpediente.join(" / ");
+    return nroexpediente.join(' / '); // Une el array con un separador
   }
-  return nroexpediente || "";
-};
+  return nroexpediente || ''; // Devuelve la cadena si es una cadena, o cadena vacía si es null/undefined
+}
+
 
 function Table() {
   const { tasks, deleteTask, getTasks, updateTaskStatus, updateTask, setTasks } = useTasks();
-  const { user } = useAuth();
+  const { user } = useAuth(); // Suponiendo que 'user' contiene el rol del usuario
   const [search, setSearch] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
   const tasksPerPage = 10;
-
-  // Modo Edición Global (Métrica interactiva)
-  const [globalEditEnabled, setGlobalEditEnabled] = useState(true);
 
   // Estados para búsqueda avanzada
   const [showAdvanced, setShowAdvanced] = useState(false);
@@ -59,39 +48,20 @@ function Table() {
   const [filterExpendio, setFilterExpendio] = useState("");
   const [filterRubro, setFilterRubro] = useState("");
 
-  const toggleGlobalEdit = () => {
-    const newState = !globalEditEnabled;
-    setGlobalEditEnabled(newState);
-    Swal.fire({
-      icon: newState ? "success" : "info",
-      title: newState ? "Edición Rápida Activada" : "Edición Rápida Pausada",
-      text: newState
-        ? "Los operadores con permisos pueden cambiar estados de expedientes."
-        : "Se ha establecido el modo de solo lectura temporal.",
-      timer: 2000,
-      showConfirmButton: false,
-    });
-  };
-
   async function handleDelete(id) {
     Swal.fire({
-      title: "¿Está seguro que desea eliminar este expediente?",
-      text: "Esta acción no se puede deshacer.",
-      icon: "warning",
-      confirmButtonText: "Sí, eliminar",
-      confirmButtonColor: "#e11d48",
+      title: "¿Está seguro que desea eliminar este archivo?",
+      confirmButtonText: "Eliminar",
       denyButtonText: "Cancelar",
-      denyButtonColor: "#64748b",
       showDenyButton: true,
     }).then(async (result) => {
       if (result.isConfirmed) {
         await deleteTask(id);
         Swal.fire({
-          title: "Eliminado",
-          text: "El expediente ha sido eliminado correctamente.",
+          title: "Éxito",
+          text: "Archivo eliminado correctamente",
           icon: "success",
-          timer: 2500,
-          showConfirmButton: false,
+          timer: 3500,
         });
       }
     });
@@ -99,22 +69,26 @@ function Table() {
 
   // Función para cambiar el estado de "Pagado/No Pagado"
   const handlePaidToggle = async (task) => {
-    const updatedStatus = !task.pago;
+    const updatedStatus = !task.pago; // Cambia entre pagado y no pagado
+    // Supongamos que `updateTaskStatus` puede actualizar el estado de pago
     await updateTask(task._id, { pago: updatedStatus });
-    await getTasks();
+    await getTasks(); // Refresca la lista después de actualizar
   };
 
   const searcher = (e) => {
     setSearch(e.target.value);
-    setCurrentPage(1);
+    setCurrentPage(1); // Reiniciar paginación al buscar
   };
 
-  const uniqueLocalidades = [...new Set(tasks.map((t) => t.localidad).filter(Boolean))].sort();
+  const uniqueLocalidades = [...new Set(tasks.map(t => t.localidad).filter(Boolean))].sort();
+
   const reversedTasks = [...tasks].reverse();
 
   const filteredTasks = reversedTasks.filter((task) => {
+    // 1. Filtro de búsqueda global (si hay texto en el buscador)
     if (search) {
       const searchLowerCase = search.toLowerCase();
+
       const nroexpediente = getExpedienteString(task.nroexpediente).toLowerCase();
       const apellido = task.apellido ? task.apellido.toLowerCase() : "";
       const nombre = task.nombre ? task.nombre.toLowerCase() : "";
@@ -123,9 +97,22 @@ function Table() {
       const persona = task.persona ? task.persona.toLowerCase() : "";
       const expendio = task.expendio ? task.expendio.toLowerCase() : "";
       const estado = task.estado ? task.estado.toLowerCase() : "";
+      
+      // Campos avanzados adicionales para búsqueda total
+      const domicilio = task.domicilio ? task.domicilio.toLowerCase() : "";
+      const lugar = task.lugar ? task.lugar.toLowerCase() : "";
+      const dias = task.dias ? task.dias.toLowerCase() : "";
+      const horarios = task.horarios ? task.horarios.toLowerCase() : "";
+      const tipoevento = task.tipoevento ? task.tipoevento.toLowerCase() : "";
+      const email = task.email ? task.email.toLowerCase() : "";
+      const contacto = task.contacto ? task.contacto.toLowerCase() : "";
+      const nroHabilitacion = task.nroHabilitacion ? task.nroHabilitacion.toLowerCase() : "";
+      const domicilioLocalComercial = task.domicilioLocalComercial ? task.domicilioLocalComercial.toLowerCase() : "";
       const rubro = task.rubro ? task.rubro.toLowerCase() : "";
+      const horarioAtencion = task.horarioAtencion ? task.horarioAtencion.toLowerCase() : "";
+      const habilitacionComercial = task.habilitacionComercial ? task.habilitacionComercial.toLowerCase() : "";
 
-      const matchesGlobal =
+      const matchesGlobal = (
         nroexpediente.includes(searchLowerCase) ||
         apellido.includes(searchLowerCase) ||
         nombre.includes(searchLowerCase) ||
@@ -134,15 +121,45 @@ function Table() {
         persona.includes(searchLowerCase) ||
         expendio.includes(searchLowerCase) ||
         estado.includes(searchLowerCase) ||
-        rubro.includes(searchLowerCase);
+        domicilio.includes(searchLowerCase) ||
+        lugar.includes(searchLowerCase) ||
+        dias.includes(searchLowerCase) ||
+        horarios.includes(searchLowerCase) ||
+        tipoevento.includes(searchLowerCase) ||
+        email.includes(searchLowerCase) ||
+        contacto.includes(searchLowerCase) ||
+        nroHabilitacion.includes(searchLowerCase) ||
+        domicilioLocalComercial.includes(searchLowerCase) ||
+        rubro.includes(searchLowerCase) ||
+        horarioAtencion.includes(searchLowerCase) ||
+        habilitacionComercial.includes(searchLowerCase)
+      );
 
       if (!matchesGlobal) return false;
     }
 
-    if (filterEstado && task.estado?.toLowerCase() !== filterEstado.toLowerCase()) return false;
-    if (filterLocalidad && task.localidad?.toLowerCase() !== filterLocalidad.toLowerCase()) return false;
-    if (filterExpendio && task.expendio?.toLowerCase() !== filterExpendio.toLowerCase()) return false;
-    if (filterRubro && (!task.rubro || !task.rubro.toLowerCase().includes(filterRubro.toLowerCase()))) return false;
+    // 2. Filtro avanzado por Estado
+    if (filterEstado && task.estado?.toLowerCase() !== filterEstado.toLowerCase()) {
+      return false;
+    }
+
+    // 3. Filtro avanzado por Localidad
+    if (filterLocalidad && task.localidad?.toLowerCase() !== filterLocalidad.toLowerCase()) {
+      return false;
+    }
+
+    // 4. Filtro avanzado por Tipo de Expendio
+    if (filterExpendio && task.expendio?.toLowerCase() !== filterExpendio.toLowerCase()) {
+      return false;
+    }
+
+    // 5. Filtro avanzado por Rubro
+    if (filterRubro) {
+      const taskRubro = task.rubro ? task.rubro.toLowerCase() : "";
+      if (!taskRubro.includes(filterRubro.toLowerCase())) {
+        return false;
+      }
+    }
 
     return true;
   });
@@ -150,695 +167,510 @@ function Table() {
   const indexOfLastTask = currentPage * tasksPerPage;
   const indexOfFirstTask = indexOfLastTask - tasksPerPage;
   const currentTasks = filteredTasks.slice(indexOfFirstTask, indexOfLastTask);
-  const totalPages = Math.ceil(filteredTasks.length / tasksPerPage);
 
-  const permissions = {
-    canEdit: ["admin", "editor", "mesa"].includes(user?.role),
-    canDelete: ["admin", "editor"].includes(user?.role),
-    canAddUser: ["admin"].includes(user?.role),
-    canAddTask: ["admin", "editor", "mesa"].includes(user?.role),
-    canViewStatus: ["admin", "viewer", "juridicos", "mesa", "editor"].includes(user?.role),
-    canEditStatus: ["mesa", "juridicos", "admin", "editor"].includes(user?.role) && globalEditEnabled,
-    canPagoEditStatus: ["admin", "mesa"].includes(user?.role),
-    canPagado: ["admin"].includes(user?.role),
+  const onPageChange = (pageNumber) => {
+    setCurrentPage(pageNumber);
   };
 
+  const formatDate = (dateStr) => {
+    if (!dateStr) return "";
+
+    const utcDate = new Date(dateStr);
+    const offset = 3 * 60;
+    const localDate = new Date(utcDate.getTime() + offset * 60 * 1000);
+    const day = String(localDate.getUTCDate()).padStart(2, "0");
+    const month = String(localDate.getUTCMonth() + 1).padStart(2, "0");
+    const year = localDate.getUTCFullYear();
+
+    return `${day}/${month}/${year}`;
+  };
+
+  const permissions = {
+    canEdit: ["admin", "editor", "mesa",].includes(user.role),
+    canDelete: ["admin", "editor"].includes(user.role),
+    canAddUser: ["admin"].includes(user.role),
+    canAddTask: ["admin", "editor"].includes(user.role),
+    canViewStatus: ["admin", "viewer", "juridicos", "mesa", "editor"].includes(user.role),
+    canEditStatus: ["mesa", "juridicos", "admin", "editor"].includes(user.role),
+    canPagoEditStatus: ["admin"].includes(user.role),
+    canPagado: ["admin"].includes(user.role),
+  };
+
+
+  // Función para determinar si un usuario puede editar una tarea específica
   const canEditTask = (task) => {
-    if (["admin", "editor", "mesa"].includes(user?.role)) {
+    // Admin, editor y mesa pueden editar en cualquier estado
+    if (["admin", "editor", "mesa"].includes(user.role)) {
       return true;
     }
+
     return false;
   };
 
-  const handleRefresh = async () => {
-    Swal.fire({
-      title: "Actualizando registros...",
-      didOpen: () => Swal.showLoading(),
-      timer: 800,
-      showConfirmButton: false,
-    });
-    await getTasks();
-  };
+  const handleRefresh = async () => await getTasks();
+
 
   const statusOptions = {
     mesa: {
       ingresado: ["ingresado", "pendiente", "controlado"],
       pendiente: ["pendiente", "controlado"],
       aprobado: ["aprobado", "finalizado"],
-      rechazado: ["rechazado", "pendiente", "controlado", "finalizado"],
+      rechazado: ["rechazado", "pendiente", "controlado", "finalizado"]
     },
     juridicos: {
       controlado: ["controlado", "aprobado", "rechazado"],
     },
     admin: {
-      any: ["pendiente", "controlado", "aprobado", "rechazado", "finalizado", "ingresado"],
+      any: ["pendiente", "controlado", "aprobado", "rechazado", "finalizado", "ingresado"] // Admin puede cambiar cualquier estado
     },
     editor: {
-      any: ["pendiente", "controlado", "aprobado", "rechazado", "finalizado", "ingresado"],
-    },
+      any: ["pendiente", "controlado", "aprobado", "rechazado", "finalizado", "ingresado"] // Admin puede cambiar cualquier estado
+    }
   };
 
   const getStatusOptions = (task) => {
-    const roleOptions = statusOptions[user?.role] || {};
-    const availableOptions = roleOptions[task.estado] || roleOptions.any || [];
+    const roleOptions = statusOptions[user.role] || {}; // Obtener opciones según el rol
+    const availableOptions = roleOptions[task.estado] || roleOptions.any || []; // Si no tiene opciones específicas, tomar "any"
     return availableOptions.length ? availableOptions : [];
   };
 
+
   const handleStatusChange = async (taskId, newStatus) => {
     try {
-      const currentTask = tasks.find((t) => t._id === taskId);
+      const currentTask = tasks.find(t => t._id === taskId);
+
       if (!currentTask) {
         Swal.fire("Error", "No se encontró el expediente.", "error");
         return;
       }
 
-      let updatedTask = null;
+      let updatedTask = null; // Variable para almacenar la tarea actualizada desde el backend
 
-      if (
-        (user.role === "juridicos" || user.role === "admin" || user.role === "editor") &&
-        newStatus === "rechazado"
-      ) {
+      if ((user.role === "juridicos" || user.role === "admin" || user.role === "editor") && newStatus === "rechazado") {
         const { value: motivoRechazo } = await Swal.fire({
-          title: "Motivo del Rechazo / Observación",
+          title: "Motivo del Rechazo",
           input: "textarea",
-          inputLabel: "Especifique el motivo de la observación para el solicitante:",
+          inputLabel: "Por favor, especifique la razón del rechazo.",
           inputPlaceholder: "Escriba aquí...",
-          inputValue: currentTask.motivoRechazo || "",
+          inputValue: currentTask.motivoRechazo || '',
           showCancelButton: true,
-          confirmButtonText: "Guardar Rechazo",
-          confirmButtonColor: "#e11d48",
+          confirmButtonText: "Guardar",
           cancelButtonText: "Cancelar",
           inputValidator: (value) => {
-            if (!value) return "Debe ingresar un motivo para registrar la observación.";
+            if (!value) {
+              return "Necesita escribir un motivo para rechazar el expediente.";
+            }
           },
         });
 
         if (motivoRechazo !== undefined) {
-          const res = await updateTask(taskId, { estado: newStatus, motivoRechazo });
-          updatedTask = res.task || res;
-          Swal.fire("Guardado", "El motivo de rechazo ha sido registrado.", "success");
+          // 1. Llama a la función de contexto y CAPTURA la respuesta COMPLETA
+          const res = await updateTask(taskId, { estado: newStatus, motivoRechazo: motivoRechazo });
+          updatedTask = res.task || res; // Extrae el objeto tarea si viene envuelto
+          Swal.fire("Expediente Actualizado", "El motivo de rechazo ha sido guardado.", "success");
+          // ❌ Eliminado: await getTasks();
         } else {
-          return;
+          Swal.fire("Cambio Cancelado", "El cambio de estado ha sido cancelado.", "info");
+          return; // Salir si se cancela
         }
-      } else if (
-        (user.role === "juridicos" || user.role === "admin" || user.role === "editor") &&
-        newStatus === "aprobado"
-      ) {
+      } else if ((user.role === "juridicos" || user.role === "admin" || user.role === "editor") && newStatus === "aprobado") {
         const { value: motivoAprobacion } = await Swal.fire({
           title: "Información de Pago / Aprobación",
           input: "textarea",
-          inputLabel: "Especifique el arancel o detalle para proceder al pago:",
+          inputLabel: "Por favor, especifique el arancel o información necesaria para el pago.",
           inputPlaceholder: "Escriba aquí...",
-          inputValue: currentTask.motivoAprobacion || "",
+          inputValue: currentTask.motivoAprobacion || '',
           showCancelButton: true,
-          confirmButtonText: "Aprobar y Notificar",
-          confirmButtonColor: "#059669",
+          confirmButtonText: "Guardar",
           cancelButtonText: "Cancelar",
           inputValidator: (value) => {
-            if (!value) return "Debe ingresar el detalle de pago para aprobar el expediente.";
+            if (!value) {
+              return "Necesita escribir las observaciones o arancel de pago para aprobar el expediente.";
+            }
           },
         });
 
         if (motivoAprobacion !== undefined) {
-          const res = await updateTask(taskId, { estado: newStatus, motivoAprobacion });
+          // Llama a la función de contexto y CAPTURA la respuesta COMPLETA
+          const res = await updateTask(taskId, { estado: newStatus, motivoAprobacion: motivoAprobacion });
           updatedTask = res.task || res;
-          Swal.fire("Aprobado", "La información de aprobación ha sido guardada.", "success");
+          Swal.fire("Expediente Actualizado", "La información de pago ha sido guardada.", "success");
         } else {
-          return;
+          Swal.fire("Cambio Cancelado", "El cambio de estado ha sido cancelado.", "info");
+          return; // Salir si se cancela
         }
       } else {
+        // 2. Llama a la función de contexto (solo estado) y CAPTURA la respuesta COMPLETA
         updatedTask = await updateTaskStatus(taskId, newStatus);
-        Swal.fire({
-          icon: "success",
-          title: "Estado actualizado",
-          text: `El expediente cambió a ${newStatus}`,
-          timer: 1800,
-          showConfirmButton: false,
-        });
+        Swal.fire("Estado actualizado", "El estado se ha modificado correctamente", "success");
+        // ❌ Eliminado: await getTasks();
       }
 
+      // 3. 🚀 ACTUALIZACIÓN INSTANTÁNEA: Usar la respuesta del backend para actualizar el estado `tasks`
       if (updatedTask) {
-        setTasks(tasks.map((t) => (t._id === taskId ? { ...t, ...updatedTask } : t)));
+        setTasks(tasks.map(t => (t._id === taskId ? { ...t, ...updatedTask } : t)));
       }
+
     } catch (error) {
       console.error("Error al cambiar el estado:", error);
-      Swal.fire("Error", "No se pudo actualizar el estado del expediente.", "error");
+      Swal.fire("Error", "No se pudo actualizar el estado de la tarea.", "error");
     }
   };
 
-  // Colores de fondo por Tipo de Expendio
-  const getRowBgColor = (expendio) => {
-    if (!expendio) return "transparent";
-    const exp = expendio.trim().toLowerCase();
-    if (exp === "evento particular") return "#e8f5e9"; // Verde claro
-    if (exp === "local comercial") return "#e3f2fd";   // Celeste claro
-    if (exp === "intendencia") return "#fff9c4";       // Amarillo claro
-    return "transparent";
+  // Función para mapear el estado de la BD al nombre visual
+  const getDisplayStatus = (status) => {
+    return status === 'controlado' ? 'en revisión' : status;
   };
 
-  const getRowClass = (expendio) => {
-    if (!expendio) return "";
-    const exp = expendio.trim().toLowerCase();
-    if (exp === "evento particular") return "row-evento-particular";
-    if (exp === "local comercial") return "row-local-comercial";
-    if (exp === "intendencia") return "row-intendencia";
-    return "";
-  };
-
-  // Color exacto del texto según Estado
   const getStatusColor = (status) => {
-    const st = (status === "controlado" ? "en revisión" : status || "").toLowerCase();
-    switch (st) {
-      case "aprobado":
-        return "#28a745"; // Verde
-      case "rechazado":
-        return "#dc3545"; // Rojo
-      case "controlado":
-      case "en revisión":
-        return "#007bff"; // Azul
-      case "pendiente":
-        return "#fd7e14"; // Naranja
-      case "finalizado":
-        return "#212529"; // Negro/Oscuro
-      case "ingresado":
-      default:
-        return "#6c757d"; // Gris
-    }
+    const displayStatus = (getDisplayStatus(status) || "").toLowerCase();
+    return {
+      ingresado: "#6c757d",
+      pendiente: "#fd7e14",
+      revisado: "#007bff",
+      "en revisión": "#007bff",
+      controlado: "#007bff",
+      aprobado: "#28a745",
+      rechazado: "#dc3545",
+      finalizado: "#212529",
+    }[displayStatus] || "#6c757d";
   };
 
   const getStatusIcon = (status) => (
     <FontAwesomeIcon
       icon={faCircle}
-      style={{ color: getStatusColor(status), fontSize: "10px", marginLeft: "4px" }}
+      style={{ color: getStatusColor(status), fontSize: "10px" }}
     />
   );
 
-  const handleGenerateExcel = () => {
+
+  const handleGenerateReport = () => {
     Swal.fire({
-      title: "¿Descargar reporte en Excel?",
-      text: `Se exportarán ${filteredTasks.length} registros actualmente filtrados.`,
-      icon: "question",
+      title: "¿Desea generar un reporte en PDF?",
+      text: "El reporte incluirá todos los detalles de los registros actuales.",
+      icon: "warning",
       showCancelButton: true,
-      confirmButtonText: "Descargar Excel",
-      confirmButtonColor: "#059669",
-      cancelButtonText: "Cancelar",
+      confirmButtonText: "Generar Reporte",
+      cancelButtonText: "Cancelar"
     }).then((result) => {
       if (result.isConfirmed) {
-        const worksheet = XLSX.utils.json_to_sheet(
-          filteredTasks.map((task) => ({
-            "N° Expediente": getExpedienteString(task.nroexpediente),
-            Apellido: task.apellido || "",
-            Nombre: task.nombre || "",
-            "DNI/CUIT": task.dni || "",
-            "Fecha Creación": formatFechaCreacion(task.createdAt),
-            Localidad: task.localidad || "",
-            "Tipo Persona": task.persona || "",
-            "Tipo Expendio": task.expendio || "",
-            Rubro: task.rubro || "",
-            Estado: task.estado || "",
-            Pagado: task.pago ? "SÍ" : "NO",
-          }))
-        );
+        // Crear una nueva instancia de jsPDF
+        const doc = new jsPDF();
+        doc.setFontSize(12);
+
+        // Título del reporte
+        doc.text("Reporte de Expendio", 10, 10);
+
+        // Crear el contenido de la tabla
+        const tableData = filteredTasks.map((task) => [
+          // CORRECCIÓN 3: Uso de la función auxiliar para PDF
+          getExpedienteString(task.nroexpediente),
+          task.apellido || "",
+          task.nombre || "",
+          task.dni || "",
+          formatFechaCreacion(task.createdAt),
+          task.localidad || "",
+          task.persona || "",
+          task.expendio || "",
+          task.estado || "",
+        ]);
+
+        // Usar autoTable para crear la tabla en el PDF
+        doc.autoTable({
+          startY: 20,
+          head: [
+            ["N° Expediente", "Apellido", "Nombre", "DNI", "Fecha de Creación", "Localidad", "Tipo de Persona", "Tipo de Expendio", "Estado"]
+          ],
+          body: tableData,
+          margin: { top: 10 },
+          styles: { fontSize: 10 }
+        });
+
+        // Guardar el PDF
+        doc.save("Reporte_expendio.pdf");
+
+        Swal.fire("Reporte Generado", "El reporte se ha generado exitosamente.", "success");
+      }
+    });
+  };
+
+  const handleGenerateExcel = () => {
+    Swal.fire({
+      title: "¿Desea generar un reporte en Excel?",
+      text: "El reporte incluirá todos los detalles de los registros actuales.",
+      icon: "warning",
+      showCancelButton: true,
+      confirmButtonText: "Generar Reporte",
+      cancelButtonText: "Cancelar"
+    }).then((result) => {
+      if (result.isConfirmed) {
+        // Crear una hoja de cálculo
+        const worksheet = XLSX.utils.json_to_sheet(filteredTasks.map(task => ({
+          // CORRECCIÓN 4: Uso de la función auxiliar para Excel
+          "N° Expediente": getExpedienteString(task.nroexpediente),
+          "Apellido": task.apellido || "",
+          "Nombre": task.nombre || "",
+          "DNI": task.dni || "",
+          "Fecha de Creación": formatFechaCreacion(task.createdAt),
+          "Localidad": task.localidad || "",
+          "Tipo de Persona": task.persona || "",
+          "Tipo de Expendio": task.expendio || "",
+          "Estado": task.estado || "",
+        })));
+
+        // Crear un libro de Excel y agregar la hoja
         const workbook = XLSX.utils.book_new();
-        XLSX.utils.book_append_sheet(workbook, worksheet, "Expedientes");
-        XLSX.writeFile(workbook, `Reporte_Expendio_${DateTime.now().toFormat("yyyyMMdd_HHmm")}.xlsx`);
-        Swal.fire("Reporte Generado", "El archivo Excel se descargó correctamente.", "success");
+        XLSX.utils.book_append_sheet(workbook, worksheet, "Reporte");
+
+        // Generar y descargar el archivo
+        XLSX.writeFile(workbook, "Reporte_Expendio.xlsx");
+        Swal.fire("Reporte Generado", "El reporte se ha generado exitosamente.", "success");
       }
     });
   };
 
   function formatFechaCreacion(fecha) {
-    if (!fecha) return "-";
     return DateTime.fromISO(fecha).setZone("America/Argentina/Buenos_Aires").toFormat("dd/MM/yyyy HH:mm");
   }
 
-  // Cálculos para métricas
-  const totalTasksCount = tasks.length;
-  const uniqueMunicipiosCount = new Set(tasks.map((t) => t.localidad).filter(Boolean)).size;
-  const localesComercialesCount = tasks.filter((t) => t.expendio === "Local Comercial").length;
-
-  const hasActiveFilters = Boolean(filterEstado || filterLocalidad || filterExpendio || filterRubro);
 
   return (
-    <div className="space-y-6 font-outfit">
-      {/* 1. SECCIÓN DE MÉTRICAS KPI (ESTILO ECOMMERCEMETRICS TAILADMIN) */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-5">
-        {/* KPI 1: TOTAL EXPEDIENTES */}
-        <div className="rounded-2xl border border-gray-200 bg-white p-5 sm:p-6 shadow-theme-xs flex items-center justify-between transition-all hover:shadow-theme-sm">
-          <div>
-            <span className="text-xs font-semibold text-gray-400 uppercase tracking-wider">
-              Total Expedientes
-            </span>
-            <h3 className="text-2xl sm:text-3xl font-extrabold text-gray-900 mt-1">
-              {totalTasksCount}
-            </h3>
-            <div className="mt-2">
-              <Badge variant="light" color="primary" size="sm">
-                Activos en BD
-              </Badge>
-            </div>
-          </div>
-          <div className="w-12 h-12 rounded-2xl bg-brand-50 text-brand-600 flex items-center justify-center border border-brand-200/60 shadow-theme-xs shrink-0">
-            <FontAwesomeIcon icon={faUsers} className="text-xl" />
-          </div>
-        </div>
-
-        {/* KPI 2: MUNICIPIOS ÚNICOS */}
-        <div className="rounded-2xl border border-gray-200 bg-white p-5 sm:p-6 shadow-theme-xs flex items-center justify-between transition-all hover:shadow-theme-sm">
-          <div>
-            <span className="text-xs font-semibold text-gray-400 uppercase tracking-wider">
-              Municipios Únicos
-            </span>
-            <h3 className="text-2xl sm:text-3xl font-extrabold text-gray-900 mt-1">
-              {uniqueMunicipiosCount}
-            </h3>
-            <div className="mt-2">
-              <Badge variant="light" color="info" size="sm">
-                Provincia Misiones
-              </Badge>
-            </div>
-          </div>
-          <div className="w-12 h-12 rounded-2xl bg-sky-50 text-sky-600 flex items-center justify-center border border-sky-200/60 shadow-theme-xs shrink-0">
-            <FontAwesomeIcon icon={faMapMarkerAlt} className="text-xl" />
-          </div>
-        </div>
-
-        {/* KPI 3: LOCALES COMERCIALES */}
-        <div className="rounded-2xl border border-gray-200 bg-white p-5 sm:p-6 shadow-theme-xs flex items-center justify-between transition-all hover:shadow-theme-sm">
-          <div>
-            <span className="text-xs font-semibold text-gray-400 uppercase tracking-wider">
-              Locales Comerciales
-            </span>
-            <h3 className="text-2xl sm:text-3xl font-extrabold text-gray-900 mt-1">
-              {localesComercialesCount}
-            </h3>
-            <div className="mt-2">
-              <Badge variant="light" color="success" size="sm">
-                Habilitaciones
-              </Badge>
-            </div>
-          </div>
-          <div className="w-12 h-12 rounded-2xl bg-emerald-50 text-emerald-600 flex items-center justify-center border border-emerald-200/60 shadow-theme-xs shrink-0">
-            <FontAwesomeIcon icon={faBuilding} className="text-xl" />
-          </div>
-        </div>
-
-        {/* KPI 4: PERMISO EDICIÓN GLOBAL CON TOGGLE */}
-        <div className="rounded-2xl border border-gray-200 bg-white p-5 sm:p-6 shadow-theme-xs flex items-center justify-between transition-all hover:shadow-theme-sm">
-          <div>
-            <span className="text-xs font-semibold text-gray-400 uppercase tracking-wider">
-              Edición Global
-            </span>
-            <h3 className="text-lg font-bold text-gray-800 mt-1">
-              {globalEditEnabled ? "Habilitada" : "Bloqueada"}
-            </h3>
-            <div className="mt-2">
-              <button
-                onClick={toggleGlobalEdit}
-                className={`cursor-pointer px-2.5 py-1 text-xs font-semibold rounded-full border transition-all ${
-                  globalEditEnabled
-                    ? "bg-emerald-50 text-emerald-700 border-emerald-300 hover:bg-emerald-100"
-                    : "bg-rose-50 text-rose-700 border-rose-300 hover:bg-rose-100"
-                }`}
-              >
-                {globalEditEnabled ? "Alternar a Pausa" : "Habilitar Edición"}
-              </button>
-            </div>
-          </div>
-          <div
-            onClick={toggleGlobalEdit}
-            className={`w-12 h-12 rounded-2xl flex items-center justify-center border shadow-theme-xs shrink-0 cursor-pointer transition-all ${
-              globalEditEnabled
-                ? "bg-emerald-50 text-emerald-600 border-emerald-200"
-                : "bg-rose-50 text-rose-600 border-rose-200"
-            }`}
-          >
-            <FontAwesomeIcon
-              icon={globalEditEnabled ? faLockOpen : faLock}
-              className="text-xl"
-            />
-          </div>
-        </div>
-      </div>
-
-      {/* 2. CARD PRINCIPAL CON CONTROLES, FILTROS Y TABLA */}
-      <ComponentCard
-        title="Gestión y Control de Expedientes"
-        description="Listado completo de solicitudes de expendio de bebidas alcohólicas registradas en la provincia"
-        headerAction={
-          <div className="flex flex-wrap items-center gap-2">
-            {permissions.canAddTask && (
-              <Link to="/add-task">
-                <Button
-                  size="sm"
-                  variant="primary"
-                  icon={<FontAwesomeIcon icon={faFileCirclePlus} />}
-                >
-                  Nuevo Trámite
-                </Button>
-              </Link>
-            )}
-
-            {permissions.canAddUser && (
-              <Link to="/registeradmin">
-                <Button
-                  size="sm"
-                  variant="secondary"
-                  icon={<FontAwesomeIcon icon={faUserPlus} />}
-                >
-                  Usuario
-                </Button>
-              </Link>
-            )}
-
-            {permissions.canPagoEditStatus && (
-              <Link to="/pago">
-                <Button
-                  size="sm"
-                  variant="secondary"
-                  icon={<FontAwesomeIcon icon={faDollar} />}
-                >
-                  Aranceles
-                </Button>
-              </Link>
-            )}
-
-            <Button
-              size="sm"
-              variant="secondary"
-              icon={<FontAwesomeIcon icon={faRotate} />}
-              onClick={handleRefresh}
-              title="Recargar expedientes"
-            />
-
-            <Button
-              size="sm"
-              variant="success"
-              icon={<FontAwesomeIcon icon={faFileExcel} />}
-              onClick={handleGenerateExcel}
-            >
-              Excel
-            </Button>
-          </div>
-        }
-      >
-        {/* BARRA DE BÚSQUEDA Y FILTROS */}
-        <div className="space-y-3 mb-5">
-          <div className="flex flex-col sm:flex-row gap-3">
-            <div className="relative flex-1">
+    <div className="container-fluid bg-primary vh-100 vw-100 d-flex align-items-center justify-content-center">
+      <div className="row">
+        <div className="col-md-12">
+          <div className="table-container">
+            <div className="table-title">Buscador</div>
+            <div className="input-group mb-3">
               <input
-                type="text"
                 value={search}
                 onChange={searcher}
-                placeholder="Buscar por titular, DNI, número de expediente, rubro, localidad..."
-                className="w-full rounded-xl border border-gray-300 bg-white pl-10 pr-10 py-2.5 text-sm text-gray-800 placeholder-gray-400 focus:border-brand-500 focus:ring-4 focus:ring-brand-500/10 outline-none transition shadow-theme-xs"
+                type="text"
+                placeholder="Buscar"
+                className="form-control border border-gray-300 focus:outline-none"
+                aria-describedby="search-icon"
               />
-              <span className="absolute left-3.5 top-3 text-gray-400">
-                <FontAwesomeIcon icon={faSearch} className="text-sm" />
+              <span
+                className="input-group-text bg-white border-none"
+                id="search-icon"
+              >
+                <FontAwesomeIcon icon={faSearch} className="ml-2" />
               </span>
-              {search && (
-                <button
-                  onClick={() => setSearch("")}
-                  className="absolute right-3 top-2.5 text-gray-400 hover:text-gray-600 p-1"
-                >
-                  <FontAwesomeIcon icon={faTimes} className="text-sm" />
-                </button>
-              )}
             </div>
 
-            <Button
-              variant={showAdvanced ? "primary" : "secondary"}
-              size="md"
-              onClick={() => setShowAdvanced(!showAdvanced)}
-              icon={<FontAwesomeIcon icon={faFilter} />}
-              className="shrink-0"
-            >
-              Filtros {hasActiveFilters && "•"}
-            </Button>
-          </div>
+            {/* Botón de Búsqueda Avanzada */}
+            <div className="mb-3 d-flex justify-content-start">
+              <button
+                onClick={() => setShowAdvanced(!showAdvanced)}
+                className="btn btn-primary btn-sm"
+                style={{ backgroundColor: '#4186dc', borderColor: '#4186dc' }}
+              >
+                <FontAwesomeIcon icon={faSearch} className="mr-1" style={{ marginRight: '5px' }} />
+                {showAdvanced ? "Ocultar Búsqueda Avanzada" : "Mostrar Búsqueda Avanzada"}
+              </button>
+            </div>
 
-          {/* PANEL DE FILTROS AVANZADOS */}
-          {showAdvanced && (
-            <div className="rounded-2xl bg-gray-50 border border-gray-200 p-4 animate-in fade-in duration-150 space-y-3">
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
-                <div>
-                  <label className="block text-xs font-semibold text-gray-600 uppercase tracking-wider mb-1">
-                    Estado
-                  </label>
-                  <select
-                    value={filterEstado}
-                    onChange={(e) => {
-                      setFilterEstado(e.target.value);
-                      setCurrentPage(1);
-                    }}
-                    className="w-full rounded-xl border border-gray-300 bg-white px-3 py-2 text-sm text-gray-800 focus:border-brand-500 focus:ring-2 focus:ring-brand-500/10 outline-none"
-                  >
-                    <option value="">Todos los Estados</option>
-                    <option value="ingresado">Ingresado</option>
-                    <option value="pendiente">Pendiente</option>
-                    <option value="controlado">En revisión</option>
-                    <option value="aprobado">Aprobado</option>
-                    <option value="rechazado">Rechazado</option>
-                    <option value="finalizado">Finalizado</option>
-                  </select>
+            {/* Panel de Búsqueda Avanzada */}
+            {showAdvanced && (
+              <div className="bg-light p-3 rounded mb-3 border text-left" style={{ textTransform: "uppercase", textAlign: "left", width: "100%" }}>
+                <div className="row" style={{ display: "flex", flexWrap: "wrap", gap: "15px" }}>
+                  <div className="flex-fill" style={{ flex: "1 1 200px" }}>
+                    <label className="form-label font-weight-bold" style={{ fontSize: '11px', fontWeight: 'bold', color: '#555', display: 'block', marginBottom: '5px' }}>Estado</label>
+                    <select
+                      value={filterEstado}
+                      onChange={(e) => { setFilterEstado(e.target.value); setCurrentPage(1); }}
+                      className="form-select form-control"
+                      style={{ height: '38px', width: '100%' }}
+                    >
+                      <option value="">Todos</option>
+                      <option value="ingresado">Ingresado</option>
+                      <option value="pendiente">Pendiente</option>
+                      <option value="controlado">En revisión</option>
+                      <option value="aprobado">Aprobado</option>
+                      <option value="rechazado">Rechazado</option>
+                      <option value="finalizado">Finalizado</option>
+                    </select>
+                  </div>
+                  <div className="flex-fill" style={{ flex: "1 1 200px" }}>
+                    <label className="form-label font-weight-bold" style={{ fontSize: '11px', fontWeight: 'bold', color: '#555', display: 'block', marginBottom: '5px' }}>Localidad</label>
+                    <select
+                      value={filterLocalidad}
+                      onChange={(e) => { setFilterLocalidad(e.target.value); setCurrentPage(1); }}
+                      className="form-select form-control"
+                      style={{ height: '38px', width: '100%' }}
+                    >
+                      <option value="">Todas</option>
+                      {uniqueLocalidades.map(loc => (
+                        <option key={loc} value={loc}>{loc.toUpperCase()}</option>
+                      ))}
+                    </select>
+                  </div>
+                  <div className="flex-fill" style={{ flex: "1 1 200px" }}>
+                    <label className="form-label font-weight-bold" style={{ fontSize: '11px', fontWeight: 'bold', color: '#555', display: 'block', marginBottom: '5px' }}>Tipo de Expendio</label>
+                    <select
+                      value={filterExpendio}
+                      onChange={(e) => { setFilterExpendio(e.target.value); setCurrentPage(1); }}
+                      className="form-select form-control"
+                      style={{ height: '38px', width: '100%' }}
+                    >
+                      <option value="">Todos</option>
+                      <option value="Local Comercial">Local Comercial</option>
+                      <option value="Evento Particular">Evento Particular</option>
+                      <option value="Intendencia">Intendencia</option>
+                    </select>
+                  </div>
+                  <div className="flex-fill" style={{ flex: "1 1 200px" }}>
+                    <label className="form-label font-weight-bold" style={{ fontSize: '11px', fontWeight: 'bold', color: '#555', display: 'block', marginBottom: '5px' }}>Rubro</label>
+                    <input
+                      type="text"
+                      value={filterRubro}
+                      onChange={(e) => { setFilterRubro(e.target.value); setCurrentPage(1); }}
+                      placeholder="Ej: Kiosco, Bar..."
+                      className="form-control"
+                      style={{ height: '38px', width: '100%' }}
+                    />
+                  </div>
                 </div>
-
-                <div>
-                  <label className="block text-xs font-semibold text-gray-600 uppercase tracking-wider mb-1">
-                    Localidad
-                  </label>
-                  <select
-                    value={filterLocalidad}
-                    onChange={(e) => {
-                      setFilterLocalidad(e.target.value);
-                      setCurrentPage(1);
-                    }}
-                    className="w-full rounded-xl border border-gray-300 bg-white px-3 py-2 text-sm text-gray-800 focus:border-brand-500 focus:ring-2 focus:ring-brand-500/10 outline-none"
-                  >
-                    <option value="">Todas las Localidades</option>
-                    {uniqueLocalidades.map((loc) => (
-                      <option key={loc} value={loc}>
-                        {loc.toUpperCase()}
-                      </option>
-                    ))}
-                  </select>
-                </div>
-
-                <div>
-                  <label className="block text-xs font-semibold text-gray-600 uppercase tracking-wider mb-1">
-                    Tipo de Expendio
-                  </label>
-                  <select
-                    value={filterExpendio}
-                    onChange={(e) => {
-                      setFilterExpendio(e.target.value);
-                      setCurrentPage(1);
-                    }}
-                    className="w-full rounded-xl border border-gray-300 bg-white px-3 py-2 text-sm text-gray-800 focus:border-brand-500 focus:ring-2 focus:ring-brand-500/10 outline-none"
-                  >
-                    <option value="">Todos los Tipos</option>
-                    <option value="Local Comercial">Local Comercial</option>
-                    <option value="Evento Particular">Evento Particular</option>
-                    <option value="Intendencia">Intendencia</option>
-                  </select>
-                </div>
-
-                <div>
-                  <label className="block text-xs font-semibold text-gray-600 uppercase tracking-wider mb-1">
-                    Rubro
-                  </label>
-                  <input
-                    type="text"
-                    value={filterRubro}
-                    onChange={(e) => {
-                      setFilterRubro(e.target.value);
-                      setCurrentPage(1);
-                    }}
-                    placeholder="Ej: Kiosco, Bar..."
-                    className="w-full rounded-xl border border-gray-300 bg-white px-3 py-2 text-sm text-gray-800 focus:border-brand-500 focus:ring-2 focus:ring-brand-500/10 outline-none"
-                  />
-                </div>
-              </div>
-
-              {hasActiveFilters && (
-                <div className="flex justify-end pt-2">
+                <div className="d-flex justify-content-end mt-3" style={{ display: 'flex', justifyContent: 'flex-end', marginTop: '15px' }}>
                   <button
                     onClick={() => {
                       setFilterEstado("");
                       setFilterLocalidad("");
                       setFilterExpendio("");
                       setFilterRubro("");
+                      setSearch("");
                       setCurrentPage(1);
                     }}
-                    className="text-xs text-rose-600 hover:text-rose-700 font-semibold cursor-pointer"
+                    className="btn btn-danger btn-sm"
                   >
-                    Restablecer Filtros
+                    Limpiar Filtros
                   </button>
                 </div>
-              )}
-            </div>
-          )}
-        </div>
+              </div>
+            )}
 
-        {/* 3. TABLA DE EXPEDIENTES */}
-        <div className="table-scroll overflow-x-auto rounded-xl border border-gray-200">
-          <table className="table" style={{ textTransform: "uppercase", width: "100%" }}>
-            <thead>
-              <tr style={{ backgroundColor: "#4186dc", color: "white" }}>
-                <th className="px-3 py-3 text-center text-xs font-bold uppercase tracking-wider text-white" style={{ backgroundColor: "#4186dc", color: "white" }}>N° Expediente</th>
-                <th className="px-3 py-3 text-center text-xs font-bold uppercase tracking-wider text-white" style={{ backgroundColor: "#4186dc", color: "white" }}>Apellido</th>
-                <th className="px-3 py-3 text-center text-xs font-bold uppercase tracking-wider text-white" style={{ backgroundColor: "#4186dc", color: "white" }}>Nombre</th>
-                <th className="px-3 py-3 text-center text-xs font-bold uppercase tracking-wider text-white" style={{ backgroundColor: "#4186dc", color: "white" }}>DNI/CUIT</th>
-                <th className="px-3 py-3 text-center text-xs font-bold uppercase tracking-wider text-white" style={{ backgroundColor: "#4186dc", color: "white" }}>Fecha de Creación</th>
-                <th className="px-3 py-3 text-center text-xs font-bold uppercase tracking-wider text-white" style={{ backgroundColor: "#4186dc", color: "white" }}>Localidad</th>
-                <th className="px-3 py-3 text-center text-xs font-bold uppercase tracking-wider text-white" style={{ backgroundColor: "#4186dc", color: "white" }}>Tipo de Persona</th>
-                <th className="px-3 py-3 text-center text-xs font-bold uppercase tracking-wider text-white" style={{ backgroundColor: "#4186dc", color: "white" }}>Tipo de Expendio</th>
-                {permissions.canViewStatus && (
-                  <th className="px-3 py-3 text-center text-xs font-bold uppercase tracking-wider text-white" style={{ backgroundColor: "#4186dc", color: "white" }}>Estado</th>
+            <ul className="button-container">
+              <li className="d-flex gap-2">
+                {permissions.canAddTask && (
+                  <Link to="/add-task" className="btn btn-success">
+                    <FontAwesomeIcon icon={faFileCirclePlus} />
+                  </Link>
                 )}
-                {permissions.canPagado && (
-                  <th className="px-3 py-3 text-center text-xs font-bold uppercase tracking-wider text-white" style={{ backgroundColor: "#4186dc", color: "white" }}>Pagado</th>
+                {permissions.canAddUser && (
+                  <Link to="/registeradmin" className="btn btn-success">
+                    <FontAwesomeIcon icon={faUserPlus} />
+                  </Link>
                 )}
-                <th className="px-2 py-3 text-center text-xs font-bold uppercase tracking-wider text-white" style={{ backgroundColor: "#4186dc", color: "white" }}>Ver</th>
-                {permissions.canEdit && (
-                  <th className="px-2 py-3 text-center text-xs font-bold uppercase tracking-wider text-white" style={{ backgroundColor: "#4186dc", color: "white" }}>Editar</th>
+                <button onClick={handleRefresh} className="btn btn-success">
+                  <FontAwesomeIcon icon={faRotate} />
+                </button>
+                {permissions.canPagoEditStatus && (
+                  <Link to="/pago" className="btn btn-success">
+                    <FontAwesomeIcon icon={faDollar} />
+                  </Link>
                 )}
-                {permissions.canDelete && (
-                  <th className="px-2 py-3 text-center text-xs font-bold uppercase tracking-wider text-white" style={{ backgroundColor: "#4186dc", color: "white" }}>Borrar</th>
-                )}
-              </tr>
-            </thead>
-            <tbody>
-              {currentTasks.length > 0 ? (
-                currentTasks.map((task) => {
-                  const options = getStatusOptions(task);
-                  const isSelectable = permissions.canEditStatus && options.length > 0;
+                {/* Botón para generar el reporte PDF */}
+                {/* <button onClick={handleGenerateReport} className="btn btn-danger">
+                  <FontAwesomeIcon icon={faFilePdf} />
+                </button> */}
+                {/* Botón para generar el reporte en Excel */}
+                <button onClick={handleGenerateExcel} className="btn btn-success">
+                  <FontAwesomeIcon icon={faFileExcel} />
+                </button>
+              </li>
+            </ul>
 
-                  return (
+            <br />
+            <div className="table-scroll">
+              <table className="table" style={{ textTransform: "uppercase" }}>
+                <thead>
+                  <tr>
+                    <th colSpan="13" className="table-title">Listado de Archivos</th>
+                  </tr>
+                  <tr>
+                    <th>N° Expediente</th>
+                    <th>Apellido</th>
+                    <th>Nombre</th>
+                    <th>DNI/CUIT</th>
+                    <th className="border border-gray-400 px-4 py-2">Fecha de Creación</th>
+
+                    <th>Localidad</th>
+                    <th>Tipo de Persona</th>
+                    <th>Tipo de Expendio</th>
+
+                    <th>Estado</th>
+                    {permissions.canPagado && <th>Pagado</th>}
+                    <th>Ver</th>
+                    {permissions.canEdit && <th>Editar</th>}
+                    {permissions.canDelete && <th>Borrar</th>}
+                  </tr>
+                </thead>
+                <tbody>
+                  {currentTasks.map((task) => {
+                    const rowClass = task.expendio === "Evento Particular" ? "row-evento-particular" : task.expendio === "Local Comercial" ? "row-local-comercial" : task.expendio === "Intendencia" ? "row-intendencia" : "";
+                    const rowBg = task.expendio === "Evento Particular" ? "#e8f5e9" : task.expendio === "Local Comercial" ? "#e3f2fd" : task.expendio === "Intendencia" ? "#fff9c4" : "transparent";
+                    return (
                     <tr
                       key={task._id}
-                      className={`hover:brightness-95 transition-all ${getRowClass(task.expendio)}`}
-                      style={{ backgroundColor: getRowBgColor(task.expendio) }}
+                      className={rowClass}
+                      style={{ backgroundColor: rowBg }}
                     >
-                      <td data-label="N° Expediente" className="text-center font-bold text-gray-900" style={{ padding: "10px 8px", border: "1px solid #ccc" }}>
-                        {getExpedienteString(task.nroexpediente).toUpperCase() || "-"}
-                      </td>
+                      {/* CORRECCIÓN 1: Unir el array antes de aplicar toUpperCase() */}
+                      <td data-label="N° Expediente">{getExpedienteString(task.nroexpediente).toUpperCase()}</td>
 
-                      <td data-label="Apellido" className="text-center text-gray-800 uppercase font-medium" style={{ padding: "10px 8px", border: "1px solid #ccc" }}>
-                        {task.apellido?.toUpperCase() || "-"}
-                      </td>
-
-                      <td data-label="Nombre" className="text-center text-gray-800 uppercase font-medium" style={{ padding: "10px 8px", border: "1px solid #ccc" }}>
-                        {task.nombre?.toUpperCase() || "-"}
-                      </td>
-
-                      <td data-label="DNI/CUIT" className="text-center text-gray-800 font-mono" style={{ padding: "10px 8px", border: "1px solid #ccc" }}>
-                        {task.dni?.toUpperCase() || "-"}
-                      </td>
-
-                      <td data-label="Fecha de Creación" className="text-center text-gray-700 whitespace-nowrap text-xs" style={{ padding: "10px 8px", border: "1px solid #ccc" }}>
+                      <td data-label="Apellido">{task.apellido?.toUpperCase()}</td>
+                      <td data-label="Nombre">{task.nombre?.toUpperCase()}</td>
+                      <td data-label="DNI/CUIT">{task.dni?.toUpperCase()}</td>
+                      <td data-label="Fecha de Creación" className="border border-gray-400 px-4 py-2">
                         {formatFechaCreacion(task.createdAt)}
                       </td>
-
-                      <td data-label="Localidad" className="text-center text-gray-800 uppercase" style={{ padding: "10px 8px", border: "1px solid #ccc" }}>
-                        {task.localidad?.toUpperCase() || "-"}
+                      <td data-label="Localidad">{task.localidad?.toUpperCase()}</td>
+                      <td data-label="Tipo de Persona">{task.persona?.toUpperCase()}</td>
+                      <td data-label="Tipo de expendio" style={{ fontWeight: "600" }}>
+                        {task.expendio?.toUpperCase()}
                       </td>
-
-                      <td data-label="Tipo de Persona" className="text-center text-gray-800 uppercase" style={{ padding: "10px 8px", border: "1px solid #ccc" }}>
-                        {task.persona?.toUpperCase() || "-"}
-                      </td>
-
-                      <td data-label="Tipo de Expendio" className="text-center text-gray-900 uppercase font-bold" style={{ padding: "10px 8px", border: "1px solid #ccc" }}>
-                        {task.expendio?.toUpperCase() || "-"}
-                      </td>
-
                       {permissions.canViewStatus && (
-                        <td data-label="Estado" className="text-center" style={{ padding: "10px 8px", border: "1px solid #ccc" }}>
-                          {isSelectable ? (
+                        <td data-label="Estado">
+                          {permissions.canEditStatus && getStatusOptions(task).length > 0 ? (
                             <select
                               value={task.estado || "ingresado"}
                               onChange={(e) => handleStatusChange(task._id, e.target.value)}
-                              style={{
-                                color: getStatusColor(task.estado),
-                                fontWeight: "bold",
-                                textTransform: "uppercase",
-                                width: "135px",
-                                height: "32px",
-                                textAlign: "center",
-                                borderRadius: "4px",
-                                border: "1px solid #ccc",
-                                backgroundColor: "white",
-                                cursor: "pointer"
-                              }}
+                              style={{ color: getStatusColor(task.estado) }}
                             >
-                              {options.map((state) => (
-                                <option key={state} value={state} style={{ color: getStatusColor(state), fontWeight: "bold" }}>
+                              {getStatusOptions(task).map((state) => (
+                                <option key={state} value={state} style={{ color: getStatusColor(state) }}>
                                   {(state === 'controlado' ? 'en revisión' : state).charAt(0).toUpperCase() + (state === 'controlado' ? 'en revisión' : state).slice(1)}
                                 </option>
                               ))}
                             </select>
                           ) : (
-                            <span
-                              style={{
-                                color: getStatusColor(task.estado),
-                                fontWeight: "bold",
-                                textTransform: "uppercase",
-                                display: "inline-flex",
-                                alignItems: "center",
-                                justifyContent: "center",
-                                gap: "6px"
-                              }}
-                            >
-                              {(task.estado === 'controlado' ? 'en revisión' : task.estado)?.toUpperCase()} {getStatusIcon(task.estado)}
+                            <span style={{ color: getStatusColor(task.estado) }}>
+                              {(task.estado === 'controlado' ? 'en revisión' : task.estado)?.charAt(0).toUpperCase() + (task.estado === 'controlado' ? 'en revisión' : task.estado)?.slice(1)} {getStatusIcon(task.estado)}
                             </span>
                           )}
-
-                          {task.estado === "rechazado" && ["juridicos", "admin", "editor"].includes(user?.role) && (
-                            <div style={{ marginTop: "4px" }}>
-                              <button
-                                onClick={() => handleStatusChange(task._id, "rechazado")}
-                                className="btn-dark"
-                                title="Editar motivo de rechazo"
-                                style={{
-                                  backgroundColor: "#343a40",
-                                  color: "white",
-                                  padding: "2px 8px",
-                                  borderRadius: "4px",
-                                  fontSize: "11px",
-                                  cursor: "pointer",
-                                  border: "none"
-                                }}
-                              >
-                                <FontAwesomeIcon icon={faEdit} style={{ marginRight: "4px" }} />Editar Motivo
-                              </button>
-                            </div>
+                          {/* AÑADE ESTE BOTÓN AQUÍ */}
+                          {task.estado === "rechazado" && (user.role === "juridicos" || user.role === "admin" || user.role === "editor") && (
+                            <button
+                              onClick={() => handleStatusChange(task._id, "rechazado")}
+                              className="btn-dark"
+                              title="Editar motivo de rechazo"
+                            >
+                              <FontAwesomeIcon icon={faEdit} />Editar Motivo
+                            </button>
                           )}
-
-                          {task.estado === "aprobado" && ["juridicos", "admin", "editor"].includes(user?.role) && (
-                            <div style={{ marginTop: "4px" }}>
-                              <button
-                                onClick={() => handleStatusChange(task._id, "aprobado")}
-                                className="btn-dark"
-                                title="Editar información de pago"
-                                style={{
-                                  backgroundColor: "#343a40",
-                                  color: "white",
-                                  padding: "2px 8px",
-                                  borderRadius: "4px",
-                                  fontSize: "11px",
-                                  cursor: "pointer",
-                                  border: "none"
-                                }}
-                              >
-                                <FontAwesomeIcon icon={faEdit} style={{ marginRight: "4px" }} />Editar Info Pago
-                              </button>
-                            </div>
+                          {task.estado === "aprobado" && (user.role === "juridicos" || user.role === "admin" || user.role === "editor") && (
+                            <button
+                              onClick={() => handleStatusChange(task._id, "aprobado")}
+                              className="btn-dark"
+                              style={{ marginLeft: "5px" }}
+                              title="Editar información de pago"
+                            >
+                              <FontAwesomeIcon icon={faEdit} />Editar Info Pago
+                            </button>
                           )}
                         </td>
                       )}
-
                       {permissions.canPagado && (
-                        <td data-label="Pagado" className="text-center" style={{ padding: "10px 8px", border: "1px solid #ccc" }}>
+                        <td data-label="Pagado">
                           <label className="switch">
                             <input
                               type="checkbox"
@@ -849,121 +681,41 @@ function Table() {
                           </label>
                         </td>
                       )}
-
-                      <td data-label="Ver" className="text-center" style={{ padding: "10px 8px", border: "1px solid #ccc" }}>
-                        <Link
-                          to={`/view/task/${task._id}`}
-                          className="btn btn-success"
-                          style={{
-                            backgroundColor: "#28a745",
-                            color: "white",
-                            width: "36px",
-                            height: "34px",
-                            display: "inline-flex",
-                            alignItems: "center",
-                            justifyContent: "center",
-                            borderRadius: "4px",
-                            textDecoration: "none"
-                          }}
-                          title="Ver"
-                        >
+                      <td data-label="Ver">
+                        <Link className="btn btn-success" to={`/view/task/${task._id}`}>
                           <FontAwesomeIcon icon={faEye} />
                         </Link>
                       </td>
-
-                      {permissions.canEdit && (
-                        <td data-label="Editar" className="text-center" style={{ padding: "10px 8px", border: "1px solid #ccc" }}>
-                          {canEditTask(task) && (
-                            <Link
-                              to={`/edit-task/${task._id}`}
-                              className="btn btn-primary"
-                              style={{
-                                backgroundColor: "#007bff",
-                                color: "white",
-                                width: "36px",
-                                height: "34px",
-                                display: "inline-flex",
-                                alignItems: "center",
-                                justifyContent: "center",
-                                borderRadius: "4px",
-                                textDecoration: "none"
-                              }}
-                              title="Editar"
-                            >
-                              <FontAwesomeIcon icon={faEdit} />
-                            </Link>
-                          )}
+                      {canEditTask(task) && (
+                        <td data-label="Editar">
+                          <Link className="btn btn-primary" to={`/edit-task/${task._id}`}>
+                            <FontAwesomeIcon icon={faEdit} />
+                          </Link>
                         </td>
                       )}
-
                       {permissions.canDelete && (
-                        <td data-label="Borrar" className="text-center" style={{ padding: "10px 8px", border: "1px solid #ccc" }}>
-                          <button
-                            onClick={() => handleDelete(task._id)}
-                            className="btn btn-danger"
-                            style={{
-                              backgroundColor: "#dc3545",
-                              color: "white",
-                              width: "36px",
-                              height: "34px",
-                              display: "inline-flex",
-                              alignItems: "center",
-                              justifyContent: "center",
-                              borderRadius: "4px",
-                              border: "none",
-                              cursor: "pointer"
-                            }}
-                            title="Borrar"
-                          >
+                        <td data-label="Borrar">
+                          <button className="btn btn-danger" onClick={() => handleDelete(task._id)}>
                             <FontAwesomeIcon icon={faTrashAlt} />
                           </button>
                         </td>
                       )}
                     </tr>
-                  );
-                })
-              ) : (
-                <tr>
-                  <td
-                    colSpan={13}
-                    className="px-6 py-12 text-center text-gray-500"
-                    style={{ border: "1px solid #ccc" }}
-                  >
-                    No se encontraron expedientes registrados con los criterios seleccionados.
-                  </td>
-                </tr>
-              )}
-            </tbody>
-          </table>
-        </div>
-
-        {/* 4. PIE DE TABLA: CONTADOR Y PAGINADOR */}
-        <div className="flex flex-col sm:flex-row items-center justify-between gap-4 mt-5 pt-3 border-t border-gray-100">
-          <p className="text-xs sm:text-sm text-gray-500">
-            Mostrando{" "}
-            <span className="font-semibold text-gray-800">
-              {filteredTasks.length > 0 ? indexOfFirstTask + 1 : 0}
-            </span>{" "}
-            a{" "}
-            <span className="font-semibold text-gray-800">
-              {Math.min(indexOfLastTask, filteredTasks.length)}
-            </span>{" "}
-            de{" "}
-            <span className="font-semibold text-gray-800">
-              {filteredTasks.length}
-            </span>{" "}
-            expedientes
-          </p>
-
+                  );})}
+                </tbody>
+              </table>
+            </div>
+          </div>
           <Paginator
             currentPage={currentPage}
-            totalPages={totalPages}
-            onPageChange={(page) => setCurrentPage(page)}
+            totalPages={Math.ceil(filteredTasks.length / tasksPerPage)}
+            onPageChange={onPageChange}
           />
         </div>
-      </ComponentCard>
+      </div>
     </div>
   );
 }
 
 export default Table;
+
