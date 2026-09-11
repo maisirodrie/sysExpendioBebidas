@@ -278,25 +278,53 @@ function Table() {
     }
   };
 
-  const renderStatusBadge = (estado) => {
-    if (!estado) return <Badge variant="light" color="neutral">Sin estado</Badge>;
-    const st = estado.toLowerCase();
+  // Colores de fondo por Tipo de Expendio
+  const getRowBgColor = (expendio) => {
+    if (!expendio) return "transparent";
+    const exp = expendio.trim().toLowerCase();
+    if (exp === "evento particular") return "#e8f5e9"; // Verde claro
+    if (exp === "local comercial") return "#e3f2fd";   // Celeste claro
+    if (exp === "intendencia") return "#fff9c4";       // Amarillo claro
+    return "transparent";
+  };
+
+  // Colores para estados
+  const getStatusBadgeStyle = (status) => {
+    const st = (status === "controlado" ? "en revisión" : status || "").toLowerCase();
     switch (st) {
-      case "ingresado":
-        return <Badge variant="light" color="neutral" dot>Ingresado</Badge>;
-      case "pendiente":
-        return <Badge variant="light" color="warning" dot>Pendiente</Badge>;
-      case "controlado":
-        return <Badge variant="light" color="info" dot>En revisión</Badge>;
       case "aprobado":
-        return <Badge variant="light" color="success" dot>Aprobado</Badge>;
+        return { bg: "bg-emerald-100", text: "text-emerald-800", border: "border-emerald-300", dot: "bg-emerald-500" };
       case "rechazado":
-        return <Badge variant="light" color="error" dot>Rechazado</Badge>;
+        return { bg: "bg-rose-100", text: "text-rose-800", border: "border-rose-300", dot: "bg-rose-500" };
+      case "controlado":
+      case "en revisión":
+        return { bg: "bg-blue-100", text: "text-blue-800", border: "border-blue-300", dot: "bg-blue-500" };
+      case "pendiente":
+        return { bg: "bg-amber-100", text: "text-amber-800", border: "border-amber-300", dot: "bg-amber-500" };
       case "finalizado":
-        return <Badge variant="solid" color="neutral">Finalizado</Badge>;
+        return { bg: "bg-slate-800", text: "text-white", border: "border-slate-900", dot: "bg-slate-300" };
+      case "ingresado":
       default:
-        return <Badge variant="light" color="neutral">{estado}</Badge>;
+        return { bg: "bg-gray-100", text: "text-gray-700", border: "border-gray-300", dot: "bg-gray-400" };
     }
+  };
+
+  const renderStatusBadge = (estado) => {
+    if (!estado) {
+      return (
+        <span className="px-2.5 py-1 rounded-full text-xs font-semibold bg-gray-100 text-gray-500 border border-gray-200">
+          Sin estado
+        </span>
+      );
+    }
+    const label = estado === "controlado" ? "En revisión" : estado.charAt(0).toUpperCase() + estado.slice(1);
+    const style = getStatusBadgeStyle(estado);
+    return (
+      <span className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-bold border shadow-2xs uppercase ${style.bg} ${style.text} ${style.border}`}>
+        <span className={`w-2 h-2 rounded-full ${style.dot}`}></span>
+        {label}
+      </span>
+    );
   };
 
   const handleGenerateExcel = () => {
@@ -691,7 +719,8 @@ function Table() {
                   return (
                     <tr
                       key={task._id}
-                      className="hover:bg-gray-50/70 transition-colors group"
+                      style={{ backgroundColor: getRowBgColor(task.expendio) }}
+                      className="hover:brightness-95 transition-all border-b border-gray-200/70 group"
                     >
                       <td className="px-4 py-3.5 font-semibold text-gray-900 whitespace-nowrap">
                         {getExpedienteString(task.nroexpediente) || (
@@ -700,58 +729,102 @@ function Table() {
                       </td>
 
                       <td className="px-4 py-3.5 text-gray-800">
-                        <div className="font-medium">
+                        <div className="font-semibold">
                           {task.apellido} {task.nombre}
                         </div>
                         {task.persona && (
-                          <span className="text-[11px] text-gray-400">
+                          <span className="text-[11px] text-gray-500 font-medium">
                             Persona {task.persona}
                           </span>
                         )}
                       </td>
 
-                      <td className="px-4 py-3.5 text-gray-600 font-mono text-xs">
+                      <td className="px-4 py-3.5 text-gray-700 font-mono text-xs font-medium">
                         {task.dni}
                       </td>
 
-                      <td className="px-4 py-3.5 text-gray-700 whitespace-nowrap">
+                      <td className="px-4 py-3.5 text-gray-800 whitespace-nowrap font-medium">
                         {task.localidad?.toUpperCase() || "-"}
                       </td>
 
                       <td className="px-4 py-3.5">
-                        <span className="inline-flex text-xs font-medium text-gray-700">
-                          {task.expendio || "-"}
+                        <span
+                          className="inline-flex px-2 py-0.5 rounded-md text-xs font-bold"
+                          style={{
+                            backgroundColor:
+                              task.expendio === "Evento Particular"
+                                ? "#c8e6c9"
+                                : task.expendio === "Local Comercial"
+                                ? "#bbdefb"
+                                : task.expendio === "Intendencia"
+                                ? "#fff59d"
+                                : "#f1f5f9",
+                            color:
+                              task.expendio === "Evento Particular"
+                                ? "#1b5e20"
+                                : task.expendio === "Local Comercial"
+                                ? "#0d47a1"
+                                : task.expendio === "Intendencia"
+                                ? "#f57f17"
+                                : "#334155",
+                          }}
+                        >
+                          {task.expendio?.toUpperCase() || "-"}
                         </span>
                         {task.rubro && (
-                          <p className="text-[11px] text-gray-400 truncate max-w-[140px]">
+                          <p className="text-[11px] text-gray-600 truncate max-w-[140px] mt-0.5">
                             {task.rubro}
                           </p>
                         )}
                       </td>
 
-                      <td className="px-4 py-3.5 text-gray-500 text-xs whitespace-nowrap">
+                      <td className="px-4 py-3.5 text-gray-600 text-xs whitespace-nowrap">
                         {task.createdAt ? formatFechaCreacion(task.createdAt) : "-"}
                       </td>
 
                       <td className="px-4 py-3.5 text-center whitespace-nowrap">
-                        {isSelectable ? (
-                          <select
-                            value={task.estado}
-                            onChange={(e) => handleStatusChange(task._id, e.target.value)}
-                            className="text-xs font-semibold rounded-lg px-2.5 py-1 border border-gray-300 bg-white text-gray-800 focus:border-brand-500 focus:ring-2 focus:ring-brand-500/10 cursor-pointer shadow-theme-xs outline-none"
-                          >
-                            <option value={task.estado} disabled>
-                              {task.estado}
-                            </option>
-                            {options.map((option) => (
-                              <option key={option} value={option}>
-                                {option === "controlado" ? "en revisión" : option}
+                        <div className="inline-flex items-center gap-1.5 justify-center">
+                          {isSelectable ? (
+                            <select
+                              value={task.estado}
+                              onChange={(e) => handleStatusChange(task._id, e.target.value)}
+                              className={`text-xs font-bold rounded-lg px-2.5 py-1 border cursor-pointer shadow-theme-xs outline-none transition-colors uppercase ${
+                                getStatusBadgeStyle(task.estado).bg
+                              } ${getStatusBadgeStyle(task.estado).text} ${
+                                getStatusBadgeStyle(task.estado).border
+                              }`}
+                            >
+                              <option value={task.estado} disabled className="bg-white text-gray-800 font-normal">
+                                {task.estado === "controlado" ? "EN REVISIÓN" : task.estado?.toUpperCase()}
                               </option>
-                            ))}
-                          </select>
-                        ) : (
-                          renderStatusBadge(task.estado)
-                        )}
+                              {options.map((option) => (
+                                <option key={option} value={option} className="bg-white text-gray-800 font-normal">
+                                  {option === "controlado" ? "EN REVISIÓN" : option.toUpperCase()}
+                                </option>
+                              ))}
+                            </select>
+                          ) : (
+                            renderStatusBadge(task.estado)
+                          )}
+                          {task.estado === "rechazado" && ["juridicos", "admin", "editor"].includes(user?.role) && (
+                            <button
+                              onClick={() => handleStatusChange(task._id, "rechazado")}
+                              className="px-1.5 py-1 rounded bg-rose-200 hover:bg-rose-300 text-rose-800 text-[11px] font-semibold transition-colors"
+                              title="Editar motivo de rechazo"
+                            >
+                              <FontAwesomeIcon icon={faEdit} />
+                            </button>
+                          )}
+                          {task.estado === "aprobado" && ["juridicos", "admin", "editor"].includes(user?.role) && (
+                            <button
+                              onClick={() => handleStatusChange(task._id, "aprobado")}
+                              className="px-1.5 py-1 rounded bg-emerald-200 hover:bg-emerald-300 text-emerald-800 text-[11px] font-semibold transition-colors"
+                              title="Editar información de pago"
+                            >
+                              <FontAwesomeIcon icon={faEdit} />
+                            </button>
+                          )}
+                        </div>
                       </td>
 
                       {permissions.canPagado && (
@@ -760,7 +833,7 @@ function Table() {
                             onClick={() => handlePaidToggle(task)}
                             className={`px-2.5 py-1 rounded-full text-xs font-semibold transition-all cursor-pointer ${
                               task.pago
-                                ? "bg-emerald-50 text-emerald-700 border border-emerald-200"
+                                ? "bg-emerald-100 text-emerald-800 border border-emerald-300"
                                 : "bg-gray-100 text-gray-500 border border-gray-200 hover:bg-gray-200"
                             }`}
                           >
@@ -773,29 +846,29 @@ function Table() {
                         <div className="inline-flex items-center gap-1.5 justify-end">
                           <Link
                             to={`/view/task/${task._id}`}
-                            className="p-1.5 rounded-lg text-gray-500 hover:text-brand-600 hover:bg-brand-50 transition-colors"
+                            className="inline-flex items-center justify-center w-8 h-8 rounded-lg bg-emerald-500 hover:bg-emerald-600 text-white shadow-xs transition-all hover:scale-105"
                             title="Ver detalle del expediente"
                           >
-                            <FontAwesomeIcon icon={faEye} />
+                            <FontAwesomeIcon icon={faEye} className="w-3.5 h-3.5" />
                           </Link>
 
                           {permissions.canEdit && (
                             <Link
                               to={`/edit-task/${task._id}`}
-                              className="p-1.5 rounded-lg text-gray-500 hover:text-amber-600 hover:bg-amber-50 transition-colors"
+                              className="inline-flex items-center justify-center w-8 h-8 rounded-lg bg-blue-500 hover:bg-blue-600 text-white shadow-xs transition-all hover:scale-105"
                               title="Editar expediente"
                             >
-                              <FontAwesomeIcon icon={faEdit} />
+                              <FontAwesomeIcon icon={faEdit} className="w-3.5 h-3.5" />
                             </Link>
                           )}
 
                           {permissions.canDelete && (
                             <button
                               onClick={() => handleDelete(task._id)}
-                              className="p-1.5 rounded-lg text-gray-500 hover:text-rose-600 hover:bg-rose-50 transition-colors cursor-pointer"
+                              className="inline-flex items-center justify-center w-8 h-8 rounded-lg bg-rose-500 hover:bg-rose-600 text-white shadow-xs transition-all hover:scale-105 cursor-pointer"
                               title="Eliminar expediente"
                             >
-                              <FontAwesomeIcon icon={faTrashAlt} />
+                              <FontAwesomeIcon icon={faTrashAlt} className="w-3.5 h-3.5" />
                             </button>
                           )}
                         </div>
