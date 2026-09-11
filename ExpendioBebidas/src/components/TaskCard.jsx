@@ -27,6 +27,7 @@ import {
   faLockOpen
 } from "@fortawesome/free-solid-svg-icons";
 import Paginator from "./Paginator";
+import "./Table.css";
 import Swal from "sweetalert2";
 import { DateTime } from "luxon";
 import ComponentCard from "./common/ComponentCard";
@@ -162,6 +163,13 @@ function Table() {
     canPagado: ["admin"].includes(user?.role),
   };
 
+  const canEditTask = (task) => {
+    if (["admin", "editor", "mesa"].includes(user?.role)) {
+      return true;
+    }
+    return false;
+  };
+
   const handleRefresh = async () => {
     Swal.fire({
       title: "Actualizando registros...",
@@ -288,44 +296,33 @@ function Table() {
     return "transparent";
   };
 
-  // Colores para estados
-  const getStatusBadgeStyle = (status) => {
+  // Color exacto del texto según Estado
+  const getStatusColor = (status) => {
     const st = (status === "controlado" ? "en revisión" : status || "").toLowerCase();
     switch (st) {
       case "aprobado":
-        return { bg: "bg-emerald-100", text: "text-emerald-800", border: "border-emerald-300", dot: "bg-emerald-500" };
+        return "#28a745"; // Verde
       case "rechazado":
-        return { bg: "bg-rose-100", text: "text-rose-800", border: "border-rose-300", dot: "bg-rose-500" };
+        return "#dc3545"; // Rojo
       case "controlado":
       case "en revisión":
-        return { bg: "bg-blue-100", text: "text-blue-800", border: "border-blue-300", dot: "bg-blue-500" };
+        return "#007bff"; // Azul
       case "pendiente":
-        return { bg: "bg-amber-100", text: "text-amber-800", border: "border-amber-300", dot: "bg-amber-500" };
+        return "#fd7e14"; // Naranja
       case "finalizado":
-        return { bg: "bg-slate-800", text: "text-white", border: "border-slate-900", dot: "bg-slate-300" };
+        return "#212529"; // Negro/Oscuro
       case "ingresado":
       default:
-        return { bg: "bg-gray-100", text: "text-gray-700", border: "border-gray-300", dot: "bg-gray-400" };
+        return "#6c757d"; // Gris
     }
   };
 
-  const renderStatusBadge = (estado) => {
-    if (!estado) {
-      return (
-        <span className="px-2.5 py-1 rounded-full text-xs font-semibold bg-gray-100 text-gray-500 border border-gray-200">
-          Sin estado
-        </span>
-      );
-    }
-    const label = estado === "controlado" ? "En revisión" : estado.charAt(0).toUpperCase() + estado.slice(1);
-    const style = getStatusBadgeStyle(estado);
-    return (
-      <span className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-bold border shadow-2xs uppercase ${style.bg} ${style.text} ${style.border}`}>
-        <span className={`w-2 h-2 rounded-full ${style.dot}`}></span>
-        {label}
-      </span>
-    );
-  };
+  const getStatusIcon = (status) => (
+    <FontAwesomeIcon
+      icon={faCircle}
+      style={{ color: getStatusColor(status), fontSize: "8px" }}
+    />
+  );
 
   const handleGenerateExcel = () => {
     Swal.fire({
@@ -674,43 +671,35 @@ function Table() {
           )}
         </div>
 
-        {/* 3. TABLA OFICIAL TAILADMIN */}
-        <div className="overflow-x-auto rounded-xl border border-gray-200">
-          <table className="w-full text-left border-collapse">
+        {/* 3. TABLA DE EXPEDIENTES */}
+        <div className="table-scroll overflow-x-auto rounded-xl border border-gray-200">
+          <table className="table" style={{ textTransform: "uppercase", width: "100%" }}>
             <thead>
-              <tr className="border-b border-gray-200 bg-gray-50/80">
-                <th className="px-4 py-3 text-xs font-semibold uppercase tracking-wider text-gray-500">
-                  N° Expediente
-                </th>
-                <th className="px-4 py-3 text-xs font-semibold uppercase tracking-wider text-gray-500">
-                  Titular
-                </th>
-                <th className="px-4 py-3 text-xs font-semibold uppercase tracking-wider text-gray-500">
-                  DNI/CUIT
-                </th>
-                <th className="px-4 py-3 text-xs font-semibold uppercase tracking-wider text-gray-500">
-                  Localidad
-                </th>
-                <th className="px-4 py-3 text-xs font-semibold uppercase tracking-wider text-gray-500">
-                  Expendio
-                </th>
-                <th className="px-4 py-3 text-xs font-semibold uppercase tracking-wider text-gray-500">
-                  Fecha
-                </th>
-                <th className="px-4 py-3 text-xs font-semibold uppercase tracking-wider text-gray-500 text-center">
-                  Estado
-                </th>
-                {permissions.canPagado && (
-                  <th className="px-4 py-3 text-xs font-semibold uppercase tracking-wider text-gray-500 text-center">
-                    Pago
-                  </th>
+              <tr style={{ backgroundColor: "#4186dc", color: "white" }}>
+                <th className="px-3 py-3 text-center text-xs font-bold uppercase tracking-wider text-white" style={{ backgroundColor: "#4186dc", color: "white" }}>N° Expediente</th>
+                <th className="px-3 py-3 text-center text-xs font-bold uppercase tracking-wider text-white" style={{ backgroundColor: "#4186dc", color: "white" }}>Apellido</th>
+                <th className="px-3 py-3 text-center text-xs font-bold uppercase tracking-wider text-white" style={{ backgroundColor: "#4186dc", color: "white" }}>Nombre</th>
+                <th className="px-3 py-3 text-center text-xs font-bold uppercase tracking-wider text-white" style={{ backgroundColor: "#4186dc", color: "white" }}>DNI/CUIT</th>
+                <th className="px-3 py-3 text-center text-xs font-bold uppercase tracking-wider text-white" style={{ backgroundColor: "#4186dc", color: "white" }}>Fecha de Creación</th>
+                <th className="px-3 py-3 text-center text-xs font-bold uppercase tracking-wider text-white" style={{ backgroundColor: "#4186dc", color: "white" }}>Localidad</th>
+                <th className="px-3 py-3 text-center text-xs font-bold uppercase tracking-wider text-white" style={{ backgroundColor: "#4186dc", color: "white" }}>Tipo de Persona</th>
+                <th className="px-3 py-3 text-center text-xs font-bold uppercase tracking-wider text-white" style={{ backgroundColor: "#4186dc", color: "white" }}>Tipo de Expendio</th>
+                {permissions.canViewStatus && (
+                  <th className="px-3 py-3 text-center text-xs font-bold uppercase tracking-wider text-white" style={{ backgroundColor: "#4186dc", color: "white" }}>Estado</th>
                 )}
-                <th className="px-4 py-3 text-xs font-semibold uppercase tracking-wider text-gray-500 text-right">
-                  Acciones
-                </th>
+                {permissions.canPagado && (
+                  <th className="px-3 py-3 text-center text-xs font-bold uppercase tracking-wider text-white" style={{ backgroundColor: "#4186dc", color: "white" }}>Pagado</th>
+                )}
+                <th className="px-2 py-3 text-center text-xs font-bold uppercase tracking-wider text-white" style={{ backgroundColor: "#4186dc", color: "white" }}>Ver</th>
+                {permissions.canEdit && (
+                  <th className="px-2 py-3 text-center text-xs font-bold uppercase tracking-wider text-white" style={{ backgroundColor: "#4186dc", color: "white" }}>Editar</th>
+                )}
+                {permissions.canDelete && (
+                  <th className="px-2 py-3 text-center text-xs font-bold uppercase tracking-wider text-white" style={{ backgroundColor: "#4186dc", color: "white" }}>Borrar</th>
+                )}
               </tr>
             </thead>
-            <tbody className="divide-y divide-gray-100 bg-white text-sm">
+            <tbody>
               {currentTasks.length > 0 ? (
                 currentTasks.map((task) => {
                   const options = getStatusOptions(task);
@@ -720,186 +709,224 @@ function Table() {
                     <tr
                       key={task._id}
                       style={{ backgroundColor: getRowBgColor(task.expendio) }}
-                      className="hover:brightness-95 transition-all border-b border-gray-200/70 group"
+                      className="hover:brightness-95 transition-all"
                     >
-                      <td className="px-4 py-3.5 font-semibold text-gray-900 whitespace-nowrap">
-                        {getExpedienteString(task.nroexpediente) || (
-                          <span className="text-gray-400 font-normal italic">Sin asignar</span>
-                        )}
+                      <td data-label="N° Expediente" className="text-center font-bold text-gray-900" style={{ padding: "10px 8px", border: "1px solid #ccc" }}>
+                        {getExpedienteString(task.nroexpediente).toUpperCase() || "-"}
                       </td>
 
-                      <td className="px-4 py-3.5 text-gray-800">
-                        <div className="font-semibold">
-                          {task.apellido} {task.nombre}
-                        </div>
-                        {task.persona && (
-                          <span className="text-[11px] text-gray-500 font-medium">
-                            Persona {task.persona}
-                          </span>
-                        )}
+                      <td data-label="Apellido" className="text-center text-gray-800 uppercase font-medium" style={{ padding: "10px 8px", border: "1px solid #ccc" }}>
+                        {task.apellido?.toUpperCase() || "-"}
                       </td>
 
-                      <td className="px-4 py-3.5 text-gray-700 font-mono text-xs font-medium">
-                        {task.dni}
+                      <td data-label="Nombre" className="text-center text-gray-800 uppercase font-medium" style={{ padding: "10px 8px", border: "1px solid #ccc" }}>
+                        {task.nombre?.toUpperCase() || "-"}
                       </td>
 
-                      <td className="px-4 py-3.5 text-gray-800 whitespace-nowrap font-medium">
+                      <td data-label="DNI/CUIT" className="text-center text-gray-800 font-mono" style={{ padding: "10px 8px", border: "1px solid #ccc" }}>
+                        {task.dni?.toUpperCase() || "-"}
+                      </td>
+
+                      <td data-label="Fecha de Creación" className="text-center text-gray-700 whitespace-nowrap text-xs" style={{ padding: "10px 8px", border: "1px solid #ccc" }}>
+                        {formatFechaCreacion(task.createdAt)}
+                      </td>
+
+                      <td data-label="Localidad" className="text-center text-gray-800 uppercase" style={{ padding: "10px 8px", border: "1px solid #ccc" }}>
                         {task.localidad?.toUpperCase() || "-"}
                       </td>
 
-                      <td className="px-4 py-3.5">
-                        <span
-                          className="inline-flex px-2 py-0.5 rounded-md text-xs font-bold"
-                          style={{
-                            backgroundColor:
-                              task.expendio === "Evento Particular"
-                                ? "#c8e6c9"
-                                : task.expendio === "Local Comercial"
-                                ? "#bbdefb"
-                                : task.expendio === "Intendencia"
-                                ? "#fff59d"
-                                : "#f1f5f9",
-                            color:
-                              task.expendio === "Evento Particular"
-                                ? "#1b5e20"
-                                : task.expendio === "Local Comercial"
-                                ? "#0d47a1"
-                                : task.expendio === "Intendencia"
-                                ? "#f57f17"
-                                : "#334155",
-                          }}
-                        >
-                          {task.expendio?.toUpperCase() || "-"}
-                        </span>
-                        {task.rubro && (
-                          <p className="text-[11px] text-gray-600 truncate max-w-[140px] mt-0.5">
-                            {task.rubro}
-                          </p>
-                        )}
+                      <td data-label="Tipo de Persona" className="text-center text-gray-800 uppercase" style={{ padding: "10px 8px", border: "1px solid #ccc" }}>
+                        {task.persona?.toUpperCase() || "-"}
                       </td>
 
-                      <td className="px-4 py-3.5 text-gray-600 text-xs whitespace-nowrap">
-                        {task.createdAt ? formatFechaCreacion(task.createdAt) : "-"}
+                      <td data-label="Tipo de Expendio" className="text-center text-gray-900 uppercase font-bold" style={{ padding: "10px 8px", border: "1px solid #ccc" }}>
+                        {task.expendio?.toUpperCase() || "-"}
                       </td>
 
-                      <td className="px-4 py-3.5 text-center whitespace-nowrap">
-                        <div className="inline-flex items-center gap-1.5 justify-center">
+                      {permissions.canViewStatus && (
+                        <td data-label="Estado" className="text-center" style={{ padding: "10px 8px", border: "1px solid #ccc" }}>
                           {isSelectable ? (
                             <select
-                              value={task.estado}
+                              value={task.estado || "ingresado"}
                               onChange={(e) => handleStatusChange(task._id, e.target.value)}
-                              className={`text-xs font-bold rounded-lg px-2.5 py-1 border cursor-pointer shadow-theme-xs outline-none transition-colors uppercase ${
-                                getStatusBadgeStyle(task.estado).bg
-                              } ${getStatusBadgeStyle(task.estado).text} ${
-                                getStatusBadgeStyle(task.estado).border
-                              }`}
+                              style={{
+                                color: getStatusColor(task.estado),
+                                fontWeight: "bold",
+                                textTransform: "uppercase",
+                                width: "135px",
+                                height: "32px",
+                                textAlign: "center",
+                                borderRadius: "4px",
+                                border: "1px solid #ccc",
+                                backgroundColor: "white",
+                                cursor: "pointer"
+                              }}
                             >
-                              <option value={task.estado} disabled className="bg-white text-gray-800 font-normal">
-                                {task.estado === "controlado" ? "EN REVISIÓN" : task.estado?.toUpperCase()}
-                              </option>
-                              {options.map((option) => (
-                                <option key={option} value={option} className="bg-white text-gray-800 font-normal">
-                                  {option === "controlado" ? "EN REVISIÓN" : option.toUpperCase()}
+                              {options.map((state) => (
+                                <option key={state} value={state} style={{ color: getStatusColor(state), fontWeight: "bold" }}>
+                                  {(state === 'controlado' ? 'en revisión' : state).charAt(0).toUpperCase() + (state === 'controlado' ? 'en revisión' : state).slice(1)}
                                 </option>
                               ))}
                             </select>
                           ) : (
-                            renderStatusBadge(task.estado)
-                          )}
-                          {task.estado === "rechazado" && ["juridicos", "admin", "editor"].includes(user?.role) && (
-                            <button
-                              onClick={() => handleStatusChange(task._id, "rechazado")}
-                              className="px-1.5 py-1 rounded bg-rose-200 hover:bg-rose-300 text-rose-800 text-[11px] font-semibold transition-colors"
-                              title="Editar motivo de rechazo"
+                            <div
+                              style={{
+                                color: getStatusColor(task.estado),
+                                fontWeight: "bold",
+                                textTransform: "uppercase",
+                                width: "135px",
+                                height: "32px",
+                                display: "inline-flex",
+                                alignItems: "center",
+                                justifyContent: "center",
+                                gap: "6px",
+                                borderRadius: "4px",
+                                border: "1px solid #ccc",
+                                backgroundColor: "white",
+                                margin: "0 auto"
+                              }}
                             >
-                              <FontAwesomeIcon icon={faEdit} />
-                            </button>
+                              {(task.estado === 'controlado' ? 'en revisión' : task.estado)?.toUpperCase()} {getStatusIcon(task.estado)}
+                            </div>
                           )}
-                          {task.estado === "aprobado" && ["juridicos", "admin", "editor"].includes(user?.role) && (
-                            <button
-                              onClick={() => handleStatusChange(task._id, "aprobado")}
-                              className="px-1.5 py-1 rounded bg-emerald-200 hover:bg-emerald-300 text-emerald-800 text-[11px] font-semibold transition-colors"
-                              title="Editar información de pago"
-                            >
-                              <FontAwesomeIcon icon={faEdit} />
-                            </button>
-                          )}
-                        </div>
-                      </td>
 
-                      {permissions.canPagado && (
-                        <td className="px-4 py-3.5 text-center whitespace-nowrap">
-                          <button
-                            onClick={() => handlePaidToggle(task)}
-                            className={`px-2.5 py-1 rounded-full text-xs font-semibold transition-all cursor-pointer ${
-                              task.pago
-                                ? "bg-emerald-100 text-emerald-800 border border-emerald-300"
-                                : "bg-gray-100 text-gray-500 border border-gray-200 hover:bg-gray-200"
-                            }`}
-                          >
-                            {task.pago ? "Pagado" : "No pagado"}
-                          </button>
+                          {task.estado === "rechazado" && ["juridicos", "admin", "editor"].includes(user?.role) && (
+                            <div style={{ marginTop: "4px" }}>
+                              <button
+                                onClick={() => handleStatusChange(task._id, "rechazado")}
+                                className="btn-dark"
+                                title="Editar motivo de rechazo"
+                                style={{
+                                  backgroundColor: "#343a40",
+                                  color: "white",
+                                  padding: "2px 8px",
+                                  borderRadius: "4px",
+                                  fontSize: "11px",
+                                  cursor: "pointer",
+                                  border: "none"
+                                }}
+                              >
+                                <FontAwesomeIcon icon={faEdit} style={{ marginRight: "4px" }} />Editar Motivo
+                              </button>
+                            </div>
+                          )}
+
+                          {task.estado === "aprobado" && ["juridicos", "admin", "editor"].includes(user?.role) && (
+                            <div style={{ marginTop: "4px" }}>
+                              <button
+                                onClick={() => handleStatusChange(task._id, "aprobado")}
+                                className="btn-dark"
+                                title="Editar información de pago"
+                                style={{
+                                  backgroundColor: "#343a40",
+                                  color: "white",
+                                  padding: "2px 8px",
+                                  borderRadius: "4px",
+                                  fontSize: "11px",
+                                  cursor: "pointer",
+                                  border: "none"
+                                }}
+                              >
+                                <FontAwesomeIcon icon={faEdit} style={{ marginRight: "4px" }} />Editar Info Pago
+                              </button>
+                            </div>
+                          )}
                         </td>
                       )}
 
-                      <td className="px-4 py-3.5 text-right whitespace-nowrap">
-                        <div className="inline-flex items-center gap-1.5 justify-end">
-                          <Link
-                            to={`/view/task/${task._id}`}
-                            className="inline-flex items-center justify-center w-8 h-8 rounded-lg bg-emerald-500 hover:bg-emerald-600 text-white shadow-xs transition-all hover:scale-105"
-                            title="Ver detalle del expediente"
-                          >
-                            <FontAwesomeIcon icon={faEye} className="w-3.5 h-3.5" />
-                          </Link>
+                      {permissions.canPagado && (
+                        <td data-label="Pagado" className="text-center" style={{ padding: "10px 8px", border: "1px solid #ccc" }}>
+                          <label className="switch">
+                            <input
+                              type="checkbox"
+                              checked={task.pago || false}
+                              onChange={() => handlePaidToggle(task)}
+                            />
+                            <span className="slider"></span>
+                          </label>
+                        </td>
+                      )}
 
-                          {permissions.canEdit && (
+                      <td data-label="Ver" className="text-center" style={{ padding: "10px 8px", border: "1px solid #ccc" }}>
+                        <Link
+                          to={`/view/task/${task._id}`}
+                          className="btn btn-success"
+                          style={{
+                            backgroundColor: "#28a745",
+                            color: "white",
+                            width: "36px",
+                            height: "34px",
+                            display: "inline-flex",
+                            alignItems: "center",
+                            justifyContent: "center",
+                            borderRadius: "4px",
+                            textDecoration: "none"
+                          }}
+                          title="Ver"
+                        >
+                          <FontAwesomeIcon icon={faEye} />
+                        </Link>
+                      </td>
+
+                      {permissions.canEdit && (
+                        <td data-label="Editar" className="text-center" style={{ padding: "10px 8px", border: "1px solid #ccc" }}>
+                          {canEditTask(task) && (
                             <Link
                               to={`/edit-task/${task._id}`}
-                              className="inline-flex items-center justify-center w-8 h-8 rounded-lg bg-blue-500 hover:bg-blue-600 text-white shadow-xs transition-all hover:scale-105"
-                              title="Editar expediente"
+                              className="btn btn-primary"
+                              style={{
+                                backgroundColor: "#007bff",
+                                color: "white",
+                                width: "36px",
+                                height: "34px",
+                                display: "inline-flex",
+                                alignItems: "center",
+                                justifyContent: "center",
+                                borderRadius: "4px",
+                                textDecoration: "none"
+                              }}
+                              title="Editar"
                             >
-                              <FontAwesomeIcon icon={faEdit} className="w-3.5 h-3.5" />
+                              <FontAwesomeIcon icon={faEdit} />
                             </Link>
                           )}
+                        </td>
+                      )}
 
-                          {permissions.canDelete && (
-                            <button
-                              onClick={() => handleDelete(task._id)}
-                              className="inline-flex items-center justify-center w-8 h-8 rounded-lg bg-rose-500 hover:bg-rose-600 text-white shadow-xs transition-all hover:scale-105 cursor-pointer"
-                              title="Eliminar expediente"
-                            >
-                              <FontAwesomeIcon icon={faTrashAlt} className="w-3.5 h-3.5" />
-                            </button>
-                          )}
-                        </div>
-                      </td>
+                      {permissions.canDelete && (
+                        <td data-label="Borrar" className="text-center" style={{ padding: "10px 8px", border: "1px solid #ccc" }}>
+                          <button
+                            onClick={() => handleDelete(task._id)}
+                            className="btn btn-danger"
+                            style={{
+                              backgroundColor: "#dc3545",
+                              color: "white",
+                              width: "36px",
+                              height: "34px",
+                              display: "inline-flex",
+                              alignItems: "center",
+                              justifyContent: "center",
+                              borderRadius: "4px",
+                              border: "none",
+                              cursor: "pointer"
+                            }}
+                            title="Borrar"
+                          >
+                            <FontAwesomeIcon icon={faTrashAlt} />
+                          </button>
+                        </td>
+                      )}
                     </tr>
                   );
                 })
               ) : (
                 <tr>
                   <td
-                    colSpan={permissions.canPagado ? 9 : 8}
-                    className="px-6 py-12 text-center text-gray-400"
+                    colSpan={13}
+                    className="px-6 py-12 text-center text-gray-500"
+                    style={{ border: "1px solid #ccc" }}
                   >
-                    <div className="flex flex-col items-center justify-center gap-2">
-                      <svg
-                        className="w-8 h-8 text-gray-300"
-                        fill="none"
-                        stroke="currentColor"
-                        viewBox="0 0 24 24"
-                      >
-                        <path
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                          strokeWidth="1.5"
-                          d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
-                        />
-                      </svg>
-                      <p className="text-sm font-medium text-gray-500">
-                        No se encontraron expedientes registrados con los criterios seleccionados.
-                      </p>
-                    </div>
+                    No se encontraron expedientes registrados con los criterios seleccionados.
                   </td>
                 </tr>
               )}
