@@ -6,18 +6,9 @@ function HomePage() {
   return (
     <PublicLayout maxWidth="max-w-2xl">
       <div className="backdrop-blur-md bg-white/95 rounded-2xl p-8 sm:p-12 border border-white/30 shadow-2xl text-center">
-        <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-amber-100 text-amber-800 text-xs sm:text-sm font-semibold mb-6 border border-amber-200">
-          <span className="w-2 h-2 rounded-full bg-amber-500 animate-pulse"></span>
-          Sistema en Mantenimiento
-        </div>
-
-        <h1 className="text-3xl sm:text-4xl font-extrabold text-gray-900 tracking-tight leading-tight mb-4">
+        <h1 className="text-3xl sm:text-4xl font-extrabold text-gray-900 tracking-tight leading-tight mb-8">
           Solicitud Provincial de Expendio de Bebidas
         </h1>
-
-        <p className="text-gray-600 text-sm sm:text-base max-w-lg mx-auto mb-8 leading-relaxed">
-          Estamos realizando tareas de actualización en la infraestructura del sistema. Los trámites y consultas en línea se reanudarán a la brevedad. Disculpe las molestias ocasionadas.
-        </p>
 
         <div className="flex flex-col sm:flex-row items-center justify-center gap-3.5">
           <Link
