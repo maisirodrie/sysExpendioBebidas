@@ -5,6 +5,8 @@ import {
   createTasks,
   createTasksPublic,
   deleteTasks,
+  getDeletedTasks,
+  restoreDeletedTask,
   getTasks,
   updateTasks,
   downloadFile,
@@ -71,6 +73,14 @@ router.post("/tasks/reporte", authRequired, generateTasksExcel);
 // --- Rutas de Búsqueda ---
 router.get("/tasks/search/:dni", getTaskByDni);
 
+// Middleware para restringir acceso exclusivo a Administradores (Maximiliano Rodriguez)
+const adminOnly = (req, res, next) => {
+  if (!req.user || req.user.role !== 'admin') {
+    return res.status(403).json({ message: "Acceso denegado: Se requieren permisos de Administrador." });
+  }
+  next();
+};
+
 // --- Rutas de Administración ---
 // Usuarios
 router.get("/admin/users", authRequired, getUsers);
@@ -84,8 +94,11 @@ router.put('/admin/users/blanquear-password/:userId', authRequired, adminChangeU
 // Pagos (Administrador)
 router.get("/admin/pago", getPago);
 router.put("/admin/pago", authRequired, validateSchema(updatePagoSchema), updatePago);
-// Actividades (Administrador)
+// Actividades / Movimientos (Administrador)
 router.get('/admin/activities', authRequired, getAllUserActivities);
 router.get('/admin/activities/user/:userId', authRequired, getUserActivities);
+// Papelera de Eliminados (Exclusivo Administrador)
+router.get('/admin/deleted-tasks', authRequired, adminOnly, getDeletedTasks);
+router.post('/admin/deleted-tasks/:id/restore', authRequired, adminOnly, restoreDeletedTask);
 
 export default router;

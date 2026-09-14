@@ -419,7 +419,8 @@ export const getUserActivities = async (req, res) => {
 export const getAllUserActivities = async (req, res) => {
     try {
         const activities = await Activity.find()
-            .populate('userId', 'username email nombre apellido');
+            .populate('userId', 'username email nombre apellido role')
+            .sort({ createdAt: -1 });
         res.json(activities);
     } catch (error) {
         console.error("Error al obtener actividades:", error);

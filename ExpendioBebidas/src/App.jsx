@@ -20,6 +20,8 @@ import Pago from "./pages/Pago"
 import ChangePasswordPage from "./pages/ChangePasswordPage.jsx"
 import ForgotPasswordPage from "./pages/ForgotPasswordPage.jsx"
 import ResetPasswordPage from "./pages/ResetPasswordPage.jsx"
+import DeletedTasksPage from "./pages/DeletedTasksPage.jsx"
+import ActivitiesPage from "./pages/ActivitiesPage.jsx"
 
 function App() {
   return(
@@ -43,6 +45,8 @@ function App() {
               <Route path="/edit-task/:id" element={<TaskFormPageEdit />} />
               <Route path='/profile' element={<Profilepage/>} />
               <Route path='/pago' element={<Pago/>} />
+              <Route path='/admin/deleted-tasks' element={<DeletedTasksPage/>} />
+              <Route path='/admin/movimientos' element={<ActivitiesPage/>} />
             </Route>
           </Routes>
         </BrowserRouter>

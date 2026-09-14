@@ -4,6 +4,7 @@ import jsPDF from "jspdf";
 import * as XLSX from 'xlsx';
 import autoTable from "jspdf-autotable";
 import Task from "../models/task.model.js";
+import DeletedTask from "../models/deletedTask.model.js";
 import User from "../models/user.model.js";
 import { gfs } from "../multerConfig.js"; // Importa gfs desde multerConfig.js
 import Activity from "../models/activity.model.js"; // Asegúrate de que esta ruta es correcta
@@ -161,21 +162,79 @@ export const getTaskByDni = async (req, res) => {
 };
 
 
-// Función para registrar la actividad del usuario
-const logActivity = async (userId, action, entity, entityId) => {
-  try {
-    const activity = new Activity({
-      userId, // Asegúrate de pasar userId
-      taskId: entityId, // Asegúrate de pasar taskId aquí
-      action,
-      entity,
-      entityId,
-    });
-    await activity.save();
-    console.log("Actividad registrada:", activity);
-  } catch (error) {
-    console.error("Error registrando la actividad:", error);
-  }
+// Función para registrar la actividad del usuario con nombres legibles
+const logActivity = async (userIdOrOptions, actionParam, entityParam, entityIdParam, extraTaskOrDetails = null) => {
+  try {
+    let userId, action, entity, entityId, task, detalles;
+
+    if (typeof userIdOrOptions === 'object' && userIdOrOptions !== null && !userIdOrOptions._bsontype) {
+      ({ userId, action, entity = 'tarea', entityId, task, detalles } = userIdOrOptions);
+    } else {
+      userId = userIdOrOptions;
+      action = actionParam;
+      entity = entityParam || 'tarea';
+      entityId = entityIdParam;
+      if (extraTaskOrDetails && typeof extraTaskOrDetails === 'object') {
+        task = extraTaskOrDetails;
+      } else if (typeof extraTaskOrDetails === 'string') {
+        detalles = extraTaskOrDetails;
+      }
+    }
+
+    // Resolver datos del usuario
+    let userName = '';
+    let userRole = '';
+    let userEmail = '';
+    if (userId) {
+      try {
+        const u = await User.findById(userId).select('nombre apellido username role email');
+        if (u) {
+          userName = `${u.nombre || ''} ${u.apellido || ''}`.trim() || u.username;
+          userRole = u.role || '';
+          userEmail = u.email || '';
+        }
+      } catch (e) {
+        console.error("Error obteniendo datos de usuario para actividad:", e.message);
+      }
+    }
+
+    // Resolver datos de la tarea si no vino en el parámetro
+    let nroexpediente = task?.nroexpediente || '';
+    let nombreTitular = task ? `${task.nombre || ''} ${task.apellido || ''}`.trim() : '';
+    let dniTitular = task?.dni || '';
+
+    if ((!nroexpediente || !nombreTitular) && entityId) {
+      try {
+        const t = await Task.findById(entityId).select('nroexpediente nombre apellido dni');
+        if (t) {
+          nroexpediente = nroexpediente || t.nroexpediente || '';
+          nombreTitular = nombreTitular || `${t.nombre || ''} ${t.apellido || ''}`.trim();
+          dniTitular = dniTitular || t.dni || '';
+        }
+      } catch (e) {
+        // ignore
+      }
+    }
+
+    const activity = new Activity({
+      userId,
+      userName,
+      userRole,
+      userEmail,
+      taskId: entityId || task?._id,
+      nroexpediente,
+      nombreTitular,
+      dniTitular,
+      action,
+      detalles: detalles || action,
+      entity: entity || 'tarea',
+      entityId: entityId || task?._id,
+    });
+    await activity.save();
+    console.log("Actividad registrada:", activity);
+  } catch (error) {
+    console.error("Error registrando la actividad:", error);
+  }
 };
 
 export const getTasks = async (req, res) => {
@@ -808,30 +867,149 @@ export const taskPagos = async (req, res) => {
 
 
 export const deleteTasks = async (req, res) => {
-  try {
-    const task = await Task.findById(req.params.id);
-    if (!task) return res.status(404).json({ message: "Tarea no encontrada" });
+  try {
+    const task = await Task.findById(req.params.id);
+    if (!task) return res.status(404).json({ message: "Tarea no encontrada" });
 
-     if (task.file && task.file.length > 0) {
-      for (const file of task.file) {
-        if (file.id) {
-          try {
-            await gfs.delete(new mongoose.Types.ObjectId(file.id));
-          } catch (error) {
-            console.error(`Error eliminando archivo ${file.id} de GridFS:`, error.message);
-            // No retornamos error para permitir borrar la metadata de la tarea aunque falte el archivo físico
-          }
-        }
+    // Obtenemos datos del usuario que ejecuta la eliminación
+    let deletedByName = "Usuario";
+    let deletedByEmail = "";
+    let deletedByRole = req.user.role || "";
+    try {
+      const u = await User.findById(req.user.id).select("nombre apellido username email role");
+      if (u) {
+        deletedByName = `${u.nombre || ''} ${u.apellido || ''}`.trim() || u.username;
+        deletedByEmail = u.email || '';
+        deletedByRole = u.role || deletedByRole;
       }
+    } catch (err) {
+      console.error("Error obteniendo usuario en deleteTasks:", err.message);
     }
 
-    await Task.findByIdAndDelete(req.params.id);
-    await logActivity(req.user.id, "eliminó tarea", "tarea", task._id);
+    // CLONAR A LA COLECCIÓN deleted_tasks (Base de Eliminados)
+    // PRESERVANDO LOS ARCHIVOS EN GridFS sin borrarlos
+    const taskData = task.toObject();
+    const originalTaskId = task._id;
+    delete taskData._id;
+    delete taskData.__v;
 
-    res.sendStatus(204);
-  } catch (error) {
-    return res.status(500).json({ message: error.message });
-  }
+    const deletedTask = new DeletedTask({
+      ...taskData,
+      originalTaskId,
+      deletedBy: req.user.id,
+      deletedByName,
+      deletedByEmail,
+      deletedByRole,
+      deletedAt: new Date(),
+      deletionReason: req.body?.reason || "Eliminación desde el panel",
+    });
+    await deletedTask.save();
+
+    // Eliminar únicamente el documento de la colección activa
+    await Task.findByIdAndDelete(req.params.id);
+
+    // Registrar actividad detallada
+    await logActivity({
+      userId: req.user.id,
+      action: "eliminó tarea (enviada a papelera)",
+      entity: "tarea",
+      entityId: originalTaskId,
+      task: task,
+      detalles: `Expediente ${task.nroexpediente || 'S/N'} (${task.nombre || ''} ${task.apellido || ''}) enviado a papelera por ${deletedByName}`.trim(),
+    });
+
+    res.status(200).json({
+      success: true,
+      message: "Expediente enviado a la papelera de eliminados con éxito.",
+      deletedTaskId: deletedTask._id,
+    });
+  } catch (error) {
+    console.error("Error en deleteTasks:", error);
+    return res.status(500).json({ message: error.message });
+  }
+};
+
+// Obtener todos los expedientes en la papelera (Solo Admin)
+export const getDeletedTasks = async (req, res) => {
+  try {
+    const deletedTasks = await DeletedTask.find().sort({ deletedAt: -1 });
+    res.json(deletedTasks);
+  } catch (error) {
+    console.error("Error al obtener expedientes eliminados:", error);
+    return res.status(500).json({ message: error.message });
+  }
+};
+
+// Restaurar un expediente desde la papelera a la tabla principal (Solo Admin)
+export const restoreDeletedTask = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const deletedTask = await DeletedTask.findById(id);
+    if (!deletedTask) {
+      return res.status(404).json({ message: "Expediente no encontrado en la papelera." });
+    }
+
+    const taskData = deletedTask.toObject();
+    const originalTaskId = deletedTask.originalTaskId;
+
+    delete taskData._id;
+    delete taskData.originalTaskId;
+    delete taskData.deletedBy;
+    delete taskData.deletedByName;
+    delete taskData.deletedByEmail;
+    delete taskData.deletedByRole;
+    delete taskData.deletedAt;
+    delete taskData.deletionReason;
+    delete taskData.createdAt;
+    delete taskData.updatedAt;
+    delete taskData.__v;
+
+    // Verificar si el ID original está libre o generar nuevo
+    let restoredTask;
+    const exists = originalTaskId ? await Task.findById(originalTaskId) : null;
+    if (!exists && originalTaskId) {
+      restoredTask = new Task({
+        _id: originalTaskId,
+        ...taskData,
+      });
+    } else {
+      restoredTask = new Task(taskData);
+    }
+    await restoredTask.save();
+
+    // Eliminar de la colección deleted_tasks
+    await DeletedTask.findByIdAndDelete(id);
+
+    // Obtener datos del usuario que restaura
+    let restoredByName = "Administrador";
+    try {
+      const u = await User.findById(req.user.id).select("nombre apellido username");
+      if (u) {
+        restoredByName = `${u.nombre || ''} ${u.apellido || ''}`.trim() || u.username;
+      }
+    } catch (e) {
+      // ignore
+    }
+
+    // Registrar actividad detallada
+    await logActivity({
+      userId: req.user.id,
+      action: "restauró tarea",
+      entity: "tarea",
+      entityId: restoredTask._id,
+      task: restoredTask,
+      detalles: `Expediente ${restoredTask.nroexpediente || 'S/N'} (${restoredTask.nombre || ''} ${restoredTask.apellido || ''}) restaurado a la lista activa por ${restoredByName}`.trim(),
+    });
+
+    res.json({
+      success: true,
+      message: "Expediente restaurado con éxito.",
+      task: restoredTask,
+    });
+  } catch (error) {
+    console.error("Error al restaurar tarea:", error);
+    return res.status(500).json({ message: error.message });
+  }
 };
 
 export const downloadFile = (req, res) => {

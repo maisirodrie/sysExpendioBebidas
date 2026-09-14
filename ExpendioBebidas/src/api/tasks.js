@@ -69,6 +69,12 @@ export const updatePagoRequest = (newPagoValue) => {
     link.click();
     document.body.removeChild(link);
   };
-  
+
+  // Papelera de Eliminados (Admin)
+  export const getDeletedTasksRequest = () => axios.get("/admin/deleted-tasks");
+  export const restoreDeletedTaskRequest = (id) => axios.post(`/admin/deleted-tasks/${id}/restore`);
+
+  // Movimientos / Auditoría (Admin)
+  export const getAllActivitiesRequest = () => axios.get("/admin/activities");
 
   
