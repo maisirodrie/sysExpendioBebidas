@@ -91,7 +91,7 @@ export function TaskProvider({ children }) {
     const deleteTask = async (id) => {
         try {
             const res = await deleteTasksRequest(id);
-            if (res.status === 204) setTasks(tasks.filter((task) => task._id !== id));
+            if (res.status === 200 || res.status === 204) setTasks(tasks.filter((task) => task._id !== id));
         } catch (error) {
             console.log(error);
         }

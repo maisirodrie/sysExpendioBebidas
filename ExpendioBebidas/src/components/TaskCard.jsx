@@ -74,10 +74,10 @@ function Table() {
 
   async function handleDelete(id) {
     Swal.fire({
-      title: "¿Está seguro que desea eliminar este expediente?",
-      text: "Esta acción no se puede deshacer.",
+      title: "¿Enviar este expediente a la papelera?",
+      text: "El expediente se moverá a la Papelera de Eliminados. El Administrador podrá restaurarlo si es necesario.",
       icon: "warning",
-      confirmButtonText: "Sí, eliminar",
+      confirmButtonText: "Sí, enviar a papelera",
       confirmButtonColor: "#e11d48",
       denyButtonText: "Cancelar",
       denyButtonColor: "#64748b",
@@ -86,8 +86,8 @@ function Table() {
       if (result.isConfirmed) {
         await deleteTask(id);
         Swal.fire({
-          title: "Eliminado",
-          text: "El expediente ha sido eliminado correctamente.",
+          title: "Enviado a Papelera",
+          text: "El expediente ha sido enviado a la papelera correctamente.",
           icon: "success",
           timer: 2500,
           showConfirmButton: false,
