@@ -97,6 +97,8 @@ const ActivitiesPage = () => {
 
   const filteredActivities = activities.filter((item) => {
     const term = searchTerm.toLowerCase();
+    const idExp = String(item.taskId?._id || item.taskId || item.entityId || "").toLowerCase();
+    const idAct = String(item._id || "").toLowerCase();
     const user = (
       item.userName ||
       (item.userId?.nombre ? `${item.userId.nombre} ${item.userId.apellido || ""}`.trim() : "") ||
@@ -113,6 +115,8 @@ const ActivitiesPage = () => {
     const detalles = (item.detalles || "").toLowerCase();
 
     const matchesSearch =
+      idExp.includes(term) ||
+      idAct.includes(term) ||
       user.includes(term) ||
       exp.includes(term) ||
       titular.includes(term) ||
@@ -141,13 +145,13 @@ const ActivitiesPage = () => {
   const indexOfFirstItem = indexOfLastItem - itemsPerPage;
   const currentActivities = filteredActivities.slice(indexOfFirstItem, indexOfLastItem);
 
-  const handleCopyId = (id) => {
+  const handleCopyId = (id, label = "ID") => {
     navigator.clipboard.writeText(String(id));
     Swal.fire({
       toast: true,
       position: "top-end",
       icon: "success",
-      title: "ID copiado al portapapeles",
+      title: `${label} copiado al portapapeles`,
       showConfirmButton: false,
       timer: 1500,
     });
@@ -204,7 +208,7 @@ const ActivitiesPage = () => {
               <div className="relative w-full sm:w-72">
                 <input
                   type="text"
-                  placeholder="Buscar por usuario, expediente, titular..."
+                  placeholder="Buscar por ID, expediente, titular, DNI..."
                   value={searchTerm}
                   onChange={(e) => setSearchTerm(e.target.value)}
                   className="w-full pl-9 pr-3 py-2 text-sm rounded-xl border border-gray-200 bg-gray-50/50 focus:bg-white focus:border-brand-500 focus:ring-2 focus:ring-brand-500/20 outline-none transition-all"
@@ -258,6 +262,8 @@ const ActivitiesPage = () => {
                 </thead>
                 <tbody className="divide-y divide-gray-100">
                   {currentActivities.map((act) => {
+                    const idExpediente = String(act.taskId?._id || act.taskId || act.entityId || "");
+                    const idActividad = String(act._id || "");
                     const userName =
                       act.userName ||
                       (act.userId?.nombre
@@ -275,17 +281,31 @@ const ActivitiesPage = () => {
                     return (
                       <tr key={act._id} className="hover:bg-gray-50/70 transition-colors">
                         <td className="px-4 py-3.5 whitespace-nowrap">
-                          <button
-                            type="button"
-                            onClick={() => handleCopyId(act._id)}
-                            title={`ID Movimiento: ${act._id}${act.taskId ? `\nID Expediente: ${act.taskId}` : ''}\nClick para copiar ID`}
-                            className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-xs font-mono font-medium text-gray-700 bg-gray-100 hover:bg-brand-50 hover:text-brand-600 border border-gray-200 transition-colors cursor-pointer group"
-                          >
-                            <span>{String(act._id)}</span>
-                            <svg className="w-3.5 h-3.5 text-gray-400 group-hover:text-brand-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z" />
-                            </svg>
-                          </button>
+                          <div className="flex flex-col gap-1">
+                            {idExpediente && (
+                              <button
+                                type="button"
+                                onClick={() => handleCopyId(idExpediente, "ID de Expediente")}
+                                title={`ID Único de Expediente: ${idExpediente}\n(Es el mismo para todos los movimientos de este trámite)\nClick para copiar`}
+                                className="inline-flex items-center gap-1 px-2 py-0.5 rounded text-xs font-mono font-semibold text-brand-700 bg-brand-50 hover:bg-brand-100 border border-brand-200/80 transition-colors cursor-pointer w-fit group"
+                              >
+                                <span className="text-[10px] font-sans font-bold text-brand-500 uppercase tracking-wider">Exp:</span>
+                                <span>{idExpediente}</span>
+                                <svg className="w-3 h-3 text-brand-400 group-hover:text-brand-600 ml-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z" />
+                                </svg>
+                              </button>
+                            )}
+                            <button
+                              type="button"
+                              onClick={() => handleCopyId(idActividad, "ID de Movimiento")}
+                              title={`ID de este Registro de Auditoría: ${idActividad}\nClick para copiar`}
+                              className="inline-flex items-center gap-1 text-[11px] font-mono text-gray-400 hover:text-gray-700 px-1 transition-colors cursor-pointer w-fit"
+                            >
+                              <span className="font-sans text-[10px] text-gray-400">Mov:</span>
+                              <span>{idActividad}</span>
+                            </button>
+                          </div>
                         </td>
                         <td className="px-4 py-3.5 text-xs text-gray-500 whitespace-nowrap">
                           {formatDate(act.createdAt)}

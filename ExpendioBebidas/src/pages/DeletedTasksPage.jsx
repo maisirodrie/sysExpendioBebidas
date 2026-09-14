@@ -84,12 +84,16 @@ const DeletedTasksPage = () => {
 
   const filteredTasks = deletedTasks.filter((t) => {
     const term = searchTerm.toLowerCase();
+    const idOrig = String(t.originalTaskId || "").toLowerCase();
+    const idDel = String(t._id || "").toLowerCase();
     const exp = (t.nroexpediente || "").toLowerCase();
     const nombre = `${t.nombre || ""} ${t.apellido || ""}`.toLowerCase();
     const dni = (t.dni || "").toLowerCase();
     const deletedBy = (t.deletedByName || "").toLowerCase();
     const tipo = (t.expendio || "").toLowerCase();
     return (
+      idOrig.includes(term) ||
+      idDel.includes(term) ||
       exp.includes(term) ||
       nombre.includes(term) ||
       dni.includes(term) ||
@@ -107,13 +111,13 @@ const DeletedTasksPage = () => {
   const indexOfFirstItem = indexOfLastItem - itemsPerPage;
   const currentDeletedTasks = filteredTasks.slice(indexOfFirstItem, indexOfLastItem);
 
-  const handleCopyId = (id) => {
+  const handleCopyId = (id, label = "ID") => {
     navigator.clipboard.writeText(String(id));
     Swal.fire({
       toast: true,
       position: "top-end",
       icon: "success",
-      title: "ID copiado al portapapeles",
+      title: `${label} copiado al portapapeles`,
       showConfirmButton: false,
       timer: 1500,
     });
@@ -188,7 +192,7 @@ const DeletedTasksPage = () => {
             <div className="relative w-full sm:w-72">
               <input
                 type="text"
-                placeholder="Buscar por expediente, DNI, titular..."
+                placeholder="Buscar por ID, expediente, DNI, titular..."
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
                 className="w-full pl-9 pr-3 py-2 text-sm rounded-xl border border-gray-200 bg-gray-50/50 focus:bg-white focus:border-brand-500 focus:ring-2 focus:ring-brand-500/20 outline-none transition-all"
