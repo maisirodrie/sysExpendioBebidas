@@ -1,5 +1,4 @@
 import React, { useState, useEffect } from "react";
-import { DashboardLayout } from "../components/layout/DashboardLayout";
 import { ComponentCard } from "../components/common/ComponentCard";
 import { Badge } from "../components/common/Badge";
 import { getAllActivitiesRequest } from "../api/tasks";
@@ -84,12 +83,16 @@ const ActivitiesPage = () => {
     const term = searchTerm.toLowerCase();
     const user = (
       item.userName ||
+      (item.userId?.nombre ? `${item.userId.nombre} ${item.userId.apellido || ""}`.trim() : "") ||
       item.userId?.username ||
-      `${item.userId?.nombre || ""} ${item.userId?.apellido || ""}`
+      ""
     ).toLowerCase();
-    const exp = (item.nroexpediente || "").toLowerCase();
-    const titular = (item.nombreTitular || "").toLowerCase();
-    const dni = (item.dniTitular || "").toLowerCase();
+    const exp = (item.nroexpediente || item.taskId?.nroexpediente || "").toLowerCase();
+    const titular = (
+      item.nombreTitular ||
+      (item.taskId?.nombre ? `${item.taskId.nombre} ${item.taskId.apellido || ""}`.trim() : "")
+    ).toLowerCase();
+    const dni = (item.dniTitular || item.taskId?.dni || "").toLowerCase();
     const act = (item.action || "").toLowerCase();
     const detalles = (item.detalles || "").toLowerCase();
 
@@ -114,8 +117,7 @@ const ActivitiesPage = () => {
   });
 
   return (
-    <DashboardLayout>
-      <div className="space-y-6">
+    <div className="space-y-6 font-outfit">
         {/* ENCABEZADO */}
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
           <div>
@@ -220,10 +222,17 @@ const ActivitiesPage = () => {
                   {filteredActivities.map((act) => {
                     const userName =
                       act.userName ||
-                      act.userId?.nombre
+                      (act.userId?.nombre
                         ? `${act.userId.nombre} ${act.userId.apellido || ""}`.trim()
-                        : act.userId?.username || "Usuario";
+                        : act.userId?.username || "Usuario");
                     const userRole = act.userRole || act.userId?.role || "-";
+                    const titular =
+                      act.nombreTitular ||
+                      (act.taskId?.nombre
+                        ? `${act.taskId.nombre} ${act.taskId.apellido || ""}`.trim()
+                        : null);
+                    const dni = act.dniTitular || act.taskId?.dni;
+                    const nroExp = act.nroexpediente || act.taskId?.nroexpediente;
 
                     return (
                       <tr key={act._id} className="hover:bg-gray-50/70 transition-colors">
@@ -243,14 +252,14 @@ const ActivitiesPage = () => {
                           {getActionBadge(act.action)}
                         </td>
                         <td className="px-4 py-3.5 font-bold text-gray-900 whitespace-nowrap">
-                          {act.nroexpediente || <span className="text-gray-400 font-normal">S/N</span>}
+                          {nroExp || <span className="text-gray-400 font-normal">S/N</span>}
                         </td>
                         <td className="px-4 py-3.5">
-                          {act.nombreTitular ? (
+                          {titular ? (
                             <div>
-                              <div className="font-medium text-gray-900">{act.nombreTitular}</div>
-                              {act.dniTitular && (
-                                <div className="text-xs text-gray-500">DNI: {act.dniTitular}</div>
+                              <div className="font-medium text-gray-900">{titular}</div>
+                              {dni && (
+                                <div className="text-xs text-gray-500">DNI: {dni}</div>
                               )}
                             </div>
                           ) : (
@@ -268,8 +277,7 @@ const ActivitiesPage = () => {
             </div>
           )}
         </ComponentCard>
-      </div>
-    </DashboardLayout>
+    </div>
   );
 };
 

@@ -416,7 +416,7 @@ export const createTasks = async (req, res) => {
         await newTask.save();
         
         // Registrar actividad
-        await logActivity(req.user.id, 'creó tarea', 'tarea', newTask._id);
+        await logActivity(req.user.id, 'creó tarea', 'tarea', newTask._id, newTask);
 
         res.status(201).json(newTask);
     } catch (error) {
@@ -739,7 +739,7 @@ export const updateTasks = async (req, res) => {
         if (!finalUpdatedTask) return res.status(404).json({ message: "Tarea no encontrada después de la actualización." });
 
         // 6. Registrar actividad y responder
-        await logActivity(req.user.id, 'actualizó tarea', "tarea", finalUpdatedTask._id);
+        await logActivity(req.user.id, 'actualizó tarea', "tarea", finalUpdatedTask._id, finalUpdatedTask);
         res.json({
             success: true,
             message: "Registro actualizado con éxito.",
@@ -842,7 +842,7 @@ export const taskEstados = async (req, res) => {
         if (!finalUpdatedTask) return res.status(404).json({ message: "Tarea no encontrada después de la actualización." });
 
 
-        await logActivity(req.user.id, `cambió estado de tarea a ${newStateLower}`, "tarea", finalUpdatedTask._id);
+        await logActivity(req.user.id, `cambió estado de tarea a ${newStateLower}`, "tarea", finalUpdatedTask._id, finalUpdatedTask);
         
         // 3. Devolver la tarea COMPLETA al frontend
         res.json(finalUpdatedTask); 

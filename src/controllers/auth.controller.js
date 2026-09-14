@@ -420,6 +420,7 @@ export const getAllUserActivities = async (req, res) => {
     try {
         const activities = await Activity.find()
             .populate('userId', 'username email nombre apellido role')
+            .populate('taskId', 'nombre apellido dni nroexpediente')
             .sort({ createdAt: -1 });
         res.json(activities);
     } catch (error) {

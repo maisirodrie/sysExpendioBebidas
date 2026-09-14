@@ -1,5 +1,4 @@
 import React, { useState, useEffect } from "react";
-import { DashboardLayout } from "../components/layout/DashboardLayout";
 import { ComponentCard } from "../components/common/ComponentCard";
 import { Badge } from "../components/common/Badge";
 import { getDeletedTasksRequest, restoreDeletedTaskRequest } from "../api/tasks";
@@ -117,8 +116,7 @@ const DeletedTasksPage = () => {
   };
 
   return (
-    <DashboardLayout>
-      <div className="space-y-6">
+    <div className="space-y-6 font-outfit">
         {/* ENCABEZADO */}
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
           <div>
@@ -265,8 +263,7 @@ const DeletedTasksPage = () => {
             </div>
           )}
         </ComponentCard>
-      </div>
-    </DashboardLayout>
+    </div>
   );
 };
 
