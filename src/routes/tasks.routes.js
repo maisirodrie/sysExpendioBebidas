@@ -94,9 +94,9 @@ router.put('/admin/users/blanquear-password/:userId', authRequired, adminChangeU
 // Pagos (Administrador)
 router.get("/admin/pago", getPago);
 router.put("/admin/pago", authRequired, validateSchema(updatePagoSchema), updatePago);
-// Actividades / Movimientos (Administrador)
-router.get('/admin/activities', authRequired, getAllUserActivities);
-router.get('/admin/activities/user/:userId', authRequired, getUserActivities);
+// Actividades / Movimientos (Exclusivo Administrador)
+router.get('/admin/activities', authRequired, adminOnly, getAllUserActivities);
+router.get('/admin/activities/user/:userId', authRequired, adminOnly, getUserActivities);
 // Papelera de Eliminados (Exclusivo Administrador)
 router.get('/admin/deleted-tasks', authRequired, adminOnly, getDeletedTasks);
 router.post('/admin/deleted-tasks/:id/restore', authRequired, adminOnly, restoreDeletedTask);

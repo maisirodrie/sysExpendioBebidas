@@ -1,13 +1,27 @@
 import React, { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
+import { useAuth } from "../context/AuthContext";
 import { ComponentCard } from "../components/common/ComponentCard";
 import { Badge } from "../components/common/Badge";
+import Paginator from "../components/Paginator";
 import { getAllActivitiesRequest } from "../api/tasks";
+import Swal from "sweetalert2";
 
 const ActivitiesPage = () => {
+  const { user, loading: authLoading } = useAuth();
+  const navigate = useNavigate();
   const [activities, setActivities] = useState([]);
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState("");
   const [actionFilter, setActionFilter] = useState("all");
+  const [currentPage, setCurrentPage] = useState(1);
+  const itemsPerPage = 20;
+
+  useEffect(() => {
+    if (!authLoading && user && user.role !== "admin") {
+      navigate("/task");
+    }
+  }, [user, authLoading, navigate]);
 
   const fetchActivities = async () => {
     try {
@@ -22,8 +36,10 @@ const ActivitiesPage = () => {
   };
 
   useEffect(() => {
-    fetchActivities();
-  }, []);
+    if (user?.role === "admin") {
+      fetchActivities();
+    }
+  }, [user]);
 
   const getActionBadge = (action) => {
     const act = (action || "").toLowerCase();
@@ -115,6 +131,27 @@ const ActivitiesPage = () => {
 
     return true;
   });
+
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [searchTerm, actionFilter]);
+
+  const totalPages = Math.ceil(filteredActivities.length / itemsPerPage);
+  const indexOfLastItem = currentPage * itemsPerPage;
+  const indexOfFirstItem = indexOfLastItem - itemsPerPage;
+  const currentActivities = filteredActivities.slice(indexOfFirstItem, indexOfLastItem);
+
+  const handleCopyId = (id) => {
+    navigator.clipboard.writeText(String(id));
+    Swal.fire({
+      toast: true,
+      position: "top-end",
+      icon: "success",
+      title: "ID copiado al portapapeles",
+      showConfirmButton: false,
+      timer: 1500,
+    });
+  };
 
   return (
     <div className="space-y-6 font-outfit">
@@ -210,6 +247,7 @@ const ActivitiesPage = () => {
               <table className="w-full text-left text-sm text-gray-700">
                 <thead className="bg-gray-50/80 text-gray-500 text-xs font-semibold uppercase tracking-wider border-b border-gray-200">
                   <tr>
+                    <th className="px-4 py-3.5">ID</th>
                     <th className="px-4 py-3.5">Fecha y Hora</th>
                     <th className="px-4 py-3.5">Operador / Usuario</th>
                     <th className="px-4 py-3.5">Acción Realizada</th>
@@ -219,7 +257,7 @@ const ActivitiesPage = () => {
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-gray-100">
-                  {filteredActivities.map((act) => {
+                  {currentActivities.map((act) => {
                     const userName =
                       act.userName ||
                       (act.userId?.nombre
@@ -236,6 +274,19 @@ const ActivitiesPage = () => {
 
                     return (
                       <tr key={act._id} className="hover:bg-gray-50/70 transition-colors">
+                        <td className="px-4 py-3.5 whitespace-nowrap">
+                          <button
+                            type="button"
+                            onClick={() => handleCopyId(act._id)}
+                            title={`ID Movimiento: ${act._id}${act.taskId ? `\nID Expediente: ${act.taskId}` : ''}\nClick para copiar ID`}
+                            className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-xs font-mono font-medium text-gray-700 bg-gray-100 hover:bg-brand-50 hover:text-brand-600 border border-gray-200 transition-colors cursor-pointer group"
+                          >
+                            <span>{String(act._id)}</span>
+                            <svg className="w-3.5 h-3.5 text-gray-400 group-hover:text-brand-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z" />
+                            </svg>
+                          </button>
+                        </td>
                         <td className="px-4 py-3.5 text-xs text-gray-500 whitespace-nowrap">
                           {formatDate(act.createdAt)}
                         </td>
@@ -274,6 +325,32 @@ const ActivitiesPage = () => {
                   })}
                 </tbody>
               </table>
+            </div>
+          )}
+
+          {filteredActivities.length > 0 && (
+            <div className="flex flex-col sm:flex-row items-center justify-between gap-4 pt-4 border-t border-gray-100 mt-4 px-2">
+              <p className="text-sm text-gray-500">
+                Mostrando{" "}
+                <span className="font-semibold text-gray-800">
+                  {indexOfFirstItem + 1}
+                </span>{" "}
+                a{" "}
+                <span className="font-semibold text-gray-800">
+                  {Math.min(indexOfLastItem, filteredActivities.length)}
+                </span>{" "}
+                de{" "}
+                <span className="font-semibold text-gray-800">
+                  {filteredActivities.length}
+                </span>{" "}
+                movimientos
+              </p>
+
+              <Paginator
+                currentPage={currentPage}
+                totalPages={totalPages}
+                onPageChange={(page) => setCurrentPage(page)}
+              />
             </div>
           )}
         </ComponentCard>
